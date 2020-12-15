@@ -41,24 +41,24 @@
   </issueManagement>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-javadoc-plugin>3.1.0</version.maven-javadoc-plugin>
-    <version.maven-surefire>2.22.2</version.maven-surefire>
+    <version.maven-surefire>3.0.0-M5</version.maven-surefire>
     <version.org.apache.maven.wagon>3.4.2</version.org.apache.maven.wagon>
-    <version.org.junit.jupiter>5.6.2</version.org.junit.jupiter>
     <version.org.mockito>3.3.3</version.org.mockito>
     <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
     <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+    <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
     <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.0.0-M5</version.maven-surefire>
-    <version.org.junit.jupiter>5.7.0</version.org.junit.jupiter>
     <version.org.projectlombok>1.18.16</version.org.projectlombok>
+    <version.org.slf4j>1.7.30</version.org.slf4j>
     <version.org.springframework>5.3.2</version.org.springframework>
     <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
     <version.wagon-webdav-jackrabbit>3.4.2</version.wagon-webdav-jackrabbit>
@@ -86,6 +86,30 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>2.3.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>1.2.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>${version.jakarta.annotation-api}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>${version.jakarta.xml.bind-api}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>jakarta.validation</groupId>
       <artifactId>jakarta.validation-api</artifactId>
       <version>${version.jakarta.validation-api}</version>
@@ -105,7 +129,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.25</version>
+      <version>${version.org.slf4j}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -130,12 +154,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-      <version>${version.org.springframework.boot}</version>
-      <scope>test</scope>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>org.springframework.boot</groupId>-->
+    <!--      <artifactId>spring-boot-starter-security</artifactId>-->
+    <!--      <version>${version.org.springframework.boot}</version>-->
+    <!--      <scope>test</scope>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
@@ -435,7 +459,6 @@
         <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.org.junit.jupiter>5.7.0</version.org.junit.jupiter>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.springframework>5.3.2</version.org.springframework>
         <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
@@ -449,7 +472,6 @@
         <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.org.junit.jupiter>5.7.0</version.org.junit.jupiter>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.springframework>5.3.1</version.org.springframework>
         <version.org.springframework.boot>2.4.0</version.org.springframework.boot>
@@ -463,7 +485,6 @@
         <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.org.junit.jupiter>5.6.3</version.org.junit.jupiter>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.springframework>5.2.12.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.3.7.RELEASE</version.org.springframework.boot>
@@ -477,7 +498,6 @@
         <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.org.junit.jupiter>5.6.3</version.org.junit.jupiter>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.springframework>5.2.11.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.3.6.RELEASE</version.org.springframework.boot>

@@ -1,0 +1,11 @@
+module com.github.jinahya.datagokr.api.b090041.lrsrcldinfoservice.client.test {
+    requires com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
+    requires lombok;
+    requires spring.beans;
+    requires spring.context;
+    requires spring.web;
+    requires spring.boot;
+    requires org.junit.jupiter.api;
+    requires spring.test;
+    requires spring.boot.test;
+}
