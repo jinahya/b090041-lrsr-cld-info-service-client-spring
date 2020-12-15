@@ -11,13 +11,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,8 +28,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.Year;
+import java.util.List;
+import java.util.function.Consumer;
 
-import static java.lang.String.format;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 /**
  * A client implementation uses an instance of {@link RestTemplate}.
@@ -67,7 +77,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 
     }
 
-
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     private void onPostConstruct() {
@@ -79,17 +88,56 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public ResponseEntity<Response> getLunCalInfo(@NotNull final LocalDate solarDate) {
+    @NotNull
+    public ResponseEntity<Response> getLunCalInfo(@NotNull final Year year, @NotNull final Month month,
+                                                  @Nullable final Integer dayOfMonth, @Positive final Integer pageNo) {
         final URI url = UriComponentsBuilder
                 .fromUri(rootUri)
                 .pathSegment("getLunCalInfo")
-                .queryParam("ServiceKey", serviceKey())
-                .queryParam("solYear", format("%1$04d", solarDate.getYear()))
-                .queryParam("solMonth", format("%1$02d", solarDate.getMonthValue()))
-                .queryParam("solDay", format("%1$02d", solarDate.getDayOfMonth()))
+                .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                .queryParam("solYear", Response.Body.Item.YEAR_FORMATTER.format(year))
+                .queryParam("solMonth", Response.Body.Item.MONTH_FORMATTER.format(month))
+                .queryParamIfPresent("solDay", ofNullable(dayOfMonth)
+                        .map(v -> MonthDay.of(month, v))
+                        .map(Response.Body.Item.DAY_OF_MONTH_FORMATTER::format))
+                .queryParamIfPresent("pageNo", ofNullable(pageNo))
                 .build()
                 .toUri();
         return restTemplate.exchange(url, HttpMethod.GET, null, Response.class);
+    }
+
+    protected List<Response.Body.@NotNull @Valid Item> getItems(@NotNull final ResponseEntity<Response> entity) {
+        requireNonNull(entity, "entity is null");
+        final Response response = entity.getBody();
+        if (response == null) {
+            throw new RuntimeException("null body from the response entity");
+        }
+        return getItems(response);
+    }
+
+    @Valid
+    @NotNull
+    public Body.Item getLunCalInfo(@NotNull final LocalDate localDate) {
+        final ResponseEntity<Response> entity = getLunCalInfo(
+                Year.of(localDate.getYear()), localDate.getMonth(), localDate.getDayOfMonth(), null);
+        final List<Body.Item> items = getItems(entity);
+        if (items.isEmpty()) {
+            throw new RuntimeException("no items in response");
+        }
+        assert items.size() == 1;
+        return items.get(0);
+    }
+
+    public void getLunCalInfo(@NotNull final Year year, @NotNull final Month month,
+                              @NotNull final Consumer<? super Body.Item> consumer) {
+        for (int pageNo = 1; ; pageNo++) {
+            final ResponseEntity<Response> entity = getLunCalInfo(year, month, null, pageNo);
+            final List<Body.Item> items = getItems(entity);
+            items.forEach(consumer);
+            if (items.isEmpty()) {
+                break;
+            }
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -103,6 +151,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     /**
      * The root uri expanded with {@code '/'} from {@code restTemplate.uriTemplateHandler}.
      */
+    @Accessors(fluent = true)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.PROTECTED)
     private URI rootUri;
 
     /**

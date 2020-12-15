@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,6 +13,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,12 @@ public class Response {
         @Slf4j
         public static class Item {
 
+            public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("uuuu");
+
+            public static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MM");
+
+            public static final DateTimeFormatter DAY_OF_MONTH_FORMATTER = DateTimeFormatter.ofPattern("dd");
+
             @Override
             public String toString() {
                 return super.toString() + '{'
@@ -83,24 +91,32 @@ public class Response {
             }
 
             // ---------------------------------------------------------------------------------------------------------
+            @NotBlank
             @XmlElement
             private String lunYear;
 
+            @NotBlank
             @XmlElement
             private String lunMonth;
 
+            @NotBlank
             @XmlElement
             private String lunDay;
 
+            // -----------------------------------------------------------------------------------------------------------------
+            @NotBlank
             @XmlElement
             private String solYear;
 
+            @NotBlank
             @XmlElement
             private String solMonth;
 
+            @NotBlank
             @XmlElement
             private String solDay;
 
+            // -----------------------------------------------------------------------------------------------------------------
             @XmlElement
             private String solLeapyear;
 

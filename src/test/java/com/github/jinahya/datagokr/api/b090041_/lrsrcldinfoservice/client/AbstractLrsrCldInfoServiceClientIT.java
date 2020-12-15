@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 import static java.util.Objects.requireNonNull;
 
 abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoServiceClient> {
@@ -22,6 +26,11 @@ abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoS
         @Bean
         String lrsrCldInfoServiceServiceKey() {
             return System.getProperty(SYSTEM_PROPERTY_SERVICE_KEY);
+        }
+
+        @Bean
+        Validator validator() {
+            return Validation.buildDefaultValidatorFactory().getValidator();
         }
     }
 
@@ -50,4 +59,10 @@ abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoS
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.PROTECTED)
     private T clientInstance;
+
+    @Autowired
+    @Accessors(fluent = true)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.PROTECTED)
+    private Validator validator;
 }

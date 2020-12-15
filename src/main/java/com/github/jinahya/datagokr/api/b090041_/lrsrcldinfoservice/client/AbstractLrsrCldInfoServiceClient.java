@@ -1,5 +1,6 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +8,22 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * An abstract parent class for client classes.
@@ -36,15 +47,38 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE, ElementType.PARAMETER})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface LrsrCldInfoServiceServiceKey {
-
     }
 
     protected static final String QUERY_PARAM_NAME_SERVICE_KEY = "ServiceKey";
 
+    // -----------------------------------------------------------------------------------------------------------------
+    @NotNull
+    protected List<Response.Body.Item> getItems(@Valid @NotNull final Response response) {
+        requireNonNull(response, "response is null");
+        {
+            final Set<ConstraintViolation<Response>> violations = validator().validate(response);
+            if (!violations.isEmpty()) {
+                throw new RuntimeException("invalid response: " + response,
+                                           new ConstraintViolationException(violations));
+            }
+        }
+        if (!response.getHeader().isResultCodeSuccess()) {
+            throw new RuntimeException("unsuccessful response: " + response);
+        }
+        return response.getBody().getItems();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @LrsrCldInfoServiceServiceKey
     @Autowired
     @Accessors(fluent = true)
     @Setter(AccessLevel.NONE)
     @Getter(value = AccessLevel.PROTECTED)
     private String serviceKey;
+
+    @Autowired
+    @Accessors(fluent = true)
+    @Setter(AccessLevel.NONE)
+    @Getter(value = AccessLevel.PROTECTED)
+    private Validator validator;
 }

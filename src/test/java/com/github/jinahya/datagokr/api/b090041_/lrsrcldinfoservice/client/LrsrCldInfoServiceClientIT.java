@@ -13,7 +13,8 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootTest(
         classes = {
                 AbstractLrsrCldInfoServiceClientIT._Configuration.class,
-                LrsrCldInfoServiceClientIT._Configuration.class
+                LrsrCldInfoServiceClientIT._Configuration.class,
+                LrsrCldInfoServiceClient.class
         }
 )
 @Slf4j
@@ -49,7 +50,7 @@ class LrsrCldInfoServiceClientIT
                                 return e.execute(r, b);
                             }
                     )
-                    .rootUri(System.getProperty(AbstractLrsrCldInfoServiceClient.BASE_URL))
+                    .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .build();
