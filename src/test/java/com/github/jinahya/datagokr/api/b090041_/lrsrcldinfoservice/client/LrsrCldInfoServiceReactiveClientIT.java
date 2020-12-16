@@ -15,7 +15,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.TcpClient;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -25,30 +24,34 @@ import static java.util.concurrent.ThreadLocalRandom.current;
 @SpringBootTest(
         classes = {
                 AbstractLrsrCldInfoServiceClientIT._Configuration.class,
-                LrsrCldInfoServiceReactiveClientIT._Configuration.class
+                LrsrCldInfoServiceReactiveClientIT._Configuration.class,
+                LrsrCldInfoServiceReactiveClient.class
         }
 )
 @Slf4j
 abstract class LrsrCldInfoServiceReactiveClientIT
         extends AbstractLrsrCldInfoServiceClientIT<LrsrCldInfoServiceReactiveClient> {
 
-    @ComponentScan(basePackageClasses = {_NoOp.class})
+    @ComponentScan(
+            basePackageClasses = {
+                    _NoOp.class
+            }
+    )
     @Configuration
     static class _Configuration {
 
-        static int CONNECT_TIME_MILLIS = (int) (current().nextBoolean()
-                                                ? Duration.ofSeconds(3L).toMillis()
-                                                : TimeUnit.SECONDS.toMillis(3L));
+        static final int CONNECT_TIME_MILLIS = (int) (current().nextBoolean()
+                                                      ? Duration.ofSeconds(3L).toMillis()
+                                                      : TimeUnit.SECONDS.toMillis(3L));
 
-        static int READ_TIMEOUT_SECONDS = 3;
+        static final int READ_TIMEOUT_SECONDS = 3;
 
-        static int WRITE_TIMEOUT_SECONDS = 3;
+        static final int WRITE_TIMEOUT_SECONDS = 3;
 
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
         @Bean
-        TcpClient tcpClient() {
-            return TcpClient
-                    .create()
+        HttpClient httpClient() {
+            return HttpClient.create()
                     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIME_MILLIS)
                     .doOnConnected(c -> {
                         c.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS))
@@ -59,8 +62,8 @@ abstract class LrsrCldInfoServiceReactiveClientIT
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
         @Bean
         ClientHttpConnector clientConnector(
-                @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient final TcpClient tcpClient) {
-            return new ReactorClientHttpConnector(HttpClient.from(tcpClient));
+                @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient final HttpClient httpClient) {
+            return new ReactorClientHttpConnector(httpClient);
         }
 
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
@@ -87,9 +90,8 @@ abstract class LrsrCldInfoServiceReactiveClientIT
                         log.debug("filtering with {} and {}", r, n);
                         return n.exchange(r);
                     })
-                    .baseUrl(System.getProperty(AbstractLrsrCldInfoServiceClient.BASE_URL))
-                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL)
+                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();
         }
     }

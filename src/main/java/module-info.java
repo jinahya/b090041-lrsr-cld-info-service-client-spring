@@ -1,4 +1,4 @@
-module com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client {
+module com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring {
     requires java.annotation;
     requires java.validation;
     requires java.xml.bind;

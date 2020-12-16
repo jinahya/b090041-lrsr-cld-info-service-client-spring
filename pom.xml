@@ -41,6 +41,15 @@
   </issueManagement>
 
   <properties>
+    <!-- https://stackoverflow.com/q/50334742/330457 -->
+    <!-- https://stackoverflow.com/a/53462763/330457 -->
+    <!-- https://issues.apache.org/jira/browse/MCOMPILER-341 -->
+    <argLine>
+      --add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client=ALL-UNNAMED
+      --add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message=ALL-UNNAMED
+    </argLine>
+    <failsafe.systemPropertiesFile>${surefire.systemPropertiesFile}</failsafe.systemPropertiesFile>
+    <surefire.systemPropertiesFile>system.properties</surefire.systemPropertiesFile>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
@@ -52,6 +61,7 @@
     <version.org.mockito>3.3.3</version.org.mockito>
     <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
     <version.com.fasterxml.jackson.core.javadoc>2.11</version.com.fasterxml.jackson.core.javadoc>
+    <!--    <version.jakarta.activation-api>1.2.2</version.jakarta.activation-api>-->
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
     <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
     <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
@@ -90,13 +100,13 @@
       <artifactId>jaxb-impl</artifactId>
       <version>2.3.3</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion> <!-- split package -->
+          <groupId>com.sun.activation</groupId>
+          <artifactId>jakarta.activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>jakarta.activation</groupId>-->
-<!--      <artifactId>jakarta.activation-api</artifactId>-->
-<!--      <version>1.2.2</version>-->
-<!--      <scope>provided</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
@@ -154,12 +164,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>org.springframework.boot</groupId>-->
-    <!--      <artifactId>spring-boot-starter-security</artifactId>-->
-    <!--      <version>${version.org.springframework.boot}</version>-->
-    <!--      <scope>test</scope>-->
-    <!--    </dependency>-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
@@ -170,6 +174,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
       <version>${version.org.springframework.boot}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

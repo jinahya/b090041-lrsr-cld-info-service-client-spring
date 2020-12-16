@@ -11,10 +11,10 @@ import java.io.InputStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public class ResponseTest {
+class ResponseTest {
 
     @Test
-    public void testGetItems() throws Exception {
+    void testGetItems() throws Exception {
         try (InputStream resource = getClass().getResourceAsStream("response01.xml")) {
             assertThat(resource).isNotNull();
             final JAXBContext context = JAXBContext.newInstance(Response.class);
@@ -34,5 +34,4 @@ public class ResponseTest {
             });
         }
     }
-
 }

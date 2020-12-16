@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest(
@@ -37,22 +38,24 @@ class LrsrCldInfoServiceClientIT
                     .additionalCustomizers(
                             t -> {
                                 log.debug("1 customizing {}", t);
-                            }, t -> {
+                            },
+                            t -> {
                                 log.debug("2 customizing {}", t);
+                                t.setRequestFactory(new BufferingClientHttpRequestFactory(t.getRequestFactory()));
                             }
                     )
                     .additionalInterceptors(
                             (r, b, e) -> {
-                                log.debug("executing with ({}, {})", r, b);
+                                log.debug("1 executing with ({}, {})", r, b);
                                 return e.execute(r, b);
-                            }, (r, b, e) -> {
-                                log.debug("executing with ({}, {})", r, b);
+                            },
+                            (r, b, e) -> {
+                                log.debug("2 executing with ({}, {})", r, b);
                                 return e.execute(r, b);
                             }
                     )
                     .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
-                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();
         }
     }

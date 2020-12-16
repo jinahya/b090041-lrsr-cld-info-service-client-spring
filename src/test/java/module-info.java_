@@ -1,11 +1,20 @@
-module com.github.jinahya.datagokr.api.b090041.lrsrcldinfoservice.client.test {
-    requires com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
+module com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring.test {
+    requires com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring;
     requires lombok;
-    requires spring.beans;
-    requires spring.context;
-    requires spring.web;
-    requires spring.boot;
+    requires io.netty.handler;
+    requires io.netty.transport;
+    requires java.validation;
+    requires org.assertj.core;
     requires org.junit.jupiter.api;
-    requires spring.test;
+    requires reactor.core;
+    requires reactor.netty.core;
+    requires reactor.netty.http;
+    requires spring.beans;
+    requires spring.boot;
     requires spring.boot.test;
+    requires spring.context;
+    requires spring.core;
+    requires spring.web;
+    requires spring.test;
+    requires spring.webflux;
 }
