@@ -23,12 +23,12 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getLunCalInfo_with_localDate() {
-        final LocalDate localDate = LocalDate.now();
-        final Sinks.One<Response.Body.Item> sink = Sinks.one();
+    void test_getLunCalInfo_with_solarDate() {
+        final LocalDate solarDate = LocalDate.now();
+        final Sinks.One<Response.Body.Item> sinksOne = Sinks.one();
         clientInstance().getLunCalInfo(
-                localDate,
-                sink,
+                solarDate,
+                sinksOne,
                 (t, r) -> {
                     log.error("failed to emit value; type: {}, result: {}", t, r);
                     return false;
@@ -38,27 +38,27 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                     return false;
                 }
         );
-        final Response.Body.Item item = sink.asMono().block();
+        final Response.Body.Item item = sinksOne.asMono().block();
         assertThat(item).isNotNull().satisfies(i -> {
-            final String solYear = Response.Body.Item.YEAR_FORMATTER.format(localDate);
-            final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(localDate);
-            final String solDay = Response.Body.Item.DAY_FORMATTER.format(localDate);
+            final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarDate);
+            final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarDate);
+            final String solDay = Response.Body.Item.DAY_FORMATTER.format(solarDate);
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
             assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
-            assertThat(i.getSolLeapyearAsBoolean()).isEqualTo(localDate.isLeapYear());
-            assertThat(i.getSolJd()).isNotNull().isEqualTo(localDate.getLong(JulianFields.JULIAN_DAY));
+            assertThat(i.getSolLeapyearAsBoolean()).isEqualTo(solarDate.isLeapYear());
+            assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
         });
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getLunCalInfo_with_yearMonth() {
-        final YearMonth yearMonth = YearMonth.now();
-        final Sinks.Many<Response.Body.Item> sink = Sinks.many().unicast().onBackpressureBuffer();
+    void test_getLunCalInfo_with_solarYearMonth() {
+        final YearMonth solarYearMonth = YearMonth.now();
+        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getLunCalInfo(
-                yearMonth,
-                sink,
+                solarYearMonth,
+                sinksMany,
                 (t, r) -> {
                     log.error("failed to emit error; type: {}, result: {}", t, r);
                     return false;
@@ -71,9 +71,9 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                     log.error("failed to emit complet; type: {}, result: {}", t, r);
                     return false;
                 });
-        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(yearMonth);
-        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(yearMonth);
-        sink.asFlux()
+        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarYearMonth);
+        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarYearMonth);
+        sinksMany.asFlux()
                 .doOnNext(i -> {
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
                     assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);

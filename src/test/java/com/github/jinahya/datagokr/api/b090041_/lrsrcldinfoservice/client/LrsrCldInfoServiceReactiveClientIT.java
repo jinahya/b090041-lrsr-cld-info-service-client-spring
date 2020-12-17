@@ -87,7 +87,6 @@ abstract class LrsrCldInfoServiceReactiveClientIT
                     .clientConnector(clientConnector)
                     .exchangeStrategies(exchangeStrategies)
                     .filter((r, n) -> {
-                        log.debug("filtering with {} and {}", r, n);
                         return n.exchange(r);
                     })
                     .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL)
