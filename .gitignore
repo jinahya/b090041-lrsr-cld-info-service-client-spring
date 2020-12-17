@@ -24,4 +24,4 @@ buildNumber.properties
 *.iml
 
 
-system.properties
+src/test/resources/system.properties

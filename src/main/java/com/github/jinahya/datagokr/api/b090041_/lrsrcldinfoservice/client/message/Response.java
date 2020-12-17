@@ -266,7 +266,7 @@ public class Response {
             @Positive
             @NotNull
             @XmlElement
-            private Long solJd; // Julian day / 율리우스일
+            private Long solJd; // julian day, 율리우스일
         }
 
         // -------------------------------------------------------------------------------------------------------------
