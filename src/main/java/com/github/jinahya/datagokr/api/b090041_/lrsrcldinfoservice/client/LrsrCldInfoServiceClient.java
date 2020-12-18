@@ -108,10 +108,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @NotNull
-    protected ResponseEntity<Response> getLunCalInfo(@NotNull final Year solYear, @NotNull final Month solMonth,
-                                                     @Positive @Nullable final Integer solDay,
-                                                     @Positive @Nullable final Integer pageNo) {
+    protected @NotNull ResponseEntity<Response> getLunCalInfo(
+            @NotNull final Year solYear, @NotNull final Month solMonth,
+            @Positive @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment("getLunCalInfo")
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -128,9 +127,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
     }
 
-    @Valid
-    @NotNull
-    public Response.Body.Item getLunCalInfo(@NotNull final LocalDate solarDate) {
+    public @Valid @NotNull Response.Body.Item getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
@@ -151,8 +148,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param itemConsumer   the consumer to which each date (in lunar calendar) are accepted.
      * @return the number of items accepted to {@code itemConsumer}.
      */
-    public int getLunCalInfo(@NotNull final YearMonth solarYearMonth,
-                             @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
+    public @Positive int getLunCalInfo(@NotNull final YearMonth solarYearMonth,
+                                       @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
         int count = 0;
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
@@ -169,10 +166,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @NotNull
-    protected ResponseEntity<Response> getSolCalInfo(@NotNull final Year lunYear, @NotNull final Month lunMonth,
-                                                     @Positive @Nullable final Integer lunDay,
-                                                     @Positive @Nullable final Integer pageNo) {
+    protected @NotNull ResponseEntity<Response> getSolCalInfo(
+            @NotNull final Year lunYear, @NotNull final Month lunMonth,
+            @Positive @Nullable final Integer lunDay, @Positive @Nullable final Integer pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment("getSolCalInfo")
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -189,9 +185,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
     }
 
-    @Valid
-    @NotNull
-    public Response.Body.Item getSolCalInfo(@NotNull final LocalDate lunarDate) {
+    public @Valid @NotNull Response.Body.Item getSolCalInfo(@NotNull final LocalDate lunarDate) {
         final Year lunYear = Year.from(lunarDate);
         final Month lunMonth = Month.from(lunarDate);
         final int lunDay = lunarDate.getDayOfMonth();
@@ -212,8 +206,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param itemConsumer   the consumer to which each date (in solar calendar) are accepted.
      * @return the number of items accepted to {@code itemConsumer}.
      */
-    public int getSolCalInfo(@NotNull final YearMonth lunarYearMonth,
-                             @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
+    public @Positive int getSolCalInfo(@NotNull final YearMonth lunarYearMonth,
+                                       @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
         int count = 0;
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
