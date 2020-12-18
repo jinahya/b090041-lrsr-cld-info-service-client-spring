@@ -24,7 +24,8 @@ buildNumber.properties
 *.iml
 
 
-src/test/resources/system.properties
+src/test/resources/failsafe.system.properties
+src/test/resources/surefire.system.properties
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/microsoftoffice
