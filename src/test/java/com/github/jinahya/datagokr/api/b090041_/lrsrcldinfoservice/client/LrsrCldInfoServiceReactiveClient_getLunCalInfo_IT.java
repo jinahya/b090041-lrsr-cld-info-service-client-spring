@@ -46,7 +46,7 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
             assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
-            assertThat(i.getSolLeapyearAsBoolean()).isEqualTo(solarDate.isLeapYear());
+            assertThat(i.getSolarLeapYear()).isEqualTo(solarDate.isLeapYear());
             assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
         });
     }

@@ -19,22 +19,22 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void verify_getSpcifyLunCalInfo() {
-        final Response.Body.Item lunCalInfo = clientInstance().getLunCalInfo(LocalDate.now()).block();
-        assert lunCalInfo != null;
-        final LocalDate lunDate = lunCalInfo.getLunYearMonthDayAsLocalDate();
-        final Year fromSolYear = Year.of(lunDate.getYear()).minusYears(1L);
-        final Year toSolYear = Year.of(lunDate.getYear()).plusYears(1L);
-        final Month lunMonth = lunDate.getMonth();
-        final int lunDay = lunDate.getDayOfMonth();
-        final boolean leapMonth = lunCalInfo.getLunLeapmonthAsBoolean();
-        final Sinks.Many<Response.Body.Item> sink = Sinks.many().unicast().onBackpressureBuffer();
+        final Response.Body.Item item = clientInstance().getLunCalInfo(LocalDate.now()).block();
+        assert item != null;
+        final LocalDate lunarDate = item.getLunarDate();
+        final Year fromSolYear = Year.of(lunarDate.getYear()).minusYears(1L);
+        final Year toSolYear = Year.of(lunarDate.getYear()).plusYears(1L);
+        final Month lunMonth = lunarDate.getMonth();
+        final int lunDay = lunarDate.getDayOfMonth();
+        final boolean leapMonth = item.getLunarLeapMonth();
+        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSpcifyLunCalInfo(
                 fromSolYear,
                 toSolYear,
                 lunMonth,
                 lunDay,
                 leapMonth,
-                sink,
+                sinksMany,
                 (t, r) -> {
                     log.error("failed to emit error; type: {}, result: {}", t, r);
                     return false;
@@ -47,10 +47,10 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
                     log.error("failed to emit complete; type: {}, result: {}", t, r);
                     return false;
                 });
-        sink.asFlux()
+        sinksMany.asFlux()
                 .doOnNext(i -> {
-                    assertThat(i.getLunMonthAsMonth()).isNotNull().isEqualTo(lunMonth);
-                    assertThat(i.getLunDayAsDayOfMonth()).isNotNull().isEqualTo(lunDay);
+                    assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunMonth);
+                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunDay);
                 })
                 .blockLast();
     }

@@ -6,8 +6,8 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
@@ -17,13 +17,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.ThreadLocalRandom.current;
 
 @SpringBootTest(
         classes = {
-                AbstractLrsrCldInfoServiceClientIT._Configuration.class,
                 LrsrCldInfoServiceReactiveClientIT._Configuration.class,
                 LrsrCldInfoServiceReactiveClient.class
         }
@@ -32,21 +28,15 @@ import static java.util.concurrent.ThreadLocalRandom.current;
 abstract class LrsrCldInfoServiceReactiveClientIT
         extends AbstractLrsrCldInfoServiceClientIT<LrsrCldInfoServiceReactiveClient> {
 
-    @ComponentScan(
-            basePackageClasses = {
-                    _NoOp.class
-            }
-    )
+    @Import(AbstractLrsrCldInfoServiceClientIT._Configuration.class)
     @Configuration
     static class _Configuration {
 
-        static final int CONNECT_TIME_MILLIS = (int) (current().nextBoolean()
-                                                      ? Duration.ofSeconds(3L).toMillis()
-                                                      : TimeUnit.SECONDS.toMillis(3L));
+        static final int CONNECT_TIME_MILLIS = (int) Duration.ofSeconds(10L).toMillis();
 
-        static final int READ_TIMEOUT_SECONDS = 3;
+        static final int READ_TIMEOUT_SECONDS = 10;
 
-        static final int WRITE_TIMEOUT_SECONDS = 3;
+        static final int WRITE_TIMEOUT_SECONDS = 10;
 
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
         @Bean

@@ -62,17 +62,17 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected @NotNull Mono<Response> getLunCalInfo(@NotNull final Year solarYear, @NotNull final Month solarMonth,
-                                                    @Positive @Nullable final Integer solarDayOfMonth,
+    protected @NotNull Mono<Response> getLunCalInfo(@NotNull final Year solYear, @NotNull final Month solMonth,
+                                                    @Positive @Nullable final Integer solDay,
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
                 .uri(b -> b.pathSegment("getLunCalInfo")
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Response.Body.Item.YEAR_FORMATTER.format(solarYear))
-                        .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Response.Body.Item.MONTH_FORMATTER.format(solarMonth))
+                        .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Response.Body.Item.YEAR_FORMATTER.format(solYear))
+                        .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Response.Body.Item.MONTH_FORMATTER.format(solMonth))
                         .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-                                             ofNullable(solarDayOfMonth).map(v -> MonthDay.of(solarMonth, v))
+                                             ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
                                                      .map(Response.Body.Item.DAY_FORMATTER::format))
                         .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
                         .build())
@@ -82,10 +82,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
 
     // -----------------------------------------------------------------------------------------------------------------
     public @NotNull Mono<Response.Body.Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
-        final Year solarYear = Year.from(solarDate);
-        final Month solarMonth = Month.from(solarDate);
-        final int solarDayOfMonth = solarDate.getDayOfMonth();
-        return getLunCalInfo(solarYear, solarMonth, solarDayOfMonth, null)
+        final Year solYear = Year.from(solarDate);
+        final Month solMonth = Month.from(solarDate);
+        final int solDay = solarDate.getDayOfMonth();
+        return getLunCalInfo(solYear, solMonth, solDay, null)
                 .map(this::getItems)
                 .handle((v, s) -> {
                     if (v.isEmpty()) {
@@ -116,10 +116,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                               @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
-        final Year solarYear = Year.from(solarYearMonth);
-        final Month solarMonth = Month.from(solarYearMonth);
+        final Year solYear = Year.from(solarYearMonth);
+        final Month solMonth = Month.from(solarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
-            final Response response = getLunCalInfo(solarYear, solarMonth, null, pageNo).block();
+            final Response response = getLunCalInfo(solYear, solMonth, null, pageNo).block();
             final List<Response.Body.Item> items;
             try {
                 items = getItems(response);
@@ -136,17 +136,17 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected @NotNull Mono<Response> getSolCalInfo(@NotNull final Year lunarYear, @NotNull final Month lunarMonth,
-                                                    @Positive @Nullable final Integer lunarDayOfMonth,
+    protected @NotNull Mono<Response> getSolCalInfo(@NotNull final Year lunYear, @NotNull final Month lunMonth,
+                                                    @Positive @Nullable final Integer lunDay,
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
                 .uri(b -> b.pathSegment("getSolCalInfo")
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Response.Body.Item.YEAR_FORMATTER.format(lunarYear))
-                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Response.Body.Item.MONTH_FORMATTER.format(lunarMonth))
+                        .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Response.Body.Item.YEAR_FORMATTER.format(lunYear))
+                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Response.Body.Item.MONTH_FORMATTER.format(lunMonth))
                         .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY,
-                                             ofNullable(lunarDayOfMonth).map(v -> MonthDay.of(lunarMonth, v))
+                                             ofNullable(lunDay).map(v -> MonthDay.of(lunMonth, v))
                                                      .map(Response.Body.Item.DAY_FORMATTER::format))
                         .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
                         .build())
@@ -154,11 +154,11 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .bodyToMono(Response.class);
     }
 
-    protected @NotNull Mono<Response.Body.Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
-        final Year lunarYear = Year.from(lunarDate);
-        final Month lunarMonth = Month.from(lunarDate);
-        final int lunarDayOfMonth = lunarDate.getDayOfMonth();
-        return getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, null)
+    public @NotNull Mono<Response.Body.Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
+        final Year lunYear = Year.from(lunarDate);
+        final Month lunMonth = Month.from(lunarDate);
+        final int lunDay = lunarDate.getDayOfMonth();
+        return getSolCalInfo(lunYear, lunMonth, lunDay, null)
                 .map(this::getItems)
                 .handle((v, s) -> {
                     if (v.isEmpty()) {
@@ -189,10 +189,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                               @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
-        final Year lunarYear = Year.from(lunarYearMonth);
-        final Month lunarMonth = Month.from(lunarYearMonth);
+        final Year lunYear = Year.from(lunarYearMonth);
+        final Month lunMonth = Month.from(lunarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
-            final Response response = getSolCalInfo(lunarYear, lunarMonth, null, pageNo).block();
+            final Response response = getSolCalInfo(lunYear, lunMonth, null, pageNo).block();
             final List<Response.Body.Item> items;
             try {
                 items = getItems(response);
@@ -209,34 +209,33 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public void getSpcifyLunCalInfo(@Positive final Year fromSolarYear, @Positive final Year toSolarYear,
-                                    @NotNull final Month lunarMonth,
-                                    @Max(31) @Min(1) final int lunarDayOfMonth, final boolean lunarLeapMonth,
+    public void getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
+                                    @NotNull final Month lunMonth, @Max(31) @Min(1) final int lunDay,
+                                    final boolean leapMonth,
                                     @NotNull final Sinks.Many<? super Response.Body.Item> sinksMany,
                                     @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                                     @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                                     @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
-        if (toSolarYear.isBefore(fromSolarYear)) {
+        if (toSolYear.isBefore(fromSolYear)) {
             throw new IllegalArgumentException(
-                    "toSolYear(" + toSolarYear + ") is before fromSolYear(" + fromSolarYear + ")");
+                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
-        final String fromSolarYearValue = Response.Body.Item.YEAR_FORMATTER.format(fromSolarYear);
-        final String toSolarYearValue = Response.Body.Item.YEAR_FORMATTER.format(toSolarYear);
-        final String lunarMonthValue = Response.Body.Item.MONTH_FORMATTER.format(lunarMonth);
-        final String lunarDayOfMonthValue
-                = Response.Body.Item.DAY_FORMATTER.format(MonthDay.of(lunarMonth, lunarDayOfMonth));
-        final String lunarLeapMonthValue = lunarLeapMonth ? Response.Body.Item.LEAP : Response.Body.Item.NORMAL;
+        final String fromSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(fromSolYear);
+        final String toSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(toSolYear);
+        final String lunMonthValue = Response.Body.Item.MONTH_FORMATTER.format(lunMonth);
+        final String lunDayValue = Response.Body.Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
+        final String leapMonthValue = leapMonth ? Response.Body.Item.LEAP : Response.Body.Item.NORMAL;
         for (final AtomicInteger pageNo = new AtomicInteger(1); ; ) {
             final Response response = webClient
                     .get()
                     .uri(b -> b
                             .pathSegment("getSpcifyLunCalInfo")
                             .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                            .queryParam("fromSolYear", fromSolarYearValue)
-                            .queryParam("toSolYear", toSolarYearValue)
-                            .queryParam("lunMonth", lunarMonthValue)
-                            .queryParam("lunDay", lunarDayOfMonthValue)
-                            .queryParam("leapMonth", lunarLeapMonthValue)
+                            .queryParam("fromSolYear", fromSolYearValue)
+                            .queryParam("toSolYear", toSolYearValue)
+                            .queryParam("lunMonth", lunMonthValue)
+                            .queryParam("lunDay", lunDayValue)
+                            .queryParam("leapMonth", leapMonthValue)
                             .queryParam("pageNo", pageNo.getAndIncrement())
                             .build()
                     )

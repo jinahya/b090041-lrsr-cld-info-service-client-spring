@@ -18,27 +18,28 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getLunCalInfo_with_localDate() {
-        final LocalDate localDate = LocalDate.now();
-        final Response.Body.Item item = clientInstance().getSolCalInfo(localDate);
+    void verify_getSolCalInfo_with_localDate() {
+        final LocalDate lunarDate = LocalDate.now();
+        final Response.Body.Item item = clientInstance().getSolCalInfo(lunarDate);
         assertThat(item).isNotNull().satisfies(i -> {
-            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(localDate);
-            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(localDate);
-            final String lunDay = Response.Body.Item.DAY_FORMATTER.format(localDate);
+            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
+            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
+            final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
             assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
             assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
             assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+            assertThat(i.getLunarDate()).isNotNull().isEqualTo(lunarDate);
         });
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void verify_getLunCalInfo_with_yearMonth() {
-        final YearMonth yearMonth = YearMonth.now();
+        final YearMonth lunarYearMonth = YearMonth.now();
         final List<Response.Body.Item> items = new ArrayList<>();
-        final int count = clientInstance().getSolCalInfo(yearMonth, i -> {
-            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(yearMonth);
-            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(yearMonth);
+        final int count = clientInstance().getSolCalInfo(lunarYearMonth, i -> {
+            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarYearMonth);
+            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarYearMonth);
             assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
             assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
             items.add(i);

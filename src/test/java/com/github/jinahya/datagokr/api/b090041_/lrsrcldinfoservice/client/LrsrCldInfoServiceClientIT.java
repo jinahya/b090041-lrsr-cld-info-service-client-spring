@@ -4,16 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+
 @SpringBootTest(
         classes = {
-                AbstractLrsrCldInfoServiceClientIT._Configuration.class,
                 LrsrCldInfoServiceClientIT._Configuration.class,
                 LrsrCldInfoServiceClient.class
         }
@@ -23,11 +24,7 @@ class LrsrCldInfoServiceClientIT
         extends AbstractLrsrCldInfoServiceClientIT<LrsrCldInfoServiceClient> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    @ComponentScan(
-            basePackageClasses = {
-                    _NoOp.class
-            }
-    )
+    @Import(AbstractLrsrCldInfoServiceClientIT._Configuration.class)
     @Configuration
     static class _Configuration {
 
@@ -54,6 +51,8 @@ class LrsrCldInfoServiceClientIT
                                 return e.execute(r, b);
                             }
                     )
+                    .setConnectTimeout(Duration.ofSeconds(10L))
+                    .setReadTimeout(Duration.ofSeconds(10L))
                     .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();
