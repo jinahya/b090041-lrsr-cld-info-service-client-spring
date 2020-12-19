@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
@@ -65,7 +66,9 @@ public class Response {
         @Setter
         @Getter
         @Slf4j
-        public static class Item {
+        public static class Item implements Serializable {
+
+            private static final long serialVersionUID = -4071620406720872635L;
 
             // ---------------------------------------------------------------------------------------------------------
             public static final String NORMAL = "\ud3c9";
