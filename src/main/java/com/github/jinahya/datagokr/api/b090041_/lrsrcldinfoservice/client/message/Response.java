@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -179,6 +180,16 @@ public class Response {
                        + ",solWeek=" + solWeek
                        + ",solJd=" + solJd
                        + '}';
+            }
+
+            // ---------------------------------------------------------------------------------------------------------
+            void beforeUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
+            }
+
+            void afterUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
+                if (lunWolgeon != null && lunWolgeon.trim().isEmpty()) {
+                    lunWolgeon = null;
+                }
             }
 
             // ------------------------------------------------------------------------------------- lunYear / lunarYear
