@@ -43,17 +43,17 @@
     <!-- https://stackoverflow.com/q/50334742/330457 -->
     <!-- https://stackoverflow.com/a/53462763/330457 -->
     <!-- https://issues.apache.org/jira/browse/MCOMPILER-341 -->
-    <argLine>
-      --add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client=ALL-UNNAMED
-      --add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message=ALL-UNNAMED
-    </argLine>
-    <failsafe.systemPropertiesFile>${surefire.systemPropertiesFile}</failsafe.systemPropertiesFile>
-    <surefire.systemPropertiesFile>src/test/resources/system.properties</surefire.systemPropertiesFile>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.release>${maven.compiler.source}</maven.compiler.release>
+<!--    <argLine>-->
+<!--      &#45;&#45;add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client=ALL-UNNAMED-->
+<!--      &#45;&#45;add-opens com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.spring/com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message=ALL-UNNAMED-->
+<!--    </argLine>-->
+    <failsafe.systemPropertiesFile>src/test/resources/failsafe.system.properties</failsafe.systemPropertiesFile>
+    <maven.compiler.source>1.8</maven.compiler.source>
+<!--    <maven.compiler.release>${maven.compiler.source}</maven.compiler.release>-->
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
+    <surefire.systemPropertiesFile>src/test/resources/surefire.system.properties</surefire.systemPropertiesFile>
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
     <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
     <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
@@ -248,7 +248,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>enforce-require-java-version-to-[11,)</id>
+            <id>enforce-require-java-version-to-[1.8.0,)</id>
             <goals>
               <goal>enforce</goal>
             </goals>
@@ -256,7 +256,7 @@
               <skip>false</skip>
               <rules>
                 <requireJavaVersion>
-                  <version>[${maven.compiler.release},)</version>
+                  <version>[1.8.0,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
