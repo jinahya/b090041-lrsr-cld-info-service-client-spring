@@ -230,7 +230,7 @@ public class Response {
                 return LocalDate.of(getLunarYear().getValue(), getLunarMonth(), getLunarDayOfMonth());
             }
 
-            void setLunarDate(final LocalDate lunarDate) {
+            public void setLunarDate(final LocalDate lunarDate) {
                 setLunarYear(ofNullable(lunarDate).map(Year::from).orElse(null));
                 setLunarMonth(ofNullable(lunarDate).map(Month::from).orElse(null));
                 setLunarDayOfMonth(ofNullable(lunarDate).map(LocalDate::getDayOfMonth).orElse(null));
@@ -242,7 +242,7 @@ public class Response {
             }
 
             @SuppressWarnings({"java:S5411"})
-            void setLunarLeapMonth(final Boolean lunarLeapMonth) {
+            public void setLunarLeapMonth(final Boolean lunarLeapMonth) {
                 setLunLeapmonth(ofNullable(lunarLeapMonth).map(v -> v ? LEAP : NORMAL).orElse(null));
             }
 
@@ -376,7 +376,7 @@ public class Response {
                 return LocalDate.of(getSolarYear().getValue(), getSolarMonth(), getSolarDayOfMonth());
             }
 
-            void setSolarDate(final LocalDate solarDate) {
+            public void setSolarDate(final LocalDate solarDate) {
                 setSolarYear(ofNullable(solarDate).map(Year::from).orElse(null));
                 setSolarMonth(ofNullable(solarDate).map(Month::from).orElse(null));
                 setSolarDayOfMonth(ofNullable(solarDate).map(LocalDate::getDayOfMonth).orElse(null));
