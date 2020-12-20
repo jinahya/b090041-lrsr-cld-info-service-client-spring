@@ -1,7 +1,8 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
@@ -17,14 +18,15 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
 
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getLunCalInfo(LocalDate)")
     @Test
     void verify_getLunCalInfo_with_localDate() {
         final LocalDate solarDate = LocalDate.now();
-        final Response.Body.Item item = clientInstance().getLunCalInfo(solarDate);
-        assertThat(item).isNotNull().satisfies(i -> {
-            final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarDate);
-            final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarDate);
-            final String solDay = Response.Body.Item.DAY_FORMATTER.format(solarDate);
+        final List<Item> items = clientInstance().getLunCalInfo(solarDate);
+        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
+            final String solYear = Item.YEAR_FORMATTER.format(solarDate);
+            final String solMonth = Item.MONTH_FORMATTER.format(solarDate);
+            final String solDay = Item.DAY_FORMATTER.format(solarDate);
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
             assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
@@ -34,13 +36,14 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getLunCalInfo(YearMonth)")
     @Test
     void verify_getLunCalInfo_with_yearMonth() {
         final YearMonth solarYearMonth = YearMonth.now();
-        final List<Response.Body.Item> items = clientInstance().getLunCalInfo(solarYearMonth);
+        final List<Item> items = clientInstance().getLunCalInfo(solarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarYearMonth);
-            final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarYearMonth);
+            final String solYear = Item.YEAR_FORMATTER.format(solarYearMonth);
+            final String solMonth = Item.MONTH_FORMATTER.format(solarYearMonth);
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
         });

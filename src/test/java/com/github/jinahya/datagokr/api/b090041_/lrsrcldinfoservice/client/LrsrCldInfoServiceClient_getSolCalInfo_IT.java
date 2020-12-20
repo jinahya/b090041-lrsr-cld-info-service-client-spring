@@ -2,6 +2,7 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
@@ -17,11 +18,12 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
 
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getSolCalInfo(LocalDate)")
     @Test
     void verify_getSolCalInfo_with_localDate() {
         final LocalDate lunarDate = LocalDate.now();
-        final Response.Body.Item item = clientInstance().getSolCalInfo(lunarDate);
-        assertThat(item).isNotNull().satisfies(i -> {
+        final List<Response.Body.Item> items = clientInstance().getSolCalInfo(lunarDate);
+        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
             final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
             final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
             final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
@@ -36,8 +38,9 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getSolCalInfo(YearMonth)")
     @Test
-    void verify_getLunCalInfo_with_yearMonth() {
+    void verify_getSolCalInfo_with_yearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
         final List<Response.Body.Item> items = clientInstance().getSolCalInfo(lunarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {

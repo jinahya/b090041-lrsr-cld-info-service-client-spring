@@ -34,7 +34,7 @@ abstract class LrsrCldInfoServiceReactiveClientIT
 
         static final int CONNECT_TIME_MILLIS = (int) Duration.ofSeconds(10L).toMillis();
 
-        static final int READ_TIMEOUT_SECONDS = 10;
+        static final int READ_TIMEOUT_SECONDS = 20;
 
         static final int WRITE_TIMEOUT_SECONDS = 10;
 

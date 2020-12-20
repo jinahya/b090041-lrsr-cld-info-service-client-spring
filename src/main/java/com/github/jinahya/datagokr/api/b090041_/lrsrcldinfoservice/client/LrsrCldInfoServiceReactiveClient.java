@@ -1,6 +1,7 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -31,7 +31,6 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.ofNullable;
@@ -69,68 +68,63 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .get()
                 .uri(b -> b.pathSegment("getLunCalInfo")
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Response.Body.Item.YEAR_FORMATTER.format(solYear))
-                        .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Response.Body.Item.MONTH_FORMATTER.format(solMonth))
+                        .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
+                        .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
                         .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
                                              ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
-                                                     .map(Response.Body.Item.DAY_FORMATTER::format))
+                                                     .map(Item.DAY_FORMATTER::format))
                         .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
                         .build())
                 .retrieve()
-                .bodyToMono(Response.class);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    public @NotNull Mono<Response.Body.Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
-        final Year solYear = Year.from(solarDate);
-        final Month solMonth = Month.from(solarDate);
-        final int solDay = solarDate.getDayOfMonth();
-        return getLunCalInfo(solYear, solMonth, solDay, null)
-                .map(this::getItems)
-                .handle((v, s) -> {
-                    if (v.isEmpty()) {
-                        s.error(new RuntimeException("empty items retrieved"));
-                    } else {
-                        Assert.isTrue(v.size() == 1, () -> "non unique item retrieved for " + solarDate);
-                        s.next(v.get(0));
-                        s.complete();
-                    }
-                })
+                .bodyToMono(Response.class)
                 ;
     }
 
     public void getLunCalInfo(@NotNull final LocalDate solarDate,
-                              @NotNull final Sinks.One<? super Response.Body.Item> sinksOne,
-                              @NotNull final Sinks.EmitFailureHandler emitValueFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler) {
-        try {
-            final Response.Body.Item item = getLunCalInfo(solarDate).block();
-            sinksOne.emitValue(item, emitValueFailureHandler);
-        } catch (final RuntimeException re) {
-            sinksOne.emitError(ofNullable(re.getCause()).orElse(re), emitErrorFailureHandler);
+                              @NotNull final Sinks.Many<? super Item> sinksMany,
+                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
+                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
+                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+        final Year solYear = Year.from(solarDate);
+        final Month solMonth = Month.from(solarDate);
+        final int solDay = solarDate.getDayOfMonth();
+        for (int pageNo = 1; ; pageNo++) {
+            final Response response;
+            try {
+                response = requireValid(getLunCalInfo(solYear, solMonth, solDay, pageNo).block());
+            } catch (final RuntimeException re) {
+                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
+                return;
+            }
+            assert response != null;
+            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
+            if (response.getBody().isLastPage()) {
+                break;
+            }
         }
+        sinksMany.emitComplete(emitCompleteFailureHandler);
     }
 
     public void getLunCalInfo(@NotNull final YearMonth solarYearMonth,
-                              @NotNull final Sinks.Many<? super Response.Body.Item> sinksMany,
+                              @NotNull final Sinks.Many<? super Item> sinksMany,
                               @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
-            final Response response = getLunCalInfo(solYear, solMonth, null, pageNo).block();
-            final List<Response.Body.Item> items;
+            final Response response;
             try {
-                items = getItems(response);
+                response = getLunCalInfo(solYear, solMonth, null, pageNo).block();
             } catch (final RuntimeException re) {
-                sinksMany.emitError(ofNullable(re.getCause()).orElse(re), emitErrorFailureHandler);
+                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
                 return;
             }
-            if (items.isEmpty()) {
+            assert response != null;
+            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
+            if (response.getBody().isLastPage()) {
                 break;
             }
-            items.forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
         }
         sinksMany.emitComplete(emitCompleteFailureHandler);
     }
@@ -143,67 +137,62 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .get()
                 .uri(b -> b.pathSegment("getSolCalInfo")
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Response.Body.Item.YEAR_FORMATTER.format(lunYear))
-                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Response.Body.Item.MONTH_FORMATTER.format(lunMonth))
+                        .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
+                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                         .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY,
                                              ofNullable(lunDay).map(v -> MonthDay.of(lunMonth, v))
-                                                     .map(Response.Body.Item.DAY_FORMATTER::format))
+                                                     .map(Item.DAY_FORMATTER::format))
                         .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
                         .build())
                 .retrieve()
                 .bodyToMono(Response.class);
     }
 
-    public @NotNull Mono<Response.Body.Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
+    public void getSolCalInfo(@NotNull final LocalDate lunarDate,
+                              @NotNull final Sinks.Many<? super Item> sinksMany,
+                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
+                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
+                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
         final Year lunYear = Year.from(lunarDate);
         final Month lunMonth = Month.from(lunarDate);
         final int lunDay = lunarDate.getDayOfMonth();
-        return getSolCalInfo(lunYear, lunMonth, lunDay, null)
-                .map(this::getItems)
-                .handle((v, s) -> {
-                    if (v.isEmpty()) {
-                        s.error(new RuntimeException("empty items retrieved"));
-                    } else {
-                        assert v.size() == 1;
-                        s.next(v.get(0));
-                        s.complete();
-                    }
-                })
-                ;
-    }
-
-    public void getSolCalInfo(@NotNull final LocalDate lunarDate,
-                              @NotNull final Sinks.One<? super Response.Body.Item> sinksOne,
-                              @NotNull final Sinks.EmitFailureHandler emitValueFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler) {
-        try {
-            final Response.Body.Item item = getSolCalInfo(lunarDate).block();
-            sinksOne.emitValue(item, emitValueFailureHandler);
-        } catch (final RuntimeException re) {
-            sinksOne.emitError(ofNullable(re.getCause()).orElse(re), emitErrorFailureHandler);
+        for (int pageNo = 1; ; pageNo++) {
+            final Response response;
+            try {
+                response = requireValid(getSolCalInfo(lunYear, lunMonth, lunDay, pageNo).block());
+            } catch (final RuntimeException re) {
+                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
+                return;
+            }
+            assert response != null;
+            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
+            if (response.getBody().isLastPage()) {
+                break;
+            }
         }
+        sinksMany.emitComplete(emitCompleteFailureHandler);
     }
 
     public void getSolCalInfo(@NotNull final YearMonth lunarYearMonth,
-                              @NotNull final Sinks.Many<? super Response.Body.Item> sinksMany,
+                              @NotNull final Sinks.Many<? super Item> sinksMany,
                               @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                               @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
-            final Response response = getSolCalInfo(lunYear, lunMonth, null, pageNo).block();
-            final List<Response.Body.Item> items;
+            final Response response;
             try {
-                items = getItems(response);
+                response = getSolCalInfo(lunYear, lunMonth, null, pageNo).block();
             } catch (final RuntimeException re) {
-                sinksMany.emitError(ofNullable(re.getCause()).orElse(re), emitErrorFailureHandler);
+                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
                 return;
             }
-            if (items.isEmpty()) {
+            assert response != null;
+            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
+            if (response.getBody().isLastPage()) {
                 break;
             }
-            items.forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
         }
         sinksMany.emitComplete(emitCompleteFailureHandler);
     }
@@ -212,7 +201,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     public void getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
                                     @NotNull final Month lunMonth, @Max(31) @Min(1) final int lunDay,
                                     final boolean leapMonth,
-                                    @NotNull final Sinks.Many<? super Response.Body.Item> sinksMany,
+                                    @NotNull final Sinks.Many<? super Item> sinksMany,
                                     @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
                                     @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
                                     @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
@@ -220,39 +209,40 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
-        final String fromSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(fromSolYear);
-        final String toSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(toSolYear);
-        final String lunMonthValue = Response.Body.Item.MONTH_FORMATTER.format(lunMonth);
-        final String lunDayValue = Response.Body.Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
-        final String leapMonthValue = leapMonth ? Response.Body.Item.LEAP : Response.Body.Item.NORMAL;
+        final String fromSolYearValue = Item.YEAR_FORMATTER.format(fromSolYear);
+        final String toSolYearValue = Item.YEAR_FORMATTER.format(toSolYear);
+        final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
+        final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
+        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
         for (final AtomicInteger pageNo = new AtomicInteger(1); ; ) {
-            final Response response = webClient
-                    .get()
-                    .uri(b -> b
-                            .pathSegment("getSpcifyLunCalInfo")
-                            .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                            .queryParam("fromSolYear", fromSolYearValue)
-                            .queryParam("toSolYear", toSolYearValue)
-                            .queryParam("lunMonth", lunMonthValue)
-                            .queryParam("lunDay", lunDayValue)
-                            .queryParam("leapMonth", leapMonthValue)
-                            .queryParam("pageNo", pageNo.getAndIncrement())
-                            .build()
-                    )
-                    .retrieve()
-                    .bodyToMono(Response.class)
-                    .block();
-            final List<Response.Body.Item> items;
+            final Response response;
             try {
-                items = getItems(response);
+                response = webClient
+                        .get()
+                        .uri(b -> b
+                                .pathSegment("getSpcifyLunCalInfo")
+                                .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                                .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
+                                .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
+                                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
+                                .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
+                                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
+                                .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo.getAndIncrement())
+                                .build()
+                        )
+                        .retrieve()
+                        .bodyToMono(Response.class)
+                        .block();
             } catch (final RuntimeException re) {
-                sinksMany.emitError(ofNullable(re.getCause()).orElse(re), emitErrorFailureHandler);
+                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
                 return;
             }
-            items.forEach(item -> {
-                sinksMany.emitNext(item, emitNextFailureHandler);
+            assert response != null;
+            requireValid(response);
+            response.getBody().getItems().forEach(i -> {
+                sinksMany.emitNext(i, emitNextFailureHandler);
             });
-            if (items.isEmpty()) {
+            if (response.getBody().isLastPage()) {
                 break;
             }
         }

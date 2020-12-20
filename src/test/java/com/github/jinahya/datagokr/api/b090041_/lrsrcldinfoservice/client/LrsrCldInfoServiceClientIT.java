@@ -52,7 +52,7 @@ class LrsrCldInfoServiceClientIT
                             }
                     )
                     .setConnectTimeout(Duration.ofSeconds(10L))
-                    .setReadTimeout(Duration.ofSeconds(10L))
+                    .setReadTimeout(Duration.ofSeconds(20L))
                     .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();

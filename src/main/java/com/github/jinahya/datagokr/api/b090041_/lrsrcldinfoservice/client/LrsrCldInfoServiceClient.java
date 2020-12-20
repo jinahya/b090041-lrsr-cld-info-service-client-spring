@@ -1,6 +1,7 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.lang.annotation.Documented;
@@ -39,7 +41,6 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -93,20 +94,19 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected @NotNull List<Response.Body.@NotNull @Valid Item> getItems(
-            @NotNull final ResponseEntity<Response> entity) {
-        requireNonNull(entity, "entity is null");
+    protected @NotNull Response getResponse(@NotNull final ResponseEntity<Response> responseEntity) {
+        requireNonNull(responseEntity, "responseEntity is null");
         {
-            final HttpStatus statusCode = entity.getStatusCode();
+            final HttpStatus statusCode = responseEntity.getStatusCode();
             if (!statusCode.is2xxSuccessful()) {
                 throw new RuntimeException("unsuccessful response status code: " + statusCode);
             }
         }
-        final Response response = entity.getBody();
+        final Response response = responseEntity.getBody();
         if (response == null) {
-            throw new RuntimeException("null body from the response entity");
+            throw new RuntimeException("null body from the response responseEntity");
         }
-        return getItems(response);
+        return requireValid(response);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -116,12 +116,12 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment("getLunCalInfo")
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Response.Body.Item.YEAR_FORMATTER.format(solYear))
-                .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Response.Body.Item.MONTH_FORMATTER.format(solMonth))
+                .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
+                .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
                 .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
                                      Optional.ofNullable(solDay)
                                              .map(v -> MonthDay.of(solMonth, v))
-                                             .map(Response.Body.Item.DAY_FORMATTER::format))
+                                             .map(Item.DAY_FORMATTER::format))
                 .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                 .encode()
                 .build()
@@ -129,17 +129,22 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
     }
 
-    public @Valid @NotNull Response.Body.Item getLunCalInfo(@NotNull final LocalDate solarDate) {
-        final Year solYear = Year.from(solarDate);
-        final Month solMonth = Month.from(solarDate);
-        final int solDay = solarDate.getDayOfMonth();
-        final ResponseEntity<Response> entity = getLunCalInfo(solYear, solMonth, solDay, null);
-        final List<Response.Body.Item> items = getItems(entity);
-        if (items.isEmpty()) {
-            throw new RuntimeException("no items in response");
+    public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
+        final List<Item> items = new ArrayList<>();
+        {
+            final Year solYear = Year.from(solarDate);
+            final Month solMonth = Month.from(solarDate);
+            final int solDay = solarDate.getDayOfMonth();
+            for (int pageNo = 1; ; pageNo++) {
+                final ResponseEntity<Response> entity = getLunCalInfo(solYear, solMonth, solDay, pageNo);
+                final Response response = getResponse(entity);
+                items.addAll(response.getBody().getItems());
+                if (response.getBody().isLastPage()) {
+                    break;
+                }
+            }
         }
-        assert items.size() == 1;
-        return items.get(0);
+        return items;
     }
 
     /**
@@ -149,19 +154,19 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param solarYearMonth the year-month from which {@code ?solYear} and {@code ?solMonth} are derived.
      * @return a list of all retrieved items.
      */
-    public @NotBlank List<Response.Body.Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
-        final List<Response.Body.Item> all = new ArrayList<>();
+    public @NotBlank List<@Valid @NotNull Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
+        final List<Item> items = new ArrayList<>();
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
             final ResponseEntity<Response> entity = getLunCalInfo(solYear, solMonth, null, pageNo);
-            final List<Response.Body.Item> items = getItems(entity);
-            if (items.isEmpty()) {
+            final Response response = getResponse(entity);
+            items.addAll(response.getBody().getItems());
+            if (response.getBody().isLastPage()) {
                 break;
             }
-            all.addAll(items);
         }
-        return all;
+        return items;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -171,12 +176,12 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment("getSolCalInfo")
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Response.Body.Item.YEAR_FORMATTER.format(lunYear))
-                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Response.Body.Item.MONTH_FORMATTER.format(lunMonth))
+                .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
+                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                 .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY,
                                      Optional.ofNullable(lunDay)
                                              .map(v -> MonthDay.of(lunMonth, v))
-                                             .map(Response.Body.Item.DAY_FORMATTER::format))
+                                             .map(Item.DAY_FORMATTER::format))
                 .queryParamIfPresent("pageNo", Optional.ofNullable(pageNo))
                 .encode()
                 .build()
@@ -184,78 +189,77 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
     }
 
-    public @Valid @NotNull Response.Body.Item getSolCalInfo(@NotNull final LocalDate lunarDate) {
-        final Year lunYear = Year.from(lunarDate);
-        final Month lunMonth = Month.from(lunarDate);
-        final int lunDay = lunarDate.getDayOfMonth();
-        final ResponseEntity<Response> responseEntity = getSolCalInfo(lunYear, lunMonth, lunDay, null);
-        final List<Response.Body.Item> items = getItems(responseEntity);
-        if (items.isEmpty()) {
-            throw new RuntimeException("no items in response");
+    public @NotEmpty List<@Valid @NotNull Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
+        final List<Item> items = new ArrayList<>();
+        {
+            final Year lunYear = Year.from(lunarDate);
+            final Month lunMonth = Month.from(lunarDate);
+            final int lunDay = lunarDate.getDayOfMonth();
+            for (int pageNo = 1; ; pageNo++) {
+                final ResponseEntity<Response> entity = getSolCalInfo(lunYear, lunMonth, lunDay, null);
+                final Response response = getResponse(entity);
+                items.addAll(response.getBody().getItems());
+                if (response.getBody().isLastPage()) {
+                    break;
+                }
+            }
         }
-        assert items.size() == 1;
-        return items.get(0);
+        return items;
     }
 
-    /**
-     * Invokes {@code GET /.../getSolCalInfo} with {@code ?lunYear} and {@code ?lunMonth} derived from specified
-     * year-month of lunar calendar and returns all items from all pages.
-     *
-     * @param lunarYearMonth the year-month from which {@code ?lunYear} and {@code ?lunMonth} are derived.
-     * @return a list of all retrieved items.
-     */
-    public @NotBlank List<Response.Body.@Valid @NotNull Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
-        final List<Response.Body.Item> all = new ArrayList<>();
-        final Year lunYear = Year.from(lunarYearMonth);
-        final Month lunMonth = Month.from(lunarYearMonth);
-        for (int pageNo = 1; ; pageNo++) {
-            final ResponseEntity<Response> entity = getSolCalInfo(lunYear, lunMonth, null, pageNo);
-            final List<Response.Body.Item> items = getItems(entity);
-            if (items.isEmpty()) {
-                break;
+    public @NotBlank List<@Valid @NotNull Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
+        final List<Item> items = new ArrayList<>();
+        {
+            final Year lunYear = Year.from(lunarYearMonth);
+            final Month lunMonth = Month.from(lunarYearMonth);
+            for (int pageNo = 1; ; pageNo++) {
+                final ResponseEntity<Response> entity = getSolCalInfo(lunYear, lunMonth, null, pageNo);
+                final Response response = getResponse(entity);
+                items.addAll(response.getBody().getItems());
+                if (response.getBody().isLastPage()) {
+                    break;
+                }
             }
-            all.addAll(items);
         }
-        return all;
+        return items;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public @Positive int getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
-                                             @NotNull final Month lunMonth, @Max(31) @Min(1) final int lunDay,
-                                             final boolean leapMonth,
-                                             @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
+    public @NotEmpty List<@Valid @NotNull Item> getSpcifyLunCalInfo(
+            @Positive final Year fromSolYear, @Positive final Year toSolYear,
+            @NotNull final Month lunMonth, @Max(31) @Min(1) final int lunDay,
+            final boolean leapMonth) {
         if (toSolYear.isBefore(fromSolYear)) {
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
-        int count = 0;
-        final String fromSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(fromSolYear);
-        final String toSolYearValue = Response.Body.Item.YEAR_FORMATTER.format(toSolYear);
-        final String lunMonthValue = Response.Body.Item.MONTH_FORMATTER.format(lunMonth);
-        final String lunDayValue = Response.Body.Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
-        final String leapMonthValue = leapMonth ? Response.Body.Item.LEAP : Response.Body.Item.NORMAL;
+        final List<Item> items = new ArrayList<>();
+        final String fromSolYearValue = Item.YEAR_FORMATTER.format(fromSolYear);
+        final String toSolYearValue = Item.YEAR_FORMATTER.format(toSolYear);
+        final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
+        final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
+        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
         for (int pageNo = 1; ; pageNo++) {
             final URI url = uriBuilderFromRootUri()
                     .pathSegment("getSpcifyLunCalInfo")
                     .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                    .queryParam("fromSolYear", fromSolYearValue)
-                    .queryParam("toSolYear", toSolYearValue)
-                    .queryParam("lunMonth", lunMonthValue)
-                    .queryParam("lunDay", lunDayValue)
-                    .queryParam("leapMonth", leapMonthValue)
-                    .queryParam("pageNo", pageNo)
+                    .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
+                    .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
+                    .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
+                    .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
+                    .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
+                    .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
                     .encode()
                     .build()
                     .toUri();
             final ResponseEntity<Response> entity = restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
-            final List<Response.Body.Item> items = getItems(entity);
-            if (items.isEmpty()) {
+            final Response response = getResponse(entity);
+            items.addAll(response.getBody().getItems());
+            if (response.getBody().isLastPage()) {
                 break;
             }
-            items.forEach(itemConsumer);
-            count += items.size();
         }
-        return count;
+        return items;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

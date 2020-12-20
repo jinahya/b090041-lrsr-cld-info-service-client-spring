@@ -19,28 +19,33 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void verify_getSolCalInfo_with_localDate() {
         final LocalDate lunarDate = LocalDate.now();
-        final Sinks.One<Response.Body.Item> sinksOne = Sinks.one();
+        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSolCalInfo(
                 lunarDate,
-                sinksOne,
-                (t, r) -> {
-                    log.error("failed to emit value; type: {}, result: {}", t, r);
-                    return false;
-                },
+                sinksMany,
                 (t, r) -> {
                     log.error("failed to emit error; type: {}, result: {}", t, r);
                     return false;
+                },
+                (t, r) -> {
+                    log.error("failed to emit next; type: {}, result: {}", t, r);
+                    return false;
+                },
+                (t, r) -> {
+                    log.error("failed to emit complet; type: {}, result: {}", t, r);
+                    return false;
                 }
         );
-        final Response.Body.Item item = sinksOne.asMono().block();
-        assertThat(item).isNotNull().satisfies(i -> {
-            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-            final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
-            assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
-            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
-            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
-        });
+        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
+        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
+        final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
+        sinksMany.asFlux()
+                .doOnNext(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+                })
+                .blockLast();
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")

@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,6 +28,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.JulianFields;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -160,6 +162,22 @@ public class Response {
                       + "\\("
                       + PATTERN_REGEXP_干支
                       + "\\)";
+
+            // ---------------------------------------------------------------------------------------------------------
+            public static Comparator<Item> COMPARING_IN_LUNAR = Comparator.comparing(Item::getLunarYear)
+                    .thenComparing(Item::getLunMonth)
+                    .thenComparing(Item::getLunDay);
+
+            public static Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);
+
+            // ---------------------------------------------------------------------------------------------------------
+
+            /**
+             * Creates a new instance.
+             */
+            public Item() {
+                super();
+            }
 
             // ---------------------------------------------------------------------------------------------------------
             @Override
@@ -510,10 +528,26 @@ public class Response {
             return items;
         }
 
+        public boolean isLastPage() {
+            return numOfRows * pageNo >= totalCount;
+        }
+
         // -------------------------------------------------------------------------------------------------------------
         @XmlElementWrapper
         @XmlElement(name = "item")
         private List<@Valid @NotNull Item> items;
+
+        @Positive
+        @XmlElement(required = true)
+        private int numOfRows;
+
+        @Positive
+        @XmlElement(required = true)
+        private int pageNo;
+
+        @PositiveOrZero
+        @XmlElement(required = true)
+        private int totalCount;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

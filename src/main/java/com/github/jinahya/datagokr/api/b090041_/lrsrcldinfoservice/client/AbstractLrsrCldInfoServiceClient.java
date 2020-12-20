@@ -19,7 +19,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -57,6 +56,13 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     protected static final String QUERY_PARAM_NAME_LUN_DAY = "lunDay";
 
     // -----------------------------------------------------------------------------------------------------------------
+    protected static final String QUERY_PARAM_NAME_FROM_SOL_YEAR = "fromSolYear";
+
+    protected static final String QUERY_PARAM_NAME_TO_SOL_YEAR = "toSolYear";
+
+    protected static final String QUERY_PARAM_NAME_LEAP_MONTH = "leapMonth";
+
+    // -----------------------------------------------------------------------------------------------------------------
     protected static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -73,19 +79,13 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected @NotNull List<Response.Body.Item> getItems(@Valid @NotNull final Response response) {
+    protected @Valid @NotNull Response requireValid(@NotNull final Response response) {
         requireNonNull(response, "response is null");
-        {
-            final Set<ConstraintViolation<Response>> violations = validator().validate(response);
-            if (!violations.isEmpty()) {
-                throw new RuntimeException("invalid response: " + response,
-                                           new ConstraintViolationException(violations));
-            }
+        final Set<ConstraintViolation<Response>> violations = validator().validate(response);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
         }
-        if (!response.getHeader().isResultCodeSuccess()) {
-            throw new RuntimeException("unsuccessful response: " + response);
-        }
-        return response.getBody().getItems();
+        return response;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

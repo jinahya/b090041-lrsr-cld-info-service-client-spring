@@ -1,6 +1,6 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -19,14 +19,33 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void verify_getSpcifyLunCalInfo() {
-        final Response.Body.Item item = clientInstance().getLunCalInfo(LocalDate.now()).block();
+        final Item item;
+        {
+            final Sinks.Many<Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
+            clientInstance().getLunCalInfo(
+                    LocalDate.now(),
+                    sinksMany,
+                    (t, r) -> {
+                        log.error("failed to emit error; type: {}, result: {}", t, r);
+                        return false;
+                    },
+                    (t, r) -> {
+                        log.error("failed to emit next; type: {}, result: {}", t, r);
+                        return false;
+                    },
+                    (t, r) -> {
+                        log.error("failed to emit complete; type: {}, result: {}", t, r);
+                        return false;
+                    });
+            item = sinksMany.asFlux().blockLast();
+        }
         assert item != null;
         final Year fromSolYear = item.getSolarYear().minusYears(1L);
         final Year toSolYear = item.getSolarYear().plusYears(1L);
         final Month lunMonth = item.getLunarMonth();
         final int lunDay = item.getLunarDayOfMonth();
         final boolean leapMonth = item.getLunarLeapMonth();
-        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
+        final Sinks.Many<Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSpcifyLunCalInfo(
                 fromSolYear,
                 toSolYear,
