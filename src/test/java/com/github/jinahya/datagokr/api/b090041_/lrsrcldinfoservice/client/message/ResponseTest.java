@@ -9,6 +9,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +31,9 @@ class ResponseTest {
                 assertThat(r.getBody()).isNotNull().satisfies(b -> {
                     assertThat(b.getItems()).isNotNull().hasSize(1).doesNotContainNull().allSatisfy(i -> {
                         assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(i)).isEmpty();
-                        assertThat(i.getLunarDate()).isNotNull().isEqualTo(LocalDate.of(2020, 10, 30));
+                        assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(2020));
+                        assertThat(i.getLunarMonth()).isNotNull().isEqualTo(Month.of(10));
+                        assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(30);
                         assertThat(i.getSolarDate()).isNotNull().isEqualTo(LocalDate.of(2020, 12, 14));
                     });
                 });

@@ -239,17 +239,6 @@ public class Response {
                 setLunarDayOfMonth(ofNullable(lunarMonthDay).map(MonthDay::getDayOfMonth).orElse(null));
             }
 
-            // ----------------------------------------------------------------------------------------------- lunarDate
-            public LocalDate getLunarDate() {
-                return LocalDate.of(getLunarYear().getValue(), getLunarMonth(), getLunarDayOfMonth());
-            }
-
-            public void setLunarDate(final LocalDate lunarDate) {
-                setLunarYear(ofNullable(lunarDate).map(Year::from).orElse(null));
-                setLunarMonth(ofNullable(lunarDate).map(Month::from).orElse(null));
-                setLunarDayOfMonth(ofNullable(lunarDate).map(LocalDate::getDayOfMonth).orElse(null));
-            }
-
             // --------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
             public Boolean getLunarLeapMonth() {
                 return LEAP.equals(getLunLeapmonth());

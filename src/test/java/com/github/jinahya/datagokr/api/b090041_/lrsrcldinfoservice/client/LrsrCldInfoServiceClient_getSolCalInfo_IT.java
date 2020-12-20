@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,10 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
             assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
             assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
             assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
-            assertThat(i.getLunarDate()).isNotNull().isEqualTo(lunarDate);
+            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
+            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
+            assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
+            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
         });
     }
 

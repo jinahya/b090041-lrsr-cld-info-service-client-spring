@@ -59,20 +59,4 @@ class ResponseBodyItemTest {
                 .isEqualTo(solarDate.isLeapYear() ? Response.Body.Item.LEAP : Response.Body.Item.NORMAL);
         assertThat(item.getSolJd()).isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
     }
-
-    @Test
-    void testSetLunarDate() {
-        final Response.Body.Item item = new Response.Body.Item();
-        {
-            item.setLunarDate(null);
-            assertThat(item.getLunarYear()).isNull();
-            assertThat(item.getLunarMonth()).isNull();
-            assertThat(item.getLunarDayOfMonth()).isNull();
-        }
-        final LocalDate expected = LocalDate.now();
-        item.setLunarDate(expected);
-        assertThat(item.getLunarDate()).isNotNull().isEqualTo(expected);
-        assertThat(item.getLunYear()).isNotNull().isEqualTo(Response.Body.Item.YEAR_FORMATTER.format(expected));
-        assertThat(item.getLunMonth()).isNotNull().isEqualTo(Response.Body.Item.MONTH_FORMATTER.format(expected));
-    }
 }

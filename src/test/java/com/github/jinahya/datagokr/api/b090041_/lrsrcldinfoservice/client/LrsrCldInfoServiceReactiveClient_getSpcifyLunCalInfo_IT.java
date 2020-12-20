@@ -21,11 +21,10 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     void verify_getSpcifyLunCalInfo() {
         final Response.Body.Item item = clientInstance().getLunCalInfo(LocalDate.now()).block();
         assert item != null;
-        final LocalDate lunarDate = item.getLunarDate();
-        final Year fromSolYear = Year.of(lunarDate.getYear()).minusYears(1L);
-        final Year toSolYear = Year.of(lunarDate.getYear()).plusYears(1L);
-        final Month lunMonth = lunarDate.getMonth();
-        final int lunDay = lunarDate.getDayOfMonth();
+        final Year fromSolYear = item.getSolarYear().minusYears(1L);
+        final Year toSolYear = item.getSolarYear().plusYears(1L);
+        final Month lunMonth = item.getLunarMonth();
+        final int lunDay = item.getLunarDayOfMonth();
         final boolean leapMonth = item.getLunarLeapMonth();
         final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSpcifyLunCalInfo(
