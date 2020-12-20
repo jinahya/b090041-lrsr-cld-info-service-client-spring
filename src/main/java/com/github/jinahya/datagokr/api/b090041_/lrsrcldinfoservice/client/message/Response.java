@@ -197,7 +197,7 @@ public class Response {
                 return ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
 
-            void setLunarYear(final Year lunarYear) {
+            public void setLunarYear(final Year lunarYear) {
                 setLunYear(ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
             }
 
@@ -206,7 +206,7 @@ public class Response {
                 return ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
             }
 
-            void setLunarMonth(final Month lunarMonth) {
+            public void setLunarMonth(final Month lunarMonth) {
                 setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
             }
 
@@ -215,7 +215,7 @@ public class Response {
                 return ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
             }
 
-            void setLunarDayOfMonth(final Integer lunarDayOfMonth) {
+            public void setLunarDayOfMonth(final Integer lunarDayOfMonth) {
                 setLunDay(ofNullable(lunarDayOfMonth).map(v -> format("%1$02d", v)).orElse(null));
             }
 
