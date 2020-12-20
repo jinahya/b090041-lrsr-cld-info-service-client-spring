@@ -8,7 +8,6 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;

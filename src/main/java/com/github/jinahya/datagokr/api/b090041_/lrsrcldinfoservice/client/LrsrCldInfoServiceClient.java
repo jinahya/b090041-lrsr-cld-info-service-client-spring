@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.lang.annotation.Documented;
@@ -35,6 +36,7 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -141,16 +143,14 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Reads all dates in lunar calendar associated with specified month in solar calendar and accepts each of them to
-     * specified consumer.
+     * Invokes {@code GET /.../getLunCalInfo} with {@code ?solYear} and {@code ?solMonth} derived from specified
+     * year-month of solar calendar and returns all items from all pages.
      *
-     * @param solarYearMonth the month (in solar calendar) whose dates (in lunar calendar) are read.
-     * @param itemConsumer   the consumer to which each date (in lunar calendar) are accepted.
-     * @return the number of items accepted to {@code itemConsumer}.
+     * @param solarYearMonth the year-month from which {@code ?solYear} and {@code ?solMonth} are derived.
+     * @return a list of all retrieved items.
      */
-    public @Positive int getLunCalInfo(@NotNull final YearMonth solarYearMonth,
-                                       @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
-        int count = 0;
+    public @NotBlank List<Response.Body.Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
+        final List<Response.Body.Item> all = new ArrayList<>();
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
@@ -159,10 +159,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             if (items.isEmpty()) {
                 break;
             }
-            items.forEach(itemConsumer);
-            count += items.size();
+            all.addAll(items);
         }
-        return count;
+        return all;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -199,16 +198,14 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Reads all dates in solar calendar associated with specified month in lunar calendar and accepts each of them to
-     * specified consumer.
+     * Invokes {@code GET /.../getSolCalInfo} with {@code ?lunYear} and {@code ?lunMonth} derived from specified
+     * year-month of lunar calendar and returns all items from all pages.
      *
-     * @param lunarYearMonth the month (in lunar calendar) whose dates (in solar calendar) are read.
-     * @param itemConsumer   the consumer to which each date (in solar calendar) are accepted.
-     * @return the number of items accepted to {@code itemConsumer}.
+     * @param lunarYearMonth the year-month from which {@code ?lunYear} and {@code ?lunMonth} are derived.
+     * @return a list of all retrieved items.
      */
-    public @Positive int getSolCalInfo(@NotNull final YearMonth lunarYearMonth,
-                                       @NotNull final Consumer<? super Response.Body.Item> itemConsumer) {
-        int count = 0;
+    public @NotBlank List<Response.Body.@Valid @NotNull Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
+        final List<Response.Body.Item> all = new ArrayList<>();
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
@@ -217,10 +214,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             if (items.isEmpty()) {
                 break;
             }
-            items.forEach(itemConsumer);
-            count += items.size();
+            all.addAll(items);
         }
-        return count;
+        return all;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

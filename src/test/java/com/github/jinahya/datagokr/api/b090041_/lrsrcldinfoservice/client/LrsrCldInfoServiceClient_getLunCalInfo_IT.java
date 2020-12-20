@@ -8,7 +8,6 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,14 +37,12 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     @Test
     void verify_getLunCalInfo_with_yearMonth() {
         final YearMonth solarYearMonth = YearMonth.now();
-        final List<Response.Body.Item> items = new ArrayList<>();
-        final int count = clientInstance().getLunCalInfo(solarYearMonth, i -> {
+        final List<Response.Body.Item> items = clientInstance().getLunCalInfo(solarYearMonth);
+        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
             final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarYearMonth);
             final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarYearMonth);
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
-            items.add(i);
         });
-        assertThat(count).isEqualTo(items.size());
     }
 }
