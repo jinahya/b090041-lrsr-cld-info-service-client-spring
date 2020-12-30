@@ -20,7 +20,7 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(LocalDate)")
     @Test
-    void test_getLunCalInfo_with_solarDate() {
+    void getLunCalInfo_Expected_YearMonthDay() {
         final LocalDate solarDate = LocalDate.now();
         final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getLunCalInfo(
@@ -55,7 +55,7 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void test_getLunCalInfo_with_solarYearMonth() {
+    void getLunCalInfo_Expected_YearMonth() {
         final YearMonth solarYearMonth = YearMonth.now();
         final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getLunCalInfo(

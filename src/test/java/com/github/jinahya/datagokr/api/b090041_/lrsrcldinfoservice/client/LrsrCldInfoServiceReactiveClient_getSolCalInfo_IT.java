@@ -17,7 +17,7 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getSolCalInfo_with_localDate() {
+    void getSolCalInfo_Expected_LocalDateNow() {
         final LocalDate lunarDate = LocalDate.now();
         final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSolCalInfo(
@@ -50,7 +50,7 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getSolCalInfo_with_yearMonth() {
+    void getSolCalInfo_Expected_YearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
         final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
         clientInstance().getSolCalInfo(

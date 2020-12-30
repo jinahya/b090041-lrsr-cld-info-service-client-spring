@@ -20,7 +20,7 @@ class LrsrCldInfoServiceClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoService
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSpcifyLunCalInfo(Year, Year, Month, int, boolean)")
     @Test
-    void testGetSpcifyLunCalInfo() {
+    void getSpcifyLunCalInfo() {
         final Item item = clientInstance()
                 .getLunCalInfo(LocalDate.now())
                 .stream()

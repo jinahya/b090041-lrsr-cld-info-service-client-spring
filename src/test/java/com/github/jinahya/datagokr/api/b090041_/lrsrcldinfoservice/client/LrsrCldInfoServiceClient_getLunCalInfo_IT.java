@@ -20,7 +20,7 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(LocalDate)")
     @Test
-    void verify_getLunCalInfo_with_localDate() {
+    void getLunCalInfo_Expected_YearMonthDay() {
         final LocalDate solarDate = LocalDate.now();
         final List<Item> items = clientInstance().getLunCalInfo(solarDate);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
@@ -38,7 +38,7 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(YearMonth)")
     @Test
-    void verify_getLunCalInfo_with_yearMonth() {
+    void getLunCalInfo_Expected_YearMonth() {
         final YearMonth solarYearMonth = YearMonth.now();
         final List<Item> items = clientInstance().getLunCalInfo(solarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {

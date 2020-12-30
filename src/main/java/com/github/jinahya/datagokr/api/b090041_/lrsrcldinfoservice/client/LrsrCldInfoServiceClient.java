@@ -104,7 +104,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         }
         final Response response = responseEntity.getBody();
         if (response == null) {
-            throw new RuntimeException("null body from the response responseEntity");
+            throw new RuntimeException("null body from the response entity");
         }
         return requireValid(response);
     }
@@ -196,7 +196,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             final Month lunMonth = Month.from(lunarDate);
             final int lunDay = lunarDate.getDayOfMonth();
             for (int pageNo = 1; ; pageNo++) {
-                final ResponseEntity<Response> entity = getSolCalInfo(lunYear, lunMonth, lunDay, null);
+                final ResponseEntity<Response> entity = getSolCalInfo(lunYear, lunMonth, lunDay, pageNo);
                 final Response response = getResponse(entity);
                 items.addAll(response.getBody().getItems());
                 if (response.getBody().isLastPage()) {

@@ -20,27 +20,32 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSolCalInfo(LocalDate)")
     @Test
-    void verify_getSolCalInfo_with_localDate() {
+    @SuppressWarnings("java:S5841")
+    void getSolCalInfo_Expected_LocalDateNow() {
         final LocalDate lunarDate = LocalDate.now();
         final List<Response.Body.Item> items = clientInstance().getSolCalInfo(lunarDate);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-            final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-            final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
-            assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
-            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
-            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
-            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
-            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
-            assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
-            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
-        });
+        assertThat(items).isNotNull()
+//                .isNotEmpty() // may be empty!!!
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
+                    final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
+                    final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
+                    assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
+                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+                })
+        ;
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSolCalInfo(YearMonth)")
     @Test
-    void verify_getSolCalInfo_with_yearMonth() {
+    void getSolCalInfo_Expected_YearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
         final List<Response.Body.Item> items = clientInstance().getSolCalInfo(lunarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {

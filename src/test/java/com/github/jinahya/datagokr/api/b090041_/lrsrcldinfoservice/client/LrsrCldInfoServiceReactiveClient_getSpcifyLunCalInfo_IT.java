@@ -18,7 +18,7 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
-    void verify_getSpcifyLunCalInfo() {
+    void getSpcifyLunCalInfo() {
         final Item item;
         {
             final Sinks.Many<Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
