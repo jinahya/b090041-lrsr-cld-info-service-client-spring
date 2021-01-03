@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.Optional.ofNullable;
 
 /**
- * A component class for accessing {@link #BASE_URL}.
+ * A client implementation uses an instance of {@link WebClient}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see LrsrCldInfoServiceClient
@@ -66,7 +66,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
-                .uri(b -> b.pathSegment("getLunCalInfo")
+                .uri(b -> b.pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                         .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
                         .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
@@ -135,7 +135,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
-                .uri(b -> b.pathSegment("getSolCalInfo")
+                .uri(b -> b.pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                         .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
                         .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
@@ -199,7 +199,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
 
     // -----------------------------------------------------------------------------------------------------------------
     public void getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
-                                    @NotNull final Month lunMonth, @Max(31) @Min(1) final int lunDay,
+                                    @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
                                     final boolean leapMonth,
                                     @NotNull final Sinks.Many<? super Item> sinksMany,
                                     @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
@@ -220,7 +220,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 response = webClient
                         .get()
                         .uri(b -> b
-                                .pathSegment("getSpcifyLunCalInfo")
+                                .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
                                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                                 .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
                                 .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)

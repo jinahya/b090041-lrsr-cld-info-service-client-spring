@@ -38,6 +38,13 @@ public abstract class AbstractLrsrCldInfoServiceClient {
 
     public static final String BASE_URL_PRODUCTION = BASE_URL_DEVELOPMENT;
 
+    // -----------------------------------------------------------------------------------------------------------------
+    protected static final String PATH_SEGMENT_GET_LUN_CAL_INFO = "getLunCalInfo";
+
+    protected static final String PATH_SEGMENT_GET_SOL_CAL_INFO = "getSolCalInfo";
+
+    protected static final String PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO = "getSpcifyLunCalInfo";
+
     // ---------------------------------------------------------------------------------------------------- ?ServiceKey=
     protected static final String QUERY_PARAM_NAME_SERVICE_KEY = "ServiceKey";
 
