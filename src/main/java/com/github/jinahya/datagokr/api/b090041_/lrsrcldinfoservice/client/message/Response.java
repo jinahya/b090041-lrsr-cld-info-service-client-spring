@@ -142,6 +142,7 @@ public class Response {
                 // has nothing to do.
             }
 
+            @SuppressWarnings({"java:S1172"})
             void afterUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
                 if (lunWolgeon != null && lunWolgeon.trim().isEmpty()) {
                     lunWolgeon = null;
@@ -233,7 +234,7 @@ public class Response {
             }
 
             public void setSolarLeapYear(final Boolean solarLeapYear) {
-                setSolLeapyear(ofNullable(solarLeapYear).map(v -> v ? LEAP : NORMAL).orElse(null));
+                setSolLeapyear(ofNullable(solarLeapYear).map(v -> Boolean.TRUE.equals(v) ? LEAP : NORMAL).orElse(null));
             }
 
             // ------------------------------------------------------------------------------------------------- solWeek
