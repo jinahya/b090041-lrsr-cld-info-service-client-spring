@@ -11,8 +11,6 @@ See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi
 
 ## Usages
 
-### Common
-
 Expand the component-scanning path.
 
 ```java
