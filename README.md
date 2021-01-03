@@ -16,7 +16,6 @@ See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi
 Expand the component-scanning path.
 
 ```java
-
 @SpringBootApplication(
         scanBasePackageClasses = {
                 com.github.jinahya.datagokr.....client._NoOp.class,
@@ -24,7 +23,6 @@ Expand the component-scanning path.
         }
 )
 class MyApplication {
-
 }
 ```
 
