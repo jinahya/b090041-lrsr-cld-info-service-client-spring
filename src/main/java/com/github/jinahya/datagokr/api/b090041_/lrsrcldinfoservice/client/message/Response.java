@@ -103,72 +103,11 @@ public class Response {
             public static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
 
             // ---------------------------------------------------------------------------------------------------------
-
-            /**
-             * A regular expression of {@code 갑을병정무기경신임계}. The value is {@value}.
-             *
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%B2%9C%EA%B0%84">천간</a>
-             */
-            static final String PATTERN_REGEXP_천간
-                    = "[\uac11\uc744\ubcd1\uc815\ubb34\uae30\uacbd\uc2e0\uc784\uacc4]";
-
-            /**
-             * A regular expression of {@code 자축인묘인사오미신유술해}. The value is {@value}.
-             *
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%A7%80%EC%A7%80_(%EC%97%AD%EB%B2%95)">지지</a>
-             */
-            static final String PATTERN_REGEXP_지지
-                    = "[\uc790\ucd95\uc778\ubb18\uc9c4\uc0ac\uc624\ubbf8\uc2e0\uc720\uc220\ud574]";
-
-            /**
-             * A regular expression for <a href="https://ko.wikipedia.org/wiki/%EA%B0%84%EC%A7%80">간지</a>. The value is
-             * {@value}.
-             *
-             * @see <a href="https://ko.wikipedia.org/wiki/%EA%B0%84%EC%A7%80">간지</a>
-             */
-            static final String PATTERN_REGEXP_간지
-                    = "(?<stemKore>" + PATTERN_REGEXP_천간 + ")(?<branchKore>" + PATTERN_REGEXP_지지 + ")";
-
-            // ---------------------------------------------------------------------------------------------------------
-
-            /**
-             * A regular expression of {@code 甲乙丙丁戊己庚辛壬癸}. The value is {@value}.
-             *
-             * @see <a href="https://zh.wikipedia.org/wiki/%E5%A4%A9%E5%B9%B2">天干</a>
-             */
-            static final String PATTERN_REGEXP_天干
-                    = "[\u7532\u4e59\u4e19\u4e01\u620a\u5df1\u5e9a\u8f9b\u58ec\u7678]";
-
-            /**
-             * A regular expression for {@code 子丑寅卯辰巳午未申酉戌亥}. The value is {@value}.
-             *
-             * @see <a href="https://zh.wikipedia.org/wiki/%E5%9C%B0%E6%94%AF">地支</a>
-             */
-            static final String PATTERN_REGEXP_地支
-                    = "[\u5b50\u4e11\u5bc5\u536f\u8fb0\u5df3\u5348\u672a\u7533\u9149\u620c\u4ea5]";
-
-            /**
-             * A regular expression for <a href="https://zh.wikipedia.org/wiki/%E5%B9%B2%E6%94%AF">干支</a>. The value is
-             * {@value}.
-             *
-             * @see <a href="https://zh.wikipedia.org/wiki/%E5%B9%B2%E6%94%AF">干支</a>
-             */
-            static final String PATTERN_REGEXP_干支
-                    = "(?<stemHans>" + PATTERN_REGEXP_天干 + ")(?<branchHans>" + PATTERN_REGEXP_地支 + ")";
-
-            // ---------------------------------------------------------------------------------------------------------
-            static final String PATTERN_REGEXP_간지_干支
-                    = PATTERN_REGEXP_간지
-                      + "\\("
-                      + PATTERN_REGEXP_干支
-                      + "\\)";
-
-            // ---------------------------------------------------------------------------------------------------------
-            public static Comparator<Item> COMPARING_IN_LUNAR = Comparator.comparing(Item::getLunarYear)
+            public static final Comparator<Item> COMPARING_IN_LUNAR = Comparator.comparing(Item::getLunarYear)
                     .thenComparing(Item::getLunMonth)
                     .thenComparing(Item::getLunDay);
 
-            public static Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);
+            public static final Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);
 
             // ---------------------------------------------------------------------------------------------------------
 
@@ -202,6 +141,7 @@ public class Response {
 
             // ---------------------------------------------------------------------------------------------------------
             void beforeUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
+                // has nothing to do.
             }
 
             void afterUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
@@ -269,75 +209,9 @@ public class Response {
 
             // ------------------------------------------------------------------------------------------------ lunSecha
 
-            // ------------------------------------------------------------------------------------------------- 세차 / 歲次
-
-            /**
-             * Returns current value of {@code 세차} property.
-             *
-             * @return current value of {@code 세차} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%84%B8%EC%B0%A8_(%EA%B0%84%EC%A7%80)">세차 (간지)</a>
-             */
-            public String get세차() {
-                return ofNullable(getLunSecha()).map(s -> s.substring(1, 3)).orElse(null);
-            }
-
-            /**
-             * Returns current value of {@code 歲次} property.
-             *
-             * @return current value of {@code 歲次} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%84%B8%EC%B0%A8_(%EA%B0%84%EC%A7%80)">세차 (간지)</a>
-             */
-            public String get歲次() {
-                return ofNullable(getLunSecha()).map(s -> s.substring(1, 3)).orElse(null);
-            }
-
             // ---------------------------------------------------------------------------------------------- lunWolgeon
 
-            // ------------------------------------------------------------------------------------------------- 월건 / 月建
-
-            /**
-             * Returns current value of {@code 월건} property.
-             *
-             * @return current value of {@code 월건} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%9B%94%EA%B1%B4">월건</a>
-             */
-            public String get월건() {
-                return ofNullable(getLunWolgeon()).map(s -> s.substring(1, 3)).orElse(null);
-            }
-
-            /**
-             * Returns current value of {@code 月建} property.
-             *
-             * @return current value of {@code 月建} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%9B%94%EA%B1%B4">월건</a>
-             */
-            public String get月建() {
-                return ofNullable(getLunWolgeon()).map(s -> s.substring(1, 3)).orElse(null);
-            }
-
             // -----------------------------------------------------------------------------------------------  lunIljin
-
-            // ------------------------------------------------------------------------------------------------- 일진 / 日辰
-
-            /**
-             * Returns current value of {@code 일진} property.
-             *
-             * @return current value of {@code 일진} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%9D%BC%EC%A7%84_(%EA%B0%84%EC%A7%80)">일진</a>
-             */
-            public String get일진() {
-                return ofNullable(getLunWolgeon()).map(s -> s.substring(1, 3)).orElse(null);
-            }
-
-            /**
-             * Returns current value of {@code 日辰} property.
-             *
-             * @return current value of {@code 日辰} property.
-             * @see <a href="https://ko.wikipedia.org/wiki/%EC%9D%BC%EC%A7%84_(%EA%B0%84%EC%A7%80)">일진</a>
-             */
-            public String get日辰() {
-                return ofNullable(getLunWolgeon()).map(s -> s.substring(1, 3)).orElse(null);
-            }
 
             // ------------------------------------------------------------------------------------------------- lunYear
 
@@ -468,18 +342,15 @@ public class Response {
             @XmlElement
             private int lunNday;
 
-            @Pattern(regexp = PATTERN_REGEXP_간지_干支)
-            @NotNull
+            @NotBlank
             @XmlElement
             private String lunSecha;
 
-            @Pattern(regexp = PATTERN_REGEXP_간지_干支)
             @Nullable
             @XmlElement(required = false)
             private String lunWolgeon;
 
-            @Pattern(regexp = PATTERN_REGEXP_간지_干支)
-            @NotNull
+            @NotBlank
             @XmlElement
             private String lunIljin;
 

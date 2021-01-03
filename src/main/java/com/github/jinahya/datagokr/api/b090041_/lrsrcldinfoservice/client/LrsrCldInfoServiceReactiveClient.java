@@ -239,9 +239,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
             }
             assert response != null;
             requireValid(response);
-            response.getBody().getItems().forEach(i -> {
-                sinksMany.emitNext(i, emitNextFailureHandler);
-            });
+            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
             if (response.getBody().isLastPage()) {
                 break;
             }

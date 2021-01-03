@@ -96,11 +96,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
     protected @NotNull Response getResponse(@NotNull final ResponseEntity<Response> responseEntity) {
         requireNonNull(responseEntity, "responseEntity is null");
-        {
-            final HttpStatus statusCode = responseEntity.getStatusCode();
-            if (!statusCode.is2xxSuccessful()) {
-                throw new RuntimeException("unsuccessful response status code: " + statusCode);
-            }
+        final HttpStatus statusCode = responseEntity.getStatusCode();
+        if (!statusCode.is2xxSuccessful()) {
+            throw new RuntimeException("unsuccessful response status code: " + statusCode);
         }
         final Response response = responseEntity.getBody();
         if (response == null) {
