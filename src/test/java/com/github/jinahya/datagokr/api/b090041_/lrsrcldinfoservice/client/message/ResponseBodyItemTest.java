@@ -5,36 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.temporal.JulianFields;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class ResponseBodyItemTest {
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    void compile_PATTERN_REGEXP_간지() {
-        Pattern.compile(Response.Body.Item.PATTERN_REGEXP_간지);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    void compile_PATTERN_REGEXP_干支() {
-        Pattern.compile(Response.Body.Item.PATTERN_REGEXP_干支);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    void test_PATTERN_REGEXP_간지_干支() {
-        final Pattern pattern = Pattern.compile(Response.Body.Item.PATTERN_REGEXP_간지_干支);
-        for (final String input : new String[] {"정축(丁丑)", "기해(己亥)", "갑술(甲戌)"}) {
-            final Matcher matcher = pattern.matcher(input);
-            final boolean matches = matcher.matches();
-            assertThat(matches).isTrue();
-        }
-    }
 
     @Test
     void testSetSolarDate() {

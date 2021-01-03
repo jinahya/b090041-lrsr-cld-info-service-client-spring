@@ -25,11 +25,15 @@ class ResponseTest {
             final Unmarshaller unmarshaller = context.createUnmarshaller();
             final Response response = unmarshaller.unmarshal(new StreamSource(resource), Response.class).getValue();
             assertThat(response).isNotNull().satisfies(r -> {
+                assertThat(r.toString()).isNotBlank();
                 assertThat(r.getHeader()).isNotNull().satisfies(h -> {
+                    assertThat(h.toString()).isNotBlank();
                     assertThat(h.getResultCode()).isNotNull().isEqualTo(Response.Header.RESULT_CODE_SUCCESS);
                 });
                 assertThat(r.getBody()).isNotNull().satisfies(b -> {
+                    assertThat(b.toString()).isNotBlank();
                     assertThat(b.getItems()).isNotNull().hasSize(1).doesNotContainNull().allSatisfy(i -> {
+                        assertThat(i.toString()).isNotBlank();
                         assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(i)).isEmpty();
                         assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(2020));
                         assertThat(i.getLunarMonth()).isNotNull().isEqualTo(Month.of(10));

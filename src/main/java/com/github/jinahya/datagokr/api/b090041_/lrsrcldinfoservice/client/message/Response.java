@@ -155,17 +155,9 @@ public class Response {
                 return ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
 
-            public void setLunarYear(final Year lunarYear) {
-                setLunYear(ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
-            }
-
             // ----------------------------------------------------------------------------------- lunMonth / lunarMonth
             public Month getLunarMonth() {
                 return ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
-            }
-
-            public void setLunarMonth(final Month lunarMonth) {
-                setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
             }
 
             // -------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
@@ -173,38 +165,9 @@ public class Response {
                 return ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
             }
 
-            public void setLunarDayOfMonth(final Integer lunarDayOfMonth) {
-                setLunDay(ofNullable(lunarDayOfMonth).map(v -> format("%1$02d", v)).orElse(null));
-            }
-
-            // ------------------------------------------------------------------------------------------ lunarYearMonth
-            public YearMonth getLunarYearMonth() {
-                return YearMonth.of(getLunarYear().getValue(), getLunarMonth());
-            }
-
-            void setLunarYearMonth(final YearMonth lunarYearMonth) {
-                setLunarYear(ofNullable(lunarYearMonth).map(YearMonth::getYear).map(Year::of).orElse(null));
-                setLunarMonth(ofNullable(lunarYearMonth).map(YearMonth::getMonth).orElse(null));
-            }
-
-            // ------------------------------------------------------------------------------------------- lunarMonthDay
-            public MonthDay getLunarMonthDay() {
-                return MonthDay.of(getLunarMonth(), getLunarDayOfMonth());
-            }
-
-            void setLunarMonthDay(final MonthDay lunarMonthDay) {
-                setLunarMonth(ofNullable(lunarMonthDay).map(MonthDay::getMonth).orElse(null));
-                setLunarDayOfMonth(ofNullable(lunarMonthDay).map(MonthDay::getDayOfMonth).orElse(null));
-            }
-
             // --------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
             public Boolean getLunarLeapMonth() {
                 return LEAP.equals(getLunLeapmonth());
-            }
-
-            @SuppressWarnings({"java:S5411"})
-            public void setLunarLeapMonth(final Boolean lunarLeapMonth) {
-                setLunLeapmonth(ofNullable(lunarLeapMonth).map(v -> v ? LEAP : NORMAL).orElse(null));
             }
 
             // ------------------------------------------------------------------------------------------------ lunSecha
@@ -244,26 +207,6 @@ public class Response {
 
             void setSolarDayOfMonth(final Integer solarDayOfMonth) {
                 setSolDay(ofNullable(solarDayOfMonth).map(v -> format("%1$02d", v)).orElse(null));
-            }
-
-            // ------------------------------------------------------------------------------------------ solarYearMonth
-            public YearMonth getSolarYearMonth() {
-                return YearMonth.of(getSolarYear().getValue(), getSolarMonth());
-            }
-
-            void setSolarYearMonth(final YearMonth solarYearMonth) {
-                setSolarYear(ofNullable(solarYearMonth).map(YearMonth::getYear).map(Year::of).orElse(null));
-                setSolarMonth(ofNullable(solarYearMonth).map(YearMonth::getMonth).orElse(null));
-            }
-
-            // ------------------------------------------------------------------------------------------- solarMonthDay
-            public MonthDay getSolarMonthDay() {
-                return MonthDay.of(getSolarMonth(), getSolarDayOfMonth());
-            }
-
-            void setSolarMonthDay(final MonthDay solarMonthDay) {
-                setSolarMonth(ofNullable(solarMonthDay).map(MonthDay::getMonth).orElse(null));
-                setSolarDayOfMonth(ofNullable(solarMonthDay).map(MonthDay::getDayOfMonth).orElse(null));
             }
 
             // ----------------------------------------------------------------------------------------------- solarDate
