@@ -27,7 +27,6 @@ class MyApplication {
 Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded value. You should use a URL-decoded value.
 
 ```java
-
 @AbstractLrsrCldInfoServiceClient.LrsrCldInfoServiceServiceKey
 @Bean
 String lrsrCldInfoServiceServiceKey() {
