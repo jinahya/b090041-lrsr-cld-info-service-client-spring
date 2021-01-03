@@ -5,5 +5,113 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.jinahya/datagokr-api-b090041-lrsrcldinfoservice-client-spring)](https://search.maven.org/search?q=a:datagokr-api-b090041-lrsrcldinfoservice-client-spring)
 [![javadoc](https://javadoc.io/badge2/com.github.jinahya/datagokr-api-b090041-lrsrcldinfoservice-client-spring/javadoc.svg)](https://javadoc.io/doc/com.github.jinahya/datagokr-api-b090041-lrsrcldinfoservice-client-spring)
 
-A client library for http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService
+A client library for accessing http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService.
 
+See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi.do).
+
+## Usages
+
+### Common
+
+Expand the component-scanning path.
+
+```java
+
+@SpringBootApplication(
+        scanBasePackageClasses = {
+                com.github.jinahya.datagokr.....client._NoOp.class,
+                MyApplication.class
+        }
+)
+class MyApplication {
+
+}
+```
+
+Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded value. You should use a URL-decoded value.
+
+```java
+
+@AbstractLrsrCldInfoServiceClient.LrsrCldInfoServiceServiceKey
+@Bean
+String lrsrCldInfoServiceServiceKey() {
+    // The service key assigned by data.go.kr
+    // ...%3D%3D (X)
+    // ...==     (O)
+}
+```
+
+### Using `RestTeamplate`
+
+Provide an instance of `RestTemplate`.
+
+```java
+@LrsrCldInfoServiceClient.LrsrCldInfoServiceRestTemplate
+@Bean
+RestTemplate lrsrCldInfoServiceRestTemplate() {
+    return new RestTemplateBuilder()
+            ...
+            .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+            .build();
+}
+```
+
+Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is internally get autowired with the `RestTemplate` instance.
+
+```java
+@Autowired
+private LrsrCldInfoServiceClient client;
+
+void doSome() {
+    final List<Item> items = client.getLunCalInfo(LocalDate.now());
+}
+```
+
+### Using `WebClient`
+
+Provide an instance of `WebClient`.
+
+```java
+@LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
+@Bean
+WebClient lrsrCldInfoServiceWebClient(
+    return WebClient.builder()
+            ...
+            .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+            .build();
+}
+```
+
+Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with the `WebClient` instance.
+
+```java
+@Autowired
+private LrsrCldInfoServiceReactiveClient client;
+
+void doSome() {
+    final LocalDate solarDate = LocalDate.now();
+    final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
+    client.getLunCalInfo(
+            solarDate,
+            sinksMany,
+            (t, r) -> {
+                log.error("failed to emit error; type: {}, result: {}", t, r);
+                return false;
+            },
+            (t, r) -> {
+                log.error("failed to emit next; type: {}, result: {}", t, r);
+                return false;
+            },
+            (t, r) -> {
+                log.error("failed to emit complet; type: {}, result: {}", t, r);
+                return false;
+            }
+    );
+    sinksMany.asFlux()
+            .doOnNext(i -> {
+            })
+            .blockLast();
+}
+```
