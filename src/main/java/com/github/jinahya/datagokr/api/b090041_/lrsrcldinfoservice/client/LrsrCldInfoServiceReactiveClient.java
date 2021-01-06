@@ -14,8 +14,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -62,7 +62,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
 
     // -----------------------------------------------------------------------------------------------------------------
     protected @NotNull Mono<Response> getLunCalInfo(@NotNull final Year solYear, @NotNull final Month solMonth,
-                                                    @Positive @Nullable final Integer solDay,
+                                                    @Max(31) @Min(1) @Nullable final Integer solDay,
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
@@ -80,58 +80,38 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 ;
     }
 
-    public void getLunCalInfo(@NotNull final LocalDate solarDate,
-                              @NotNull final Sinks.Many<? super Item> sinksMany,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+    public Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response;
-            try {
-                response = requireValid(getLunCalInfo(solYear, solMonth, solDay, pageNo).block());
-            } catch (final RuntimeException re) {
-                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
-                return;
-            }
-            assert response != null;
-            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        sinksMany.emitComplete(emitCompleteFailureHandler);
+        final AtomicInteger pageNo = new AtomicInteger();
+        return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
-    public void getLunCalInfo(@NotNull final YearMonth solarYearMonth,
-                              @NotNull final Sinks.Many<? super Item> sinksMany,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+    public Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response;
-            try {
-                response = getLunCalInfo(solYear, solMonth, null, pageNo).block();
-            } catch (final RuntimeException re) {
-                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
-                return;
-            }
-            assert response != null;
-            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        sinksMany.emitComplete(emitCompleteFailureHandler);
+        final AtomicInteger pageNo = new AtomicInteger();
+        return getLunCalInfo(solYear, solMonth, null, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getLunCalInfo(solYear, solMonth, null, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     protected @NotNull Mono<Response> getSolCalInfo(@NotNull final Year lunYear, @NotNull final Month lunMonth,
-                                                    @Positive @Nullable final Integer lunDay,
+                                                    @Max(30) @Min(1) @Nullable final Integer lunDay,
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
@@ -148,63 +128,39 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .bodyToMono(Response.class);
     }
 
-    public void getSolCalInfo(@NotNull final LocalDate lunarDate,
-                              @NotNull final Sinks.Many<? super Item> sinksMany,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+    public Flux<Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
         final Year lunYear = Year.from(lunarDate);
         final Month lunMonth = Month.from(lunarDate);
         final int lunDay = lunarDate.getDayOfMonth();
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response;
-            try {
-                response = requireValid(getSolCalInfo(lunYear, lunMonth, lunDay, pageNo).block());
-            } catch (final RuntimeException re) {
-                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
-                return;
-            }
-            assert response != null;
-            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        sinksMany.emitComplete(emitCompleteFailureHandler);
+        final AtomicInteger pageNo = new AtomicInteger();
+        return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
-    public void getSolCalInfo(@NotNull final YearMonth lunarYearMonth,
-                              @NotNull final Sinks.Many<? super Item> sinksMany,
-                              @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
-                              @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+    public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response;
-            try {
-                response = getSolCalInfo(lunYear, lunMonth, null, pageNo).block();
-            } catch (final RuntimeException re) {
-                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
-                return;
-            }
-            assert response != null;
-            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        sinksMany.emitComplete(emitCompleteFailureHandler);
+        final AtomicInteger pageNo = new AtomicInteger();
+        return getSolCalInfo(lunYear, lunMonth, null, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getSolCalInfo(lunYear, lunMonth, null, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public void getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
-                                    @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
-                                    final boolean leapMonth,
-                                    @NotNull final Sinks.Many<? super Item> sinksMany,
-                                    @NotNull final Sinks.EmitFailureHandler emitErrorFailureHandler,
-                                    @NotNull final Sinks.EmitFailureHandler emitNextFailureHandler,
-                                    @NotNull final Sinks.EmitFailureHandler emitCompleteFailureHandler) {
+    public Mono<Response> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
+                                              @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
+                                              final boolean leapMonth, @Positive final int pageNo) {
         if (toSolYear.isBefore(fromSolYear)) {
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
@@ -214,37 +170,40 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
         final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
         final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
-        for (final AtomicInteger pageNo = new AtomicInteger(1); ; ) {
-            final Response response;
-            try {
-                response = webClient
-                        .get()
-                        .uri(b -> b
-                                .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
-                                .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                                .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
-                                .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
-                                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
-                                .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
-                                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
-                                .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo.getAndIncrement())
-                                .build()
-                        )
-                        .retrieve()
-                        .bodyToMono(Response.class)
-                        .block();
-            } catch (final RuntimeException re) {
-                sinksMany.emitError(re.getCause(), emitErrorFailureHandler);
-                return;
-            }
-            assert response != null;
-            requireValid(response);
-            response.getBody().getItems().forEach(i -> sinksMany.emitNext(i, emitNextFailureHandler));
-            if (response.getBody().isLastPage()) {
-                break;
-            }
+        return webClient
+                .get()
+                .uri(b -> b
+                        .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
+                        .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                        .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
+                        .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
+                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
+                        .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
+                        .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
+                        .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(Response.class);
+    }
+
+    public Flux<Item> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
+                                          @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
+                                          final boolean leapMonth) {
+        if (toSolYear.isBefore(fromSolYear)) {
+            throw new IllegalArgumentException(
+                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
-        sinksMany.emitComplete(emitCompleteFailureHandler);
+        final AtomicInteger pageNo = new AtomicInteger(0);
+        return getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getSpcifyLunCalInfo(
+                            fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

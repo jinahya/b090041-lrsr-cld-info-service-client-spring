@@ -120,7 +120,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     protected @NotNull ResponseEntity<Response> getLunCalInfo(
             @NotNull final Year solYear, @NotNull final Month solMonth,
-            @Positive @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
+            @Max(31) @Min(1) @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -197,7 +197,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     protected @NotNull ResponseEntity<Response> getSolCalInfo(
             @NotNull final Year lunYear, @NotNull final Month lunMonth,
-            @Positive @Nullable final Integer lunDay, @Positive @Nullable final Integer pageNo) {
+            @Max(30) @Min(1) @Nullable final Integer lunDay, @Positive @Nullable final Integer pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -262,8 +262,40 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Retrieves all items from {@code .../getSpcifyLunCalInfo?fromSolYear=&toSolYear&lunYear=&lunMonth=&lunDay=&leapMonth=}
-     * with specified arguments.
+     * Retrieves a response from {@code .../getSpcifyLunCalInfo} with specified arguments.
+     *
+     * @param fromSolYear a value for {@code ?fromSolYear}.
+     * @param toSolYear   a value for {@code ?toSolYear}.
+     * @param lunMonth    a value for {@code ?lunMonth}.
+     * @param lunDay      a value for {@code ?lunDay}.
+     * @param leapMonth   a value for {@code ?leapMonth}.
+     * @param pageNo      a value for {@code ?pageNo}.
+     * @return a reponse entity of {@link Response}.
+     */
+    public @NotNull ResponseEntity<Response> getSpcifyLunCalInfo(
+            @Positive final Year fromSolYear, @Positive final Year toSolYear, @NotNull final Month lunMonth,
+            @Max(30) @Min(1) final int lunDay, final boolean leapMonth, @Positive int pageNo) {
+        if (toSolYear.isBefore(fromSolYear)) {
+            throw new IllegalArgumentException(
+                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
+        }
+        final URI url = uriBuilderFromRootUri()
+                .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
+                .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, Item.YEAR_FORMATTER.format(fromSolYear))
+                .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, Item.YEAR_FORMATTER.format(toSolYear))
+                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
+                .queryParam(QUERY_PARAM_NAME_LUN_DAY, Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay)))
+                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NORMAL)
+                .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
+                .encode()
+                .build()
+                .toUri();
+        return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
+    }
+
+    /**
+     * Retrieves all items from {@code .../getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@code ?fromSolYear}.
      * @param toSolYear   a value for {@code ?toSolYear}.
@@ -280,26 +312,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
         final List<Item> items = new ArrayList<>();
-        final String fromSolYearValue = Item.YEAR_FORMATTER.format(fromSolYear);
-        final String toSolYearValue = Item.YEAR_FORMATTER.format(toSolYear);
-        final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
-        final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
-        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
         for (int pageNo = 1; ; pageNo++) {
-            final URI url = uriBuilderFromRootUri()
-                    .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
-                    .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                    .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
-                    .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
-                    .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
-                    .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
-                    .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
-                    .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
-                    .encode()
-                    .build()
-                    .toUri();
-            final ResponseEntity<Response> entity = restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
-            final Response response = getResponse(entity);
+            final Response response = getResponse(
+                    getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth,lunDay, leapMonth, pageNo));
             items.addAll(response.getBody().getItems());
             if (response.getBody().isLastPage()) {
                 break;

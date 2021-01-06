@@ -59,7 +59,8 @@ Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is interna
 private LrsrCldInfoServiceClient client;
 
 void doSome() {
-    final List<Item> items = client.getLunCalInfo(LocalDate.now());
+    for (final Item item : client.getLunCalInfo(LocalDate.now())) {
+    }
 }
 ```
 
@@ -87,24 +88,7 @@ private LrsrCldInfoServiceReactiveClient client;
 
 void doSome() {
     final LocalDate solarDate = LocalDate.now();
-    final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
-    client.getLunCalInfo(
-            solarDate,
-            sinksMany,
-            (t, r) -> {
-                log.error("failed to emit error; type: {}, result: {}", t, r);
-                return false;
-            },
-            (t, r) -> {
-                log.error("failed to emit next; type: {}, result: {}", t, r);
-                return false;
-            },
-            (t, r) -> {
-                log.error("failed to emit complet; type: {}, result: {}", t, r);
-                return false;
-            }
-    );
-    sinksMany.asFlux()
+    client.getLunCalInfo(solarDate)
             .doOnNext(i -> {
             })
             .blockLast();

@@ -60,6 +60,8 @@ public class Response {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Setter
+    @Getter
     @Slf4j
     public static class Body {
 
@@ -326,11 +328,15 @@ public class Response {
         }
 
         // -------------------------------------------------------------------------------------------------------------
+
         @Override
         public String toString() {
             return super.toString() + '{'
                    + "items=" + items
-                   + "}";
+                   + ",numOfRows=" + numOfRows
+                   + ",pageNo=" + pageNo
+                   + ",totalCount=" + totalCount
+                   + '}';
         }
 
         // ------------------------------------------------------------------------------------------------------- items
@@ -341,6 +347,7 @@ public class Response {
             return items;
         }
 
+        // -------------------------------------------------------------------------------------------------------------
         public boolean isLastPage() {
             return numOfRows * pageNo >= totalCount;
         }

@@ -32,11 +32,7 @@ class LrsrCldInfoServiceClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoService
         final int lunDay = item.getLunarDayOfMonth();
         final boolean leapMonth = item.getLunarLeapMonth();
         final List<Item> items = clientInstance().getSpcifyLunCalInfo(
-                fromSolYear,
-                toSolYear,
-                lunMonth,
-                lunDay,
-                leapMonth);
+                fromSolYear, toSolYear, lunMonth, lunDay, leapMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
             assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunMonth);
             assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunDay);

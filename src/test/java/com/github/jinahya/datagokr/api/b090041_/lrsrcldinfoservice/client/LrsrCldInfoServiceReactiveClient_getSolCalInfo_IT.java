@@ -4,7 +4,6 @@ import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.messag
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
-import reactor.core.publisher.Sinks;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -19,27 +18,10 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_LocalDateNow() {
         final LocalDate lunarDate = LocalDate.now();
-        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
-        clientInstance().getSolCalInfo(
-                lunarDate,
-                sinksMany,
-                (t, r) -> {
-                    log.error("failed to emit error; type: {}, result: {}", t, r);
-                    return false;
-                },
-                (t, r) -> {
-                    log.error("failed to emit next; type: {}, result: {}", t, r);
-                    return false;
-                },
-                (t, r) -> {
-                    log.error("failed to emit complet; type: {}, result: {}", t, r);
-                    return false;
-                }
-        );
         final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
         final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
         final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
-        sinksMany.asFlux()
+        clientInstance().getSolCalInfo(lunarDate)
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
@@ -52,25 +34,9 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_YearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
-        final Sinks.Many<Response.Body.Item> sinksMany = Sinks.many().unicast().onBackpressureBuffer();
-        clientInstance().getSolCalInfo(
-                lunarYearMonth,
-                sinksMany,
-                (t, r) -> {
-                    log.error("failed to emit error; type: {}, result: {}", t, r);
-                    return false;
-                },
-                (t, r) -> {
-                    log.error("failed to emit next; type: {}, result: {}", t, r);
-                    return false;
-                },
-                (t, r) -> {
-                    log.error("failed to emit cmplete; type: {}, result: {}", t, r);
-                    return false;
-                });
         final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarYearMonth);
         final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarYearMonth);
-        sinksMany.asFlux()
+        clientInstance().getSolCalInfo(lunarYearMonth)
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
