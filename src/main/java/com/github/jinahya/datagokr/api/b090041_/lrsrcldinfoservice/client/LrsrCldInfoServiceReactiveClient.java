@@ -31,6 +31,7 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.ofNullable;
@@ -80,19 +81,17 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 ;
     }
 
-    public Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
+    public Mono<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
-        final AtomicInteger pageNo = new AtomicInteger();
-        return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet())
-                .expand(r -> {
-                    if (r.getBody().isLastPage()) {
-                        return Mono.empty();
-                    }
-                    return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet());
-                })
-                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
+        return getLunCalInfo(solYear, solMonth, solDay, null)
+                .map(r -> {
+                    final List<Item> items = r.getBody().getItems();
+                    assert !items.isEmpty();
+                    assert items.size() == 1;
+                    return items.get(0);
+                });
     }
 
     public Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
@@ -128,17 +127,15 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .bodyToMono(Response.class);
     }
 
-    public Flux<Item> getSolCalInfo(@NotNull final LocalDate lunarDate) {
-        final Year lunYear = Year.from(lunarDate);
-        final Month lunMonth = Month.from(lunarDate);
-        final int lunDay = lunarDate.getDayOfMonth();
+    public Flux<Item> getSolCalInfo(@NotNull final Year lunarYear, @NotNull final Month lunarMonth,
+                                    @Max(30) @Min(1) @Nullable final Integer lunarDayOfMonth) {
         final AtomicInteger pageNo = new AtomicInteger();
-        return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet())
+        return getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, pageNo.incrementAndGet())
                 .expand(r -> {
                     if (r.getBody().isLastPage()) {
                         return Mono.empty();
                     }
-                    return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet());
+                    return getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, pageNo.incrementAndGet());
                 })
                 .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }

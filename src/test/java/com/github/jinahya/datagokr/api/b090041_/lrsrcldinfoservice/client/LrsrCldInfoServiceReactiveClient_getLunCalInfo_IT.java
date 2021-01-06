@@ -20,30 +20,30 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
     @DisplayName("getLunCalInfo(LocalDate)")
     @Test
     void getLunCalInfo_Expected_YearMonthDay() {
-        final LocalDate solarDate = LocalDate.now();
-        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarDate);
-        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarDate);
-        final String solDay = Response.Body.Item.DAY_FORMATTER.format(solarDate);
-        clientInstance().getLunCalInfo(solarDate)
+        final LocalDate now = LocalDate.now();
+        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(now);
+        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
+        final String solDay = Response.Body.Item.DAY_FORMATTER.format(now);
+        clientInstance().getLunCalInfo(now)
                 .doOnNext(i -> {
                     log.debug("item: {}", i);
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
                     assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
                     assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
-                    assertThat(i.getSolarLeapYear()).isEqualTo(solarDate.isLeapYear());
-                    assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
+                    assertThat(i.getSolarLeapYear()).isEqualTo(now.isLeapYear());
+                    assertThat(i.getSolJd()).isNotNull().isEqualTo(now.getLong(JulianFields.JULIAN_DAY));
                 })
-                .blockLast();
+                .block();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void getLunCalInfo_Expected_YearMonth() {
-        final YearMonth solarYearMonth = YearMonth.now();
-        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(solarYearMonth);
-        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(solarYearMonth);
-        clientInstance().getLunCalInfo(solarYearMonth)
+        final YearMonth now = YearMonth.now();
+        final String solYear = Response.Body.Item.YEAR_FORMATTER.format(now);
+        final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
+        clientInstance().getLunCalInfo(now)
                 .doOnNext(i -> {
                     log.debug("item: {}", i);
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);

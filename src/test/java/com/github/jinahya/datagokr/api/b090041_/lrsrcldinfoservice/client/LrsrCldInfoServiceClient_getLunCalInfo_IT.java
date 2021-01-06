@@ -22,17 +22,16 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     @Test
     void getLunCalInfo_Expected_YearMonthDay() {
         final LocalDate solarDate = LocalDate.now();
-        final List<Item> items = clientInstance().getLunCalInfo(solarDate);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            final String solYear = Item.YEAR_FORMATTER.format(solarDate);
-            final String solMonth = Item.MONTH_FORMATTER.format(solarDate);
-            final String solDay = Item.DAY_FORMATTER.format(solarDate);
-            assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
-            assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
-            assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
-            assertThat(i.getSolarLeapYear()).isEqualTo(solarDate.isLeapYear());
-            assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
-        });
+        final Item item = clientInstance().getLunCalInfo(solarDate);
+        assertThat(item).isNotNull();
+        final String solYear = Item.YEAR_FORMATTER.format(solarDate);
+        final String solMonth = Item.MONTH_FORMATTER.format(solarDate);
+        final String solDay = Item.DAY_FORMATTER.format(solarDate);
+        assertThat(item.getSolYear()).isNotNull().isEqualTo(solYear);
+        assertThat(item.getSolMonth()).isNotNull().isEqualTo(solMonth);
+        assertThat(item.getSolDay()).isNotNull().isEqualTo(solDay);
+        assertThat(item.getSolarLeapYear()).isEqualTo(solarDate.isLeapYear());
+        assertThat(item.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,11 +19,11 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void getSolCalInfo_Expected_LocalDateNow() {
-        final LocalDate lunarDate = LocalDate.now();
-        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-        final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
-        clientInstance().getSolCalInfo(lunarDate)
+        final LocalDate now = LocalDate.now();
+        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(now);
+        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
+        final String lunDay = Response.Body.Item.DAY_FORMATTER.format(now);
+        clientInstance().getSolCalInfo(Year.from(now), Month.from(now), now.getDayOfMonth())
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
@@ -33,10 +35,10 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void getSolCalInfo_Expected_YearMonth() {
-        final YearMonth lunarYearMonth = YearMonth.now();
-        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarYearMonth);
-        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarYearMonth);
-        clientInstance().getSolCalInfo(lunarYearMonth)
+        final YearMonth now = YearMonth.now();
+        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(now);
+        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
+        clientInstance().getSolCalInfo(now)
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
@@ -22,22 +23,23 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
     @Test
     @SuppressWarnings("java:S5841")
     void getSolCalInfo_Expected_LocalDateNow() {
-        final LocalDate lunarDate = LocalDate.now();
-        final List<Response.Body.Item> items = clientInstance().getSolCalInfo(lunarDate);
+        final LocalDate now = LocalDate.now();
+        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(now);
+        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
+        final String lunDay = Response.Body.Item.DAY_FORMATTER.format(now);
+        final List<Response.Body.Item> items
+                = clientInstance().getSolCalInfo(Year.from(now), Month.from(now), now.getDayOfMonth());
         assertThat(items).isNotNull()
 //                .isNotEmpty() // may be empty!!!
                 .doesNotContainNull()
                 .allSatisfy(i -> {
-                    final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-                    final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-                    final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
                     assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(lunarDate.getYear()));
-                    assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
-                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(now.getYear()));
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.of(now.getYear()));
+                    assertThat(i.getLunarMonth()).isNotNull().isEqualTo(now.getMonth());
+                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(now.getDayOfMonth());
                 })
         ;
     }
