@@ -32,9 +32,8 @@ import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * A client implementation uses an instance of {@link WebClient}.
@@ -62,6 +61,16 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Retrieves a response from {@code GET /.../getLunCalInfo} with specified arguments.
+     *
+     * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
+     * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
+     * @param solDay   a value for {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay}.
+     * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
+     * @return a mono of response.
+     */
     protected @NotNull Mono<Response> getLunCalInfo(@NotNull final Year solYear, @NotNull final Month solMonth,
                                                     @Max(31) @Min(1) @Nullable final Integer solDay,
                                                     @Positive @Nullable final Integer pageNo) {
@@ -72,15 +81,27 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                         .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
                         .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
                         .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-                                             ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
+                                             Optional.ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
                                                      .map(Item.DAY_FORMATTER::format))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
+                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                         .build())
                 .retrieve()
                 .bodyToMono(Response.class)
+                .map(this::requireSuccessful)
                 ;
     }
 
+    /**
+     * Retrieves an item from {@code GET /.../getLunCalInfo} with {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
+     * #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} derived from specified date
+     * of solar calendar and returns all items from all pages.
+     *
+     * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
+     *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
+     *                  derived.
+     * @return a mono of item.
+     * @see #getLunCalInfo(Year, Month, Integer, Integer)
+     */
     public Mono<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
@@ -94,6 +115,14 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 });
     }
 
+    /**
+     * Retrieves {@code GET /.../getLunCalInfo} with {@code ?solYear} and {@code ?solMonth} derived from specified
+     * year-month of solar calendar and returns all items from all pages.
+     *
+     * @param solarYearMonth the year-month from which {@code ?solYear} and {@code ?solMonth} are derived.
+     * @return a flux of items from all pages.
+     * @see #getLunCalInfo(Year, Month, Integer, Integer)
+     */
     public Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
@@ -109,6 +138,16 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Retrieves for {@code GET /.../getSolCalInfo} with specified arguments.
+     *
+     * @param lunYear  a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
+     * @param lunMonth a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunDay   a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
+     * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
+     * @return a mono of response.
+     */
     protected @NotNull Mono<Response> getSolCalInfo(@NotNull final Year lunYear, @NotNull final Month lunMonth,
                                                     @Max(30) @Min(1) @Nullable final Integer lunDay,
                                                     @Positive @Nullable final Integer pageNo) {
@@ -118,15 +157,25 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                         .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
                         .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY,
-                                             ofNullable(lunDay).map(v -> MonthDay.of(lunMonth, v))
-                                                     .map(Item.DAY_FORMATTER::format))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
+                        .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
+                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                         .build())
                 .retrieve()
-                .bodyToMono(Response.class);
+                .bodyToMono(Response.class)
+                .map(this::requireSuccessful)
+                ;
     }
 
+    /**
+     * Retrieves items from {@code GET /.../getSolCalInfo?lunYear=&lunMonth=&lunDay=} with parameters derived from
+     * specified lunar date.
+     *
+     * @param lunarYear       a value for {@code ?lunYear}.
+     * @param lunarMonth      a value for {@code ?lunMonth}.
+     * @param lunarDayOfMonth a value for {@code ?lunDay}.
+     * @return a flux of items from all pages.
+     * @see #getSolCalInfo(Year, Month, Integer, Integer)
+     */
     public Flux<Item> getSolCalInfo(@NotNull final Year lunarYear, @NotNull final Month lunarMonth,
                                     @Max(30) @Min(1) @Nullable final Integer lunarDayOfMonth) {
         final AtomicInteger pageNo = new AtomicInteger();
@@ -140,6 +189,15 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
+    /**
+     * Retrieves all items from {@code GET /.../getSolCalInfo?lunYear=&lunMonth=} with parameters derived from specified
+     * lunar date.
+     *
+     * @param lunarYearMonth the date from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
+     *                       #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
+     * @return a flux of items from all pages.
+     * @see #getSolCalInfo(Year, Month, Integer, Integer)
+     */
     public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
@@ -155,6 +213,18 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Retrieves a response from {@code GET /.../getSpcifyLunCalInfo} with specified arguments.
+     *
+     * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
+     * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
+     * @param lunMonth    a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunDay      a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
+     * @param leapMonth   a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
+     * @param pageNo      a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
+     * @return a mono of response.
+     */
     public Mono<Response> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
                                               @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
                                               final boolean leapMonth, @Positive final int pageNo) {
@@ -181,9 +251,22 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                         .build()
                 )
                 .retrieve()
-                .bodyToMono(Response.class);
+                .bodyToMono(Response.class)
+                .map(this::requireSuccessful)
+                ;
     }
 
+    /**
+     * Retrieves all items from {@code GET /.../getSpcifyLunCalInfo} with specified arguments.
+     *
+     * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
+     * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
+     * @param lunMonth    a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunDay      a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
+     * @param leapMonth   a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
+     * @return a flux of items from all pages.
+     * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
+     */
     public Flux<Item> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
                                           @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
                                           final boolean leapMonth) {

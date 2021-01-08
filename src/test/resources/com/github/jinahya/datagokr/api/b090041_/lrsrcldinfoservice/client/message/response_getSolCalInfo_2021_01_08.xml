@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+  <header>
+    <resultCode>00</resultCode>
+    <resultMsg>NORMAL SERVICE.</resultMsg>
+  </header>
+  <body>
+    <items>
+      <item>
+        <lunDay>08</lunDay>
+        <lunIljin>무술(戊戌)</lunIljin>
+        <lunLeapmonth>평</lunLeapmonth>
+        <lunMonth>01</lunMonth>
+        <lunNday>29</lunNday>
+        <lunSecha>신축(辛丑)</lunSecha>
+        <lunWolgeon>경인(庚寅)</lunWolgeon>
+        <lunYear>2021</lunYear>
+        <solDay>19</solDay>
+        <solJd>2459265</solJd>
+        <solLeapyear>평</solLeapyear>
+        <solMonth>02</solMonth>
+        <solWeek>금</solWeek>
+        <solYear>2021</solYear>
+      </item>
+    </items>
+    <numOfRows>10</numOfRows>
+    <pageNo>1</pageNo>
+    <totalCount>1</totalCount>
+  </body>
+</response>

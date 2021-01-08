@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
@@ -18,6 +19,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.beans.Transient;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -29,29 +32,62 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
+import java.util.Objects;
+import java.util.Optional;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @Setter
 @Getter
 @Slf4j
-public class Response {
+public class Response implements Serializable {
 
+    private static final long serialVersionUID = -383243653796767676L;
+
+    // -----------------------------------------------------------------------------------------------------------------
     @XmlAccessorType(XmlAccessType.FIELD)
     @Setter
     @Getter
     @Slf4j
-    public static class Header {
+    public static class Header implements Serializable {
+
+        private static final long serialVersionUID = -3266148101861301931L;
 
         public static final String RESULT_CODE_SUCCESS = "00";
 
+        // -------------------------------------------------------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return super.toString() + '{'
+                   + "resultCode=" + resultCode
+                   + ",resultMsg=" + resultMsg
+                   + '}';
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Header header = (Header) o;
+            return Objects.equals(resultCode, header.resultCode) && Objects.equals(resultMsg, header.resultMsg);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(resultCode, resultMsg);
+        }
+
+        // -------------------------------------------------------------------------------------------------- resultCode
+        @Transient
         public boolean isResultCodeSuccess() {
             return RESULT_CODE_SUCCESS.equals(resultCode);
         }
 
+        // --------------------------------------------------------------------------------------------------- resultMsg
+
+        // -------------------------------------------------------------------------------------------------------------
         @NotBlank
         private String resultCode;
 
@@ -59,17 +95,21 @@ public class Response {
         private String resultMsg;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @XmlAccessorType(XmlAccessType.FIELD)
     @Setter
     @Getter
     @Slf4j
-    public static class Body {
+    public static class Body implements Serializable {
 
+        private static final long serialVersionUID = -4780774139453333151L;
+
+        // -------------------------------------------------------------------------------------------------------------
         @XmlAccessorType(XmlAccessType.FIELD)
         @Setter
         @Getter
         @Slf4j
-        public static class Item implements Serializable {
+        public static class Item implements Serializable, Cloneable {
 
             private static final long serialVersionUID = -4071620406720872635L;
 
@@ -96,6 +136,13 @@ public class Response {
              * The formatter for {@code solDay} and {@code lunDay}.
              */
             public static final DateTimeFormatter DAY_FORMATTER = DateTimeFormatter.ofPattern("dd");
+
+            public static String formatDay(final int dayOfMonth) {
+                if (dayOfMonth < 1 || dayOfMonth > 31) {
+                    throw new IllegalArgumentException("invalid dayOfMonth: " + dayOfMonth);
+                }
+                return String.format("%1$02d", dayOfMonth);
+            }
 
             /**
              * The formatter for {@code solWeek}.
@@ -140,6 +187,34 @@ public class Response {
             }
 
             // ---------------------------------------------------------------------------------------------------------
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj) return true;
+                if (obj == null || getClass() != obj.getClass()) return false;
+                final Item cast = (Item) obj;
+                return lunNday == cast.lunNday
+                       && Objects.equals(lunYear, cast.lunYear)
+                       && Objects.equals(lunMonth, cast.lunMonth)
+                       && Objects.equals(lunDay, cast.lunDay)
+                       && Objects.equals(lunLeapmonth, cast.lunLeapmonth)
+                       && Objects.equals(lunSecha, cast.lunSecha)
+                       && Objects.equals(lunWolgeon, cast.lunWolgeon)
+                       && Objects.equals(lunIljin, cast.lunIljin)
+                       && Objects.equals(solYear, cast.solYear)
+                       && Objects.equals(solMonth, cast.solMonth)
+                       && Objects.equals(solDay, cast.solDay)
+                       && Objects.equals(solLeapyear, cast.solLeapyear)
+                       && Objects.equals(solWeek, cast.solWeek)
+                       && Objects.equals(solJd, cast.solJd);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(lunYear, lunMonth, lunDay, lunLeapmonth, lunNday, lunSecha, lunWolgeon, lunIljin,
+                                    solYear, solMonth, solDay, solLeapyear, solWeek, solJd);
+            }
+
+            // ---------------------------------------------------------------------------------------------------------
             void beforeUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
                 // has nothing to do.
             }
@@ -151,24 +226,64 @@ public class Response {
                 }
             }
 
+            // ---------------------------------------------------------------------------------------------------------
+            @Override
+            public Item clone() {
+                try {
+                    return (Item) super.clone();
+                } catch (final CloneNotSupportedException cnse) {
+                    throw new AssertionError("failed to clone; " + cnse.getMessage());
+                }
+            }
+
             // ------------------------------------------------------------------------------------- lunYear / lunarYear
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Year getLunarYear() {
-                return ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
+                return Optional.ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
+            }
+
+            public void setLunarYear(final Year lunarYear) {
+                setLunYear(Optional.ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
             }
 
             // ----------------------------------------------------------------------------------- lunMonth / lunarMonth
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Month getLunarMonth() {
-                return ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
+                return Optional.ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
+            }
+
+            public void setLunarMonth(final Month lunarMonth) {
+                setLunMonth(Optional.ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
             }
 
             // -------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Integer getLunarDayOfMonth() {
-                return ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
+                return Optional.ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
+            }
+
+            public void setLunarDayOfMonth(final Integer lunarDayOfMonth) {
+                setLunDay(Optional.ofNullable(lunarDayOfMonth).map(v -> String.format("%1$02d", v)).orElse(null));
             }
 
             // --------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Boolean getLunarLeapMonth() {
                 return LEAP.equals(getLunLeapmonth());
+            }
+
+            public void setLunarLeapMonth(final Boolean lunarLeapMonth) {
+                setLunLeapmonth(Optional.ofNullable(lunarLeapMonth)
+                                        .map(v -> v.equals(Boolean.TRUE) ? LEAP : NORMAL)
+                                        .orElse(null));
             }
 
             // ------------------------------------------------------------------------------------------------ lunSecha
@@ -177,78 +292,91 @@ public class Response {
 
             // -----------------------------------------------------------------------------------------------  lunIljin
 
-            // ------------------------------------------------------------------------------------------------- lunYear
-
-            // ----------------------------------------------------------------------------------------------- solarYear
+            // ------------------------------------------------------------------------------------- solYear / solarYear
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Year getSolarYear() {
-                return ofNullable(getSolYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
+                return Optional.ofNullable(getSolYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
 
             void setSolarYear(final Year solarYear) {
-                setSolYear(ofNullable(solarYear).map(YEAR_FORMATTER::format).orElse(null));
+                setSolYear(Optional.ofNullable(solarYear).map(YEAR_FORMATTER::format).orElse(null));
             }
 
-            // ------------------------------------------------------------------------------------------------ solMonth
-
-            // ---------------------------------------------------------------------------------------------- solarMonth
+            // ----------------------------------------------------------------------------------- solMonth / solarMonth
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Month getSolarMonth() {
-                return ofNullable(getSolMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
+                return Optional.ofNullable(getSolMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
             }
 
             void setSolarMonth(final Month solarMonth) {
-                setSolMonth(ofNullable(solarMonth).map(MONTH_FORMATTER::format).orElse(null));
+                setSolMonth(Optional.ofNullable(solarMonth).map(MONTH_FORMATTER::format).orElse(null));
             }
 
-            // -------------------------------------------------------------------------------------------------- solDay
-
-            // ----------------------------------------------------------------------------------------- solarDayOfMonth
+            // -------------------------------------------------------------------------------- solDay / solarDayOfMonth
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Integer getSolarDayOfMonth() {
-                return ofNullable(getSolDay()).map(Integer::parseInt).orElse(null);
+                return Optional.ofNullable(getSolDay()).map(Integer::parseInt).orElse(null);
             }
 
             void setSolarDayOfMonth(final Integer solarDayOfMonth) {
-                setSolDay(ofNullable(solarDayOfMonth).map(v -> format("%1$02d", v)).orElse(null));
+                setSolDay(Optional.ofNullable(solarDayOfMonth).map(Item::formatDay).orElse(null));
             }
 
             // ----------------------------------------------------------------------------------------------- solarDate
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public LocalDate getSolarDate() {
                 return LocalDate.of(getSolarYear().getValue(), getSolarMonth(), getSolarDayOfMonth());
             }
 
             public void setSolarDate(final LocalDate solarDate) {
-                setSolarYear(ofNullable(solarDate).map(Year::from).orElse(null));
-                setSolarMonth(ofNullable(solarDate).map(Month::from).orElse(null));
-                setSolarDayOfMonth(ofNullable(solarDate).map(LocalDate::getDayOfMonth).orElse(null));
-                setSolarLeapYear(ofNullable(solarDate).map(LocalDate::isLeapYear).orElse(null));
-                setSolarDayOfWeek(ofNullable(solarDate).map(DayOfWeek::from).orElse(null));
-                setSolarJulianDay(ofNullable(solarDate).map(v -> v.getLong(JulianFields.JULIAN_DAY)).orElse(null));
+                setSolarYear(Optional.ofNullable(solarDate).map(Year::from).orElse(null));
+                setSolarMonth(Optional.ofNullable(solarDate).map(Month::from).orElse(null));
+                setSolarDayOfMonth(Optional.ofNullable(solarDate).map(LocalDate::getDayOfMonth).orElse(null));
+                setSolarLeapYear(Optional.ofNullable(solarDate).map(LocalDate::isLeapYear).orElse(null));
+                setSolarDayOfWeek(Optional.ofNullable(solarDate).map(DayOfWeek::from).orElse(null));
+                setSolarJulianDay(
+                        Optional.ofNullable(solarDate).map(v -> v.getLong(JulianFields.JULIAN_DAY)).orElse(null));
             }
 
-            // --------------------------------------------------------------------------------------------- solLeapyear
+            // ----------------------------------------------------------------------------- solLeapyear / solarLeapYear
             @AssertTrue
             private boolean isSolLeapyearValid() {
                 return getSolarDate().isLeapYear() == getSolarLeapYear();
             }
 
-            // ------------------------------------------------------------------------------------------- solarLeapYear
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Boolean getSolarLeapYear() {
-                return ofNullable(getSolLeapyear()).map(v -> v.equals(LEAP)).orElse(null);
+                return Optional.ofNullable(getSolLeapyear()).map(v -> v.equals(LEAP)).orElse(null);
             }
 
             public void setSolarLeapYear(final Boolean solarLeapYear) {
-                setSolLeapyear(ofNullable(solarLeapYear).map(v -> Boolean.TRUE.equals(v) ? LEAP : NORMAL).orElse(null));
+                setSolLeapyear(
+                        Optional.ofNullable(solarLeapYear)
+                                .map(v -> Boolean.TRUE.equals(v) ? LEAP : NORMAL)
+                                .orElse(null)
+                );
             }
 
-            // ------------------------------------------------------------------------------------------------- solWeek
-
-            // ------------------------------------------------------------------------------------------ solarDayOfWeek
-            @NotNull
+            // ---------------------------------------------------------------------------------- solWeek / larDayOfWeek
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public DayOfWeek getSolarDayOfWeek() {
-                return ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
+                return Optional.ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
             }
 
             void setSolarDayOfWeek(final DayOfWeek solarDayOfWeek) {
-                setSolWeek(ofNullable(solarDayOfWeek).map(WEEK_FORMATTER::format).orElse(null));
+                setSolWeek(Optional.ofNullable(solarDayOfWeek).map(WEEK_FORMATTER::format).orElse(null));
             }
 
             // ---------------------------------------------------------------------------------- solJd / solarJulianDay
@@ -257,6 +385,9 @@ public class Response {
                 return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
             }
 
+            @JsonbTransient
+            @XmlTransient
+            @Transient
             public Long getSolarJulianDay() {
                 return getSolJd();
             }
@@ -339,6 +470,23 @@ public class Response {
                    + '}';
         }
 
+        // -------------------------------------------------------------------------------------------------------------
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            final Body cast = (Body) obj;
+            return numOfRows == cast.numOfRows
+                   && pageNo == cast.pageNo
+                   && totalCount == cast.totalCount
+                   && Objects.equals(items, cast.items);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(items, numOfRows, pageNo, totalCount);
+        }
+
         // ------------------------------------------------------------------------------------------------------- items
         public List<Item> getItems() {
             if (items == null) {
@@ -348,6 +496,9 @@ public class Response {
         }
 
         // -------------------------------------------------------------------------------------------------------------
+        @JsonbTransient
+        @XmlTransient
+        @Transient
         public boolean isLastPage() {
             return numOfRows * pageNo >= totalCount;
         }
@@ -377,6 +528,21 @@ public class Response {
                + "header=" + header
                + ",body=" + body
                + '}';
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        final Response casted = (Response) obj;
+        return Objects.equals(header, casted.header)
+               && Objects.equals(body, casted.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(header, body);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

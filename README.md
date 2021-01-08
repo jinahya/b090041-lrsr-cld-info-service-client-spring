@@ -9,11 +9,20 @@ A client library for accessing http://apis.data.go.kr/B090041/openapi/service/Lr
 
 See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi.do).
 
+## Verify
+
+Verify with your own service key assigned by the service provider.
+
+```shell
+$ mvn -Pfailsafe -DservcieKey=... clean verify
+```
+
 ## Usages
 
 Expand the component-scanning path.
 
 ```java
+
 @SpringBootApplication(
         scanBasePackageClasses = {
                 com.github.jinahya.datagokr.....client._NoOp.class,
@@ -21,18 +30,20 @@ Expand the component-scanning path.
         }
 )
 class MyApplication {
+
 }
 ```
 
-Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded value. You should use a URL-decoded value.
+Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded
+value. You should use a URL-decoded value.
 
 ```java
 @AbstractLrsrCldInfoServiceClient.LrsrCldInfoServiceServiceKey
 @Bean
 String lrsrCldInfoServiceServiceKey() {
-    // The service key assigned by data.go.kr
-    // ...%3D%3D (X)
-    // ...==     (O)
+        // The service key assigned by data.go.kr
+        // ...%3D%3D (X)
+        // ...==     (O)
 }
 ```
 
@@ -52,14 +63,15 @@ RestTemplate lrsrCldInfoServiceRestTemplate() {
 }
 ```
 
-Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is internally get autowired with the `RestTemplate` instance.
+Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is internally get autowired with
+the `RestTemplate` instance.
 
 ```java
 @Autowired
 private LrsrCldInfoServiceClient client;
 
-void doSome() {
-    for (final Item item : client.getLunCalInfo(LocalDate.now())) {
+void doSome(){
+    for(final Item item : client.getLunCalInfo(LocalDate.now())) {
     }
 }
 ```
@@ -80,7 +92,8 @@ WebClient lrsrCldInfoServiceWebClient(
 }
 ```
 
-Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with the `WebClient` instance.
+Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with
+the `WebClient` instance.
 
 ```java
 @Autowired
@@ -89,8 +102,8 @@ private LrsrCldInfoServiceReactiveClient client;
 void doSome() {
     final LocalDate solarDate = LocalDate.now();
     client.getLunCalInfo(solarDate)
-            .doOnNext(i -> {
-            })
-            .blockLast();
+    .doOnNext(i->{
+    })
+    .blockLast();
 }
 ```
