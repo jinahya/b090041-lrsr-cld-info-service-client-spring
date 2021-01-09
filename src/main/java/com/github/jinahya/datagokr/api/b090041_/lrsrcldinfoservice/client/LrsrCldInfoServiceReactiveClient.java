@@ -50,7 +50,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * An injection qualifier for an instance of {@link WebClient} for accessing {@link #BASE_URL}.
+     * An injection qualifier for an instance of {@link WebClient}.
      */
     @Qualifier
     @Documented
@@ -63,7 +63,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Retrieves a response from {@code GET /.../getLunCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
@@ -87,14 +87,12 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                         .build())
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireSuccessful)
+                .map(this::requireResultSuccessful)
                 ;
     }
 
     /**
-     * Retrieves an item from {@code GET /.../getLunCalInfo} with {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
-     * #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} derived from specified date
-     * of solar calendar and returns all items from all pages.
+     * Retrieves an item from {@code /.../getLunCalInfo} with parameters derived from specified date in solar calendar.
      *
      * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
      *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
@@ -116,11 +114,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves {@code GET /.../getLunCalInfo} with {@code ?solYear} and {@code ?solMonth} derived from specified
-     * year-month of solar calendar and returns all items from all pages.
+     * Retrieves all items from {@code /getLunCalInfo} with arguments derived from specified month in solar calendar.
      *
-     * @param solarYearMonth the year-month from which {@code ?solYear} and {@code ?solMonth} are derived.
-     * @return a flux of items from all pages.
+     * @param solarYearMonth the month from which {@code ?solYear} and {@code ?solMonth} are derived.
+     * @return a flux of all items from all pages.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
     public Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
@@ -140,7 +137,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Retrieves for {@code GET /.../getSolCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
      * @param lunYear  a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunMonth a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
@@ -162,17 +159,16 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                         .build())
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireSuccessful)
+                .map(this::requireResultSuccessful)
                 ;
     }
 
     /**
-     * Retrieves items from {@code GET /.../getSolCalInfo?lunYear=&lunMonth=&lunDay=} with parameters derived from
-     * specified lunar date.
+     * Retrieves all items from {@code /getSolCalInfo} with specified arguments.
      *
-     * @param lunarYear       a value for {@code ?lunYear}.
-     * @param lunarMonth      a value for {@code ?lunMonth}.
-     * @param lunarDayOfMonth a value for {@code ?lunDay}.
+     * @param lunarYear       a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
+     * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
      * @return a flux of items from all pages.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
@@ -190,17 +186,16 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all items from {@code GET /.../getSolCalInfo?lunYear=&lunMonth=} with parameters derived from specified
-     * lunar date.
+     * Retrieves all items from {@code /getSolCalInfo} with parameters derived from specified month in lunar calendar.
      *
-     * @param lunarYearMonth the date from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
-     *                       #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
-     * @return a flux of items from all pages.
+     * @param lunarMonth the month from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
+     *                   #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
+     * @return a flux of all items from all pages.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
-    public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
-        final Year lunYear = Year.from(lunarYearMonth);
-        final Month lunMonth = Month.from(lunarYearMonth);
+    public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarMonth) {
+        final Year lunYear = Year.from(lunarMonth);
+        final Month lunMonth = Month.from(lunarMonth);
         final AtomicInteger pageNo = new AtomicInteger();
         return getSolCalInfo(lunYear, lunMonth, null, pageNo.incrementAndGet())
                 .expand(r -> {
@@ -215,7 +210,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Retrieves a response from {@code GET /.../getSpcifyLunCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
@@ -252,19 +247,19 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 )
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireSuccessful)
+                .map(this::requireResultSuccessful)
                 ;
     }
 
     /**
-     * Retrieves all items from {@code GET /.../getSpcifyLunCalInfo} with specified arguments.
+     * Retrieves all items from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
      * @param lunMonth    a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
      * @param lunDay      a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
      * @param leapMonth   a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
-     * @return a flux of items from all pages.
+     * @return a flux of all items from all pages.
      * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
      */
     public Flux<Item> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,

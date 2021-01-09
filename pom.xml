@@ -50,6 +50,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <surefire.systemPropertiesFile>src/test/resources/surefire.system.properties</surefire.systemPropertiesFile>
     <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
+    <version.io.projectreactor>3.4.1</version.io.projectreactor>
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
     <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
     <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
@@ -208,9 +209,12 @@
           <version>3.2.0</version>
           <configuration>
             <links>
+              <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
               <link>https://docs.spring.io/spring-framework/docs/${version.org.springframework}/javadoc-api/</link>
               <link>https://javadoc.io/doc/jakarta.annotation/jakarta.annotation-api/${version.jakarta.annotation-api}/</link>
+              <link>https://javadoc.io/doc/jakarta.json.bind/jakarta.json.bind-api/${version.jakarta.json.bind-api}/</link>
               <link>https://javadoc.io/doc/jakarta.validation/jakarta.validation-api/${version.jakarta.validation-api}/</link>
+              <link>https://projectreactor.io/docs/core/${version.io.projectreactor}/api/</link>
             </links>
           </configuration>
         </plugin>

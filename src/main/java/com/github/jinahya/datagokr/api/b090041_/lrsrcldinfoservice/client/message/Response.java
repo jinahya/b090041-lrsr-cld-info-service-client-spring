@@ -38,6 +38,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A class for binding {@code /:response} path.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @Setter
@@ -48,6 +53,12 @@ public class Response implements Serializable {
     private static final long serialVersionUID = -383243653796767676L;
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * A class for binding {@code /:response/:header} path.
+     *
+     * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+     */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Setter
     @Getter
@@ -70,11 +81,11 @@ public class Response implements Serializable {
 
         // -------------------------------------------------------------------------------------------------------------
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Header header = (Header) o;
-            return Objects.equals(resultCode, header.resultCode) && Objects.equals(resultMsg, header.resultMsg);
+        public boolean equals(final Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            final Header casted = (Header) obj;
+            return Objects.equals(resultCode, casted.resultCode) && Objects.equals(resultMsg, casted.resultMsg);
         }
 
         @Override
@@ -105,6 +116,10 @@ public class Response implements Serializable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * A class for binding {@code /:response/:body} path.
+     */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Setter
     @Getter
@@ -114,6 +129,11 @@ public class Response implements Serializable {
         private static final long serialVersionUID = -4780774139453333151L;
 
         // -------------------------------------------------------------------------------------------------------------
+
+        /**
+         * A class for binding {@link /:response/:body/:item} path.
+         * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+         */
         @XmlAccessorType(XmlAccessType.FIELD)
         @Setter
         @Getter

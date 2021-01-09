@@ -117,6 +117,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     public static final String QUERY_PARAM_NAME_LEAP_MONTH = "leapMonth";
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * A query parameter name for the page number. The value is {@value}.
      */
@@ -145,7 +146,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
         return response;
     }
 
-    protected Response requireSuccessful(final Response response) {
+    protected Response requireResultSuccessful(final Response response) {
         if (!requireValid(response).getHeader().isResultCodeSuccess()) {
             throw new RuntimeException("unsuccessful result: " + response.getHeader());
         }
