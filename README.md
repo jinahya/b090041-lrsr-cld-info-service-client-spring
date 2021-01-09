@@ -66,8 +66,8 @@ String lrsrCldInfoServiceServiceKey(){
     // The service key assigned by data.go.kr
     // Might be already URL-encoded
     // Use a URL-decoded value    
-    // return ...%3D%3D (X)
-    // return ...==     (O)
+    // return "...%3D%3D"; (X)
+    // return "...==";     (O)
 }
 ```
 
