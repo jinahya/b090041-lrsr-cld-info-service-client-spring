@@ -132,6 +132,7 @@ public class Response implements Serializable {
 
         /**
          * A class for binding {@code /:response/:body/:item} path.
+         *
          * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
          */
         @XmlAccessorType(XmlAccessType.FIELD)
