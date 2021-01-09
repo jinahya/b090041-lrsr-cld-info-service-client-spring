@@ -82,6 +82,7 @@ class ResponseTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @MethodSource({"items"})
     @ParameterizedTest
     void items_Jsonb(final Response.Body.Item expected) {
@@ -102,5 +103,50 @@ class ResponseTest {
         final String string = mapper.writeValueAsString(expected);
         final Response.Body.Item actual = mapper.readValue(string, Response.Body.Item.class);
         assertThat(actual).isEqualTo(expected);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForYearHans_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForYearHans()).isNotBlank();
+    }
+
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForYearKore_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForYearKore()).isNotBlank();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForMonthHans_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForMonthHans()).satisfiesAnyOf(
+                v -> assertThat(v).isNull(),
+                v -> assertThat(v).isNotBlank()
+        );
+    }
+
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForMonthKore_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForMonthKore()).satisfiesAnyOf(
+                v -> assertThat(v).isNull(),
+                v -> assertThat(v).isNotBlank()
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForDayOfMonthHans_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForDayOfMonthHans()).isNotBlank();
+    }
+
+    @MethodSource({"items"})
+    @ParameterizedTest
+    void getGanzhiForDayOfMonthKore_NotBlank_(final Response.Body.Item item) {
+        assertThat(item.getLunarGanzhiForDayOfMonthKore()).isNotBlank();
     }
 }
