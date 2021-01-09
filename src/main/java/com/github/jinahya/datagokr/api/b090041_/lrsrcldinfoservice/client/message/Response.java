@@ -341,13 +341,13 @@ public class Response implements Serializable {
             // -----------------------------------------------------------------------------------------------  lunIljin
             @JsonbTransient
             @JsonIgnore
-            public String getLunarGanzhiForDayKore() {
+            public String getLunarGanzhiForDayOfMonthKore() {
                 return Optional.ofNullable(getLunIljin()).map(s -> s.substring(0, 2)).orElse(null);
             }
 
             @JsonbTransient
             @JsonIgnore
-            public String getLunarGanzhiForDayHans() {
+            public String getLunarGanzhiForDayOfMonthHans() {
                 return Optional.ofNullable(getLunIljin()).map(s -> s.substring(3, 5)).orElse(null);
             }
 
