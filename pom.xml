@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -67,6 +68,7 @@
     <version.org.slf4j>1.7.30</version.org.slf4j>
     <version.org.springframework>5.3.2</version.org.springframework>
     <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
+    <version.org.springframework.hateoas>1.2.2</version.org.springframework.hateoas>
   </properties>
 
   <dependencyManagement>
@@ -195,6 +197,12 @@
       <version>${version.org.springframework.boot}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.hateoas</groupId>
+      <artifactId>spring-hateoas</artifactId>
+      <version>${version.org.springframework.hateoas}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -280,7 +288,7 @@
             <configuration>
               <skip>true</skip>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
           </execution>

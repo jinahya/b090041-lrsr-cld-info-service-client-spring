@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.Nullable;
 
 import javax.json.bind.annotation.JsonbProperty;
@@ -142,7 +143,7 @@ public class Response implements Serializable {
         @Setter
         @Getter
         @Slf4j
-        public static class Item implements Serializable {
+        public static class Item extends RepresentationModel<Item> implements Serializable {
 
             private static final long serialVersionUID = -4071620406720872635L;
 
@@ -188,6 +189,19 @@ public class Response implements Serializable {
                     .thenComparing(Item::getLunDay);
 
             public static final Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);
+
+            // ---------------------------------------------------------------------------------------------------------
+            public static final String REL_YEAR_LUNAR = "yearLunar";
+
+            public static final String REL_MONTH_LUNAR = "monthLunar";
+
+            public static final String REL_SELF_LUNAR = "selfLunar";
+
+            public static final String REL_YEAR_SOLAR = "yearSolar";
+
+            public static final String REL_MONTH_SOLAR = "monthSolar";
+
+            public static final String REL_SELF_SOLAR = "selfSolar";
 
             // ---------------------------------------------------------------------------------------------------------
 
@@ -404,8 +418,8 @@ public class Response implements Serializable {
                 return getSolarDate().isLeapYear() == getSolarLeapYear();
             }
 
-            @JsonbProperty
-            @JsonProperty
+            @JsonbTransient
+            @JsonIgnore
             public @NotNull Boolean getSolarLeapYear() {
                 return Optional.ofNullable(getSolLeapyear()).map(v -> v.equals(LEAP)).orElse(null);
             }
@@ -419,8 +433,8 @@ public class Response implements Serializable {
             }
 
             // -------------------------------------------------------------------------------- solWeek / solarDayOfWeek
-            @JsonbProperty
-            @JsonProperty
+            @JsonbTransient
+            @JsonIgnore
             public @NotNull DayOfWeek getSolarDayOfWeek() {
                 return Optional.ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
             }
@@ -435,8 +449,8 @@ public class Response implements Serializable {
                 return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
             }
 
-            @JsonbProperty
-            @JsonProperty
+            @JsonbTransient
+            @JsonIgnore
             public @PositiveOrZero @NotNull Long getSolarJulianDay() {
                 return getSolJd();
             }
