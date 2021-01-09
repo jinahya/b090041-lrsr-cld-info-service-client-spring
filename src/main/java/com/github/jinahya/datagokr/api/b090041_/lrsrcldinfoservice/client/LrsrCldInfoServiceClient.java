@@ -144,15 +144,15 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Exchanges an item from {@code /getLunCalInfo} for specified solar date.
+     * Exchanges all items from {@code /getLunCalInfo} for specified date in solar calendar.
      *
      * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
      *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
      *                  derived.
-     * @return an item exchanged.
+     * @return a list of all items from all pages.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
-    public @Valid @NotNull Item getLunCalInfo(@NotNull final LocalDate solarDate) {
+    public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final List<Item> items = new ArrayList<>();
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
@@ -166,7 +166,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         }
         assert !items.isEmpty();
         assert items.size() == 1;
-        return items.get(0);
+        return items;
     }
 
     /**

@@ -31,7 +31,6 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -92,25 +91,28 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves an item from {@code /.../getLunCalInfo} with parameters derived from specified date in solar calendar.
+     * Retrieves all items from {@code /.../getLunCalInfo} with parameters derived from specified date in solar
+     * calendar.
      *
      * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
      *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
      *                  derived.
-     * @return a mono of item.
+     * @return a flux of all items from all pages.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
-    public Mono<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
+    public Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
-        return getLunCalInfo(solYear, solMonth, solDay, null)
-                .map(r -> {
-                    final List<Item> items = r.getBody().getItems();
-                    assert !items.isEmpty();
-                    assert items.size() == 1;
-                    return items.get(0);
-                });
+        final AtomicInteger pageNo = new AtomicInteger();
+        return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet())
+                .expand(r -> {
+                    if (r.getBody().isLastPage()) {
+                        return Mono.empty();
+                    }
+                    return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet());
+                })
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
     /**

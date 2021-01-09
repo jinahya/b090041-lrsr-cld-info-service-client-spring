@@ -26,14 +26,13 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
         final String solDay = Response.Body.Item.DAY_FORMATTER.format(now);
         clientInstance().getLunCalInfo(now)
                 .doOnNext(i -> {
-                    log.debug("item: {}", i);
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
                     assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
                     assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
                     assertThat(i.getSolarLeapYear()).isEqualTo(now.isLeapYear());
                     assertThat(i.getSolJd()).isNotNull().isEqualTo(now.getLong(JulianFields.JULIAN_DAY));
                 })
-                .block();
+                .blockLast();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -45,7 +44,6 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
         final String solMonth = Response.Body.Item.MONTH_FORMATTER.format(now);
         clientInstance().getLunCalInfo(now)
                 .doOnNext(i -> {
-                    log.debug("item: {}", i);
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
                     assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
                 })

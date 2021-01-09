@@ -20,7 +20,7 @@ class LrsrCldInfoServiceClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoService
     @DisplayName("getSpcifyLunCalInfo(Year, Month, int, boolean)")
     @Test
     void getSpcifyLunCalInfo_() {
-        final Item item = clientInstance().getLunCalInfo(LocalDate.now());
+        final Item item = clientInstance().getLunCalInfo(LocalDate.now()).get(0);
         final Month lunarMonth = item.getLunarMonth();
         final int lunarMonthOfDay = item.getLunarDayOfMonth();
         final List<Item> items = clientInstance().getSpcifyLunCalInfo(

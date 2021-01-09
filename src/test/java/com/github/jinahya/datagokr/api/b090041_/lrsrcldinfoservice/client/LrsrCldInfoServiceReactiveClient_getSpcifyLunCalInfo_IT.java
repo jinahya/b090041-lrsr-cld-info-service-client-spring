@@ -16,14 +16,13 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @Test
     void getSpcifyLunCalInfo() {
-        final Response.Body.Item item = clientInstance().getLunCalInfo(LocalDate.now()).block();
+        final Response.Body.Item item = clientInstance().getLunCalInfo(LocalDate.now()).blockLast();
         assertThat(item).isNotNull();
         clientInstance().getSpcifyLunCalInfo(item.getSolarYear().minusYears(1L),
                                              item.getSolarYear().plusYears(1L),
                                              item.getLunarMonth(),
                                              item.getLunarDayOfMonth(), item.getLunarLeapMonth())
                 .doOnNext(i -> {
-                    log.debug("item: {}", i);
                     assertThat(i.getLunarMonth()).isNotNull().isEqualTo(item.getLunarMonth());
                     assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(item.getLunarDayOfMonth());
                 })
