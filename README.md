@@ -14,8 +14,30 @@ See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi
 Verify with your own service key assigned by the service provider.
 
 ```shell
-$ mvn -Pfailsafe -DservcieKey=... clean verify
+\$ mvn -Pfailsafe -DservcieKey=... clean verify
 ```
+
+## Injection points
+
+### Commaon
+
+|Qualifier|Type|Notes|
+|---------|----|-----------|
+|`@LrsrCldInfoServiceServiceKey`|`java.lang.String`|Provided by the service provider|
+|                               |`javax.validation.Validator`||
+
+### For `RestTemplate`
+
+|Qualifier|Type|Notes|
+|---------|----|-----------|
+|`@LrsrCldInfoServiceRestTemplate`|`o.s.web.client.RestTemplate`||
+|`@LrsrCldInfoServiceRestTemplateRootUri`|`j.l.String`|Optional|
+
+### For `WebClient`
+
+|Qualifier|Type|Notes|
+|---------|----|-----------|
+|`@LrsrCldInfoServiceWebClient`|`o.s.w.r.function.client.WebClient`||
 
 ## Usages
 
@@ -40,10 +62,12 @@ value. You should use a URL-decoded value.
 ```java
 @AbstractLrsrCldInfoServiceClient.LrsrCldInfoServiceServiceKey
 @Bean
-String lrsrCldInfoServiceServiceKey() {
-        // The service key assigned by data.go.kr
-        // ...%3D%3D (X)
-        // ...==     (O)
+String lrsrCldInfoServiceServiceKey(){
+    // The service key assigned by data.go.kr
+    // Might be already URL-encoded
+    // Use a URL-decoded value    
+    // return ...%3D%3D (X)
+    // return ...==     (O)
 }
 ```
 
@@ -52,12 +76,12 @@ String lrsrCldInfoServiceServiceKey() {
 Provide an instance of `RestTemplate`.
 
 ```java
-@LrsrCldInfoServiceClient.LrsrCldInfoServiceRestTemplate
+@LrsrCldInfoServiceRestTemplate
 @Bean
 RestTemplate lrsrCldInfoServiceRestTemplate() {
     return new RestTemplateBuilder()
             ...
-            .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
+            .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
             .build();
 }
@@ -69,11 +93,6 @@ the `RestTemplate` instance.
 ```java
 @Autowired
 private LrsrCldInfoServiceClient client;
-
-void doSome(){
-    for(final Item item : client.getLunCalInfo(LocalDate.now())) {
-    }
-}
 ```
 
 ### Using `WebClient`
@@ -83,27 +102,18 @@ Provide an instance of `WebClient`.
 ```java
 @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
 @Bean
-WebClient lrsrCldInfoServiceWebClient(
+WebClient lrsrCldInfoServiceWebClient() {
     return WebClient.builder()
             ...
-            .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL)
+            .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
             .build();
 }
 ```
 
-Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with
-the `WebClient` instance.
+Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with the `WebClient` instance.
 
 ```java
 @Autowired
 private LrsrCldInfoServiceReactiveClient client;
-
-void doSome() {
-    final LocalDate solarDate = LocalDate.now();
-    client.getLunCalInfo(solarDate)
-    .doOnNext(i->{
-    })
-    .blockLast();
-}
 ```

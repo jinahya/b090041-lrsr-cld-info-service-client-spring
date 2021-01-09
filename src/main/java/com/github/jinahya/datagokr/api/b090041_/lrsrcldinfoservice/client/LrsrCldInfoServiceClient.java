@@ -26,6 +26,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -230,9 +231,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @return a list of items from all pages.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
-    public @Max(2) @NotEmpty List<@Valid @NotNull Item> getSolCalInfo(@NotNull final Year lunarYear,
-                                                                      @NotNull final Month lunarMonth,
-                                                                      @Max(30) @Min(1) final int lunarDayOfMonth) {
+    public @Size(min = 1, max = 2) @NotNull List<@Valid @NotNull Item> getSolCalInfo(
+            @NotNull final Year lunarYear, @NotNull final Month lunarMonth,
+            @Max(30) @Min(1) final int lunarDayOfMonth) {
         final List<Item> items = new ArrayList<>();
         for (int pageNo = 1; ; pageNo++) {
             final Response response = getResponse(getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, pageNo));
@@ -349,14 +350,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     private RestTemplate restTemplate;
 
     /**
-     * The root uri expanded with {@code '/'} from {@code restTemplate.uriTemplateHandler}.
-     */
-    @Accessors(fluent = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private URI rootUri;
-
-    /**
      * A custom root uri value for non-spring-boot environments.
      */
     @LrsrCldInfoServiceRestTemplateRootUri
@@ -365,4 +358,12 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private String restTemplateRootUri;
+
+    /**
+     * The root uri expanded with {@code '/'} from {@code restTemplate.uriTemplateHandler}.
+     */
+    @Accessors(fluent = true)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private URI rootUri;
 }

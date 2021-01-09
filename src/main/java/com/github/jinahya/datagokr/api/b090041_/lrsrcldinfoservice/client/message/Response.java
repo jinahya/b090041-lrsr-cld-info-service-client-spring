@@ -1,10 +1,13 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
+import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
@@ -88,10 +91,16 @@ public class Response implements Serializable {
         // --------------------------------------------------------------------------------------------------- resultMsg
 
         // -------------------------------------------------------------------------------------------------------------
+        @JsonbProperty
+        @JsonProperty
         @NotBlank
+        @XmlElement(required = true)
         private String resultCode;
 
+        @JsonbProperty
+        @JsonProperty
         @NotBlank
+        @XmlElement(required = true)
         private String resultMsg;
     }
 
@@ -238,8 +247,7 @@ public class Response implements Serializable {
 
             // ------------------------------------------------------------------------------------- lunYear / lunarYear
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Year getLunarYear() {
                 return Optional.ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
@@ -250,8 +258,7 @@ public class Response implements Serializable {
 
             // ----------------------------------------------------------------------------------- lunMonth / lunarMonth
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Month getLunarMonth() {
                 return Optional.ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
             }
@@ -262,8 +269,7 @@ public class Response implements Serializable {
 
             // -------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Integer getLunarDayOfMonth() {
                 return Optional.ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
             }
@@ -274,8 +280,7 @@ public class Response implements Serializable {
 
             // --------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Boolean getLunarLeapMonth() {
                 return LEAP.equals(getLunLeapmonth());
             }
@@ -287,15 +292,47 @@ public class Response implements Serializable {
             }
 
             // ------------------------------------------------------------------------------------------------ lunSecha
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForYearKore() {
+                return Optional.ofNullable(getLunSecha()).map(s -> s.substring(0, 2)).orElse(null);
+            }
+
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForYearHans() {
+                return Optional.ofNullable(getLunSecha()).map(s -> s.substring(3, 5)).orElse(null);
+            }
 
             // ---------------------------------------------------------------------------------------------- lunWolgeon
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForMonthKore() {
+                return Optional.ofNullable(getLunWolgeon()).map(s -> s.substring(0, 2)).orElse(null);
+            }
+
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForMonthHans() {
+                return Optional.ofNullable(getLunWolgeon()).map(s -> s.substring(3, 5)).orElse(null);
+            }
 
             // -----------------------------------------------------------------------------------------------  lunIljin
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForDayKore() {
+                return Optional.ofNullable(getLunIljin()).map(s -> s.substring(0, 2)).orElse(null);
+            }
+
+            @JsonbTransient
+            @JsonIgnore
+            public String getLunarGanzhiForDayHans() {
+                return Optional.ofNullable(getLunIljin()).map(s -> s.substring(3, 5)).orElse(null);
+            }
 
             // ------------------------------------------------------------------------------------- solYear / solarYear
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Year getSolarYear() {
                 return Optional.ofNullable(getSolYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
@@ -306,8 +343,7 @@ public class Response implements Serializable {
 
             // ----------------------------------------------------------------------------------- solMonth / solarMonth
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Month getSolarMonth() {
                 return Optional.ofNullable(getSolMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
             }
@@ -318,8 +354,7 @@ public class Response implements Serializable {
 
             // -------------------------------------------------------------------------------- solDay / solarDayOfMonth
             @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonIgnore
             public Integer getSolarDayOfMonth() {
                 return Optional.ofNullable(getSolDay()).map(Integer::parseInt).orElse(null);
             }
@@ -329,9 +364,8 @@ public class Response implements Serializable {
             }
 
             // ----------------------------------------------------------------------------------------------- solarDate
-            @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonbProperty
+            @JsonProperty
             public LocalDate getSolarDate() {
                 return LocalDate.of(getSolarYear().getValue(), getSolarMonth(), getSolarDayOfMonth());
             }
@@ -352,9 +386,8 @@ public class Response implements Serializable {
                 return getSolarDate().isLeapYear() == getSolarLeapYear();
             }
 
-            @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonbProperty
+            @JsonProperty
             public Boolean getSolarLeapYear() {
                 return Optional.ofNullable(getSolLeapyear()).map(v -> v.equals(LEAP)).orElse(null);
             }
@@ -367,10 +400,9 @@ public class Response implements Serializable {
                 );
             }
 
-            // ---------------------------------------------------------------------------------- solWeek / larDayOfWeek
-            @JsonbTransient
-            @XmlTransient
-            @Transient
+            // -------------------------------------------------------------------------------- solWeek / solarDayOfWeek
+            @JsonbProperty
+            @JsonProperty
             public DayOfWeek getSolarDayOfWeek() {
                 return Optional.ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
             }
@@ -385,73 +417,100 @@ public class Response implements Serializable {
                 return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
             }
 
-            @JsonbTransient
-            @XmlTransient
-            @Transient
+            @JsonbProperty
+            @JsonProperty
             public Long getSolarJulianDay() {
                 return getSolJd();
             }
 
-            void setSolarJulianDay(final Long solarJulianDay) {
-                setSolJd(solarJulianDay);
+            void setSolarJulianDay(final Long julianDay) {
+                setSolJd(julianDay);
             }
 
             // ---------------------------------------------------------------------------------------------------------
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String lunYear;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String lunMonth;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String lunDay;
 
+            @JsonbProperty
+            @JsonProperty
             @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
             @NotNull
             @XmlElement
             private String lunLeapmonth;
 
+            @JsonbProperty
+            @JsonProperty
             @XmlElement
             private int lunNday;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String lunSecha;
 
+            @JsonbProperty
+            @JsonProperty
             @Nullable
             @XmlElement(required = false)
             private String lunWolgeon;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String lunIljin;
 
             // ---------------------------------------------------------------------------------------------------------
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String solYear;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String solMonth;
 
+            @JsonbProperty
+            @JsonProperty
             @NotBlank
             @XmlElement
             private String solDay;
 
+            @JsonbProperty
+            @JsonProperty
             @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
             @NotNull
             @XmlElement
             private String solLeapyear;
 
+            @JsonbProperty
+            @JsonProperty
             @Pattern(regexp = "[\uc6d4\ud654\uc218\ubaa9\uae08\ud1a0\uc77c]")
             @NotNull
             @XmlElement
             private String solWeek;
 
+            @JsonbProperty
+            @JsonProperty
             @Positive
             @NotNull
             @XmlElement
@@ -497,6 +556,7 @@ public class Response implements Serializable {
 
         // -------------------------------------------------------------------------------------------------------------
         @JsonbTransient
+        @JsonIgnore
         @XmlTransient
         @Transient
         public boolean isLastPage() {
@@ -504,18 +564,26 @@ public class Response implements Serializable {
         }
 
         // -------------------------------------------------------------------------------------------------------------
+        @JsonbProperty
+        @JsonProperty
         @XmlElementWrapper
         @XmlElement(name = "item")
         private List<@Valid @NotNull Item> items;
 
+        @JsonbProperty
+        @JsonProperty
         @Positive
         @XmlElement(required = true)
         private int numOfRows;
 
+        @JsonbProperty
+        @JsonProperty
         @Positive
         @XmlElement(required = true)
         private int pageNo;
 
+        @JsonbProperty
+        @JsonProperty
         @PositiveOrZero
         @XmlElement(required = true)
         private int totalCount;
@@ -546,11 +614,15 @@ public class Response implements Serializable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @JsonbProperty
+    @JsonProperty
     @Valid
     @NotNull
     @XmlElement(required = true)
     private Header header;
 
+    @JsonbProperty
+    @JsonProperty
     @Valid
     @NotNull
     @XmlElement(required = true)
