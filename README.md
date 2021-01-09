@@ -14,7 +14,7 @@ See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi
 Verify with your own service key assigned by the service provider.
 
 ```shell
-\$ mvn -Pfailsafe -DservcieKey=... clean verify
+$ mvn -Pfailsafe -DservcieKey=... clean verify
 ```
 
 ## Injection points
