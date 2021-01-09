@@ -100,7 +100,7 @@ private LrsrCldInfoServiceClient client;
 Provide an instance of `WebClient`.
 
 ```java
-@LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
+@LrsrCldInfoServiceWebClient
 @Bean
 WebClient lrsrCldInfoServiceWebClient() {
     return WebClient.builder()
