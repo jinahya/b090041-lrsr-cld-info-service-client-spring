@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -34,7 +35,7 @@ abstract class LrsrCldInfoServiceReactiveClientIT
 
         static final int CONNECT_TIME_MILLIS = (int) Duration.ofSeconds(10L).toMillis();
 
-        static final int READ_TIMEOUT_SECONDS = 20;
+        static final int READ_TIMEOUT_SECONDS = 30;
 
         static final int WRITE_TIMEOUT_SECONDS = 10;
 
@@ -76,12 +77,14 @@ abstract class LrsrCldInfoServiceReactiveClientIT
             return WebClient.builder()
                     .clientConnector(clientConnector)
                     .exchangeStrategies(exchangeStrategies)
-                    .filter((r, n) -> {
-                        return n.exchange(r);
-                    })
-                    .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL)
+                    .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();
+        }
+
+        @Bean
+        public MethodValidationPostProcessor bean() {
+            return new MethodValidationPostProcessor();
         }
     }
 

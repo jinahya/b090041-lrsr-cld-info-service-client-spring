@@ -543,7 +543,7 @@ public class Response implements Serializable {
 
             @JsonbProperty
             @JsonProperty
-            @Positive
+            @PositiveOrZero
             @NotNull
             @XmlElement
             private Long solJd; // julian day, 율리우스일

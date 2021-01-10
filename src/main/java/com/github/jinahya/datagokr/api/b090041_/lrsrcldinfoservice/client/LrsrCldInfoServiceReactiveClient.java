@@ -190,14 +190,14 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     /**
      * Retrieves all items from {@code /getSolCalInfo} with parameters derived from specified month in lunar calendar.
      *
-     * @param lunarMonth the month from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
-     *                   #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
+     * @param lunarYearMonth the month from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
+     *                       #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
      * @return a flux of all items from all pages.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
-    public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarMonth) {
-        final Year lunYear = Year.from(lunarMonth);
-        final Month lunMonth = Month.from(lunarMonth);
+    public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
+        final Year lunYear = Year.from(lunarYearMonth);
+        final Month lunMonth = Month.from(lunarYearMonth);
         final AtomicInteger pageNo = new AtomicInteger();
         return getSolCalInfo(lunYear, lunMonth, null, pageNo.incrementAndGet())
                 .expand(r -> {
@@ -222,9 +222,9 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param pageNo      a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a mono of response.
      */
-    public Mono<Response> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
-                                              @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
-                                              final boolean leapMonth, @Positive final int pageNo) {
+    protected Mono<Response> getSpcifyLunCalInfo(@NotNull final Year fromSolYear, @NotNull final Year toSolYear,
+                                                 @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
+                                                 final boolean leapMonth, @Positive final int pageNo) {
         if (toSolYear.isBefore(fromSolYear)) {
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
@@ -256,29 +256,31 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     /**
      * Retrieves all items from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
-     * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
-     * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
-     * @param lunMonth    a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
-     * @param lunDay      a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
-     * @param leapMonth   a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
+     * @param fromSolarYear   a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
+     * @param toSolarYear     a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolarYear}.
+     * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
+     * @param lunarLeapMonth  a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
      * @return a flux of all items from all pages.
      * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
      */
-    public Flux<Item> getSpcifyLunCalInfo(@Positive final Year fromSolYear, @Positive final Year toSolYear,
-                                          @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
-                                          final boolean leapMonth) {
-        if (toSolYear.isBefore(fromSolYear)) {
+    public Flux<Item> getSpcifyLunCalInfo(@NotNull final Year fromSolarYear, @NotNull final Year toSolarYear,
+                                          @NotNull final Month lunarMonth, @Max(30) @Min(1) final int lunarDayOfMonth,
+                                          final boolean lunarLeapMonth) {
+        if (toSolarYear.isBefore(fromSolarYear)) {
             throw new IllegalArgumentException(
-                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
+                    "toSolarYear(" + toSolarYear + ") is before fromSolYear(" + fromSolarYear + ")");
         }
         final AtomicInteger pageNo = new AtomicInteger(0);
-        return getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet())
+        return getSpcifyLunCalInfo(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth,
+                                   pageNo.incrementAndGet())
                 .expand(r -> {
                     if (r.getBody().isLastPage()) {
                         return Mono.empty();
                     }
                     return getSpcifyLunCalInfo(
-                            fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet());
+                            fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth,
+                            pageNo.incrementAndGet());
                 })
                 .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }

@@ -36,6 +36,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -172,15 +173,15 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     /**
      * Exchanges all items from {@code /getLunCalInfo} for specified solar month.
      *
-     * @param solarMonth the solar month from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear} and {@link
-     *                   #QUERY_PARAM_NAME_SOL_MONTH ?solMonth} are derived.
+     * @param solarYearMonth the solar month from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear} and {@link
+     *                       #QUERY_PARAM_NAME_SOL_MONTH ?solMonth} are derived.
      * @return a list of all retrieved items.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
-    public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final YearMonth solarMonth) {
+    public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
         final List<Item> items = new ArrayList<>();
-        final Year solYear = Year.from(solarMonth);
-        final Month solMonth = Month.from(solarMonth);
+        final Year solYear = Year.from(solarYearMonth);
+        final Month solMonth = Month.from(solarYearMonth);
         for (int pageNo = 1; ; pageNo++) {
             final Response response = getResponse(getLunCalInfo(solYear, solMonth, null, pageNo));
             items.addAll(response.getBody().getItems());
@@ -279,7 +280,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @return a response entity of response.
      */
     protected @NotNull ResponseEntity<Response> getSpcifyLunCalInfo(
-            @Positive final Year fromSolYear, @Positive final Year toSolYear, @NotNull final Month lunMonth,
+            @NotNull final Year fromSolYear, @NotNull final Year toSolYear, @NotNull final Month lunMonth,
             @Max(30) @Min(1) final int lunDay, final boolean leapMonth, @Positive int pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
@@ -299,31 +300,38 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     /**
      * Exchanges all items from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
-     * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
-     * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
-     * @param lunMonth    a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
-     * @param lunDay      a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
-     * @param leapMonth   a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
+     * @param fromSolarYear   a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
+     * @param toSolarYear     a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
+     * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
+     * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
+     * @param lunarLeapMonth  a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
      * @return a list of all items from all pages.
      * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
      */
     public @NotNull List<@Valid @NotNull Item> getSpcifyLunCalInfo(
-            @Positive final Year fromSolYear, @Positive final Year toSolYear, @NotNull final Month lunMonth,
-            @Max(30) @Min(1) final int lunDay, final boolean leapMonth) {
-        if (toSolYear.isBefore(fromSolYear)) {
+            @NotNull final Year fromSolarYear, @NotNull final Year toSolarYear, @NotNull final Month lunarMonth,
+            @Max(30) @Min(1) final int lunarDayOfMonth, final boolean lunarLeapMonth) {
+        if (toSolarYear.isBefore(fromSolarYear)) {
             throw new IllegalArgumentException(
-                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
+                    "toSolarYear(" + toSolarYear + ") is before fromSolarYear(" + fromSolarYear + ")");
         }
         final List<Item> items = new ArrayList<>();
         for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(
-                    getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo));
+            final Response response = getResponse(getSpcifyLunCalInfo(
+                    fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth, pageNo));
             items.addAll(response.getBody().getItems());
             if (response.getBody().isLastPage()) {
                 break;
             }
         }
         return items;
+    }
+
+    public @NotNull List<@Valid @NotNull Item> getSpcifyLunCalInfo2(
+            @NotNull final Year solarYear, @NotNull final Period period, @NotNull final Month lunarMonth,
+            @Max(30) @Min(1) final int lunarDayOfMonth, final boolean lunarLeapMonth) {
+        return getSpcifyLunCalInfo(
+                solarYear, Year.from(period.addTo(solarYear)), lunarMonth, lunarDayOfMonth, lunarLeapMonth);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -354,6 +362,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private String restTemplateRootUri;
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The root uri expanded with {@code '/'} from {@code restTemplate.uriTemplateHandler}.

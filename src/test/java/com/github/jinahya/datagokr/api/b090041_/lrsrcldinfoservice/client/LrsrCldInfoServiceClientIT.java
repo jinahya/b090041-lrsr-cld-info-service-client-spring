@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -52,10 +53,15 @@ class LrsrCldInfoServiceClientIT
                             }
                     )
                     .setConnectTimeout(Duration.ofSeconds(10L))
-                    .setReadTimeout(Duration.ofSeconds(20L))
-                    .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL)
+                    .setReadTimeout(Duration.ofSeconds(30L))
+                    .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
                     .build();
+        }
+
+        @Bean
+        public MethodValidationPostProcessor bean() {
+            return new MethodValidationPostProcessor();
         }
     }
 
