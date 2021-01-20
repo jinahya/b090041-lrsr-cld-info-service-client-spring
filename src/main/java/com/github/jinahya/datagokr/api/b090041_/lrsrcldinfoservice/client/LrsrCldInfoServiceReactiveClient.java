@@ -75,15 +75,23 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
-                .uri(b -> b.pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
-                        .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
-                        .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-                                             Optional.ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
-                                                     .map(Item.DAY_FORMATTER::format))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
-                        .build())
+                .uri(b -> {
+                    b.pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
+                            .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                            .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
+                            .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
+//                            .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
+//                                                 Optional.ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
+//                                                         .map(Item.DAY_FORMATTER::format))
+//                            .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+                    ;
+                    Optional.ofNullable(solDay)
+                            .map(v -> MonthDay.of(solMonth, v))
+                            .map(Item.DAY_FORMATTER::format)
+                            .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_SOL_DAY, v));
+                    Optional.ofNullable(pageNo).ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+                    return b.build();
+                })
                 .retrieve()
                 .bodyToMono(Response.class)
                 .map(this::requireResultSuccessful)
@@ -152,13 +160,21 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                                                     @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
-                .uri(b -> b.pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
-                        .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
-                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
-                        .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
-                        .build())
+                .uri(b -> {
+                    b.pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
+                            .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
+                            .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
+                            .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
+//                            .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
+//                            .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+                            ;
+                    Optional.ofNullable(lunDay)
+                            .map(Item::formatDay)
+                            .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
+                    Optional.ofNullable(pageNo)
+                            .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+                    return b.build();
+                })
                 .retrieve()
                 .bodyToMono(Response.class)
                 .map(this::requireResultSuccessful)

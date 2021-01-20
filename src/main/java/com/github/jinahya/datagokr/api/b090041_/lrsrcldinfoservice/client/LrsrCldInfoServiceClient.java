@@ -128,16 +128,23 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     protected @NotNull ResponseEntity<Response> getLunCalInfo(
             @NotNull final Year solYear, @NotNull final Month solMonth,
             @Max(31) @Min(1) @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
-        final URI url = uriBuilderFromRootUri()
+        final UriComponentsBuilder builder = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                 .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
                 .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
-                .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-                                     Optional.ofNullable(solDay)
-                                             .map(v -> MonthDay.of(solMonth, v))
-                                             .map(Item.DAY_FORMATTER::format))
-                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+//                .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
+//                                     Optional.ofNullable(solDay)
+//                                             .map(v -> MonthDay.of(solMonth, v))
+//                                             .map(Item.DAY_FORMATTER::format))
+//                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+                ;
+        Optional.ofNullable(solDay)
+                .map(v -> MonthDay.of(solMonth, v))
+                .map(Item.DAY_FORMATTER::format)
+                .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_SOL_DAY, v));
+        Optional.ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+        final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();
@@ -206,13 +213,17 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     protected @NotNull ResponseEntity<Response> getSolCalInfo(
             @NotNull final Year lunYear, @NotNull final Month lunMonth,
             @Max(30) @Min(1) @Nullable final Integer lunDay, @Positive @Nullable final Integer pageNo) {
-        final URI url = uriBuilderFromRootUri()
+        final UriComponentsBuilder builder = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                 .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
                 .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
-                .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
-                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+//                .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
+//                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
+                ;
+        Optional.ofNullable(lunDay).map(Item::formatDay).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
+        Optional.ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+        final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();

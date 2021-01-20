@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -49,8 +50,8 @@
     <sonar.organization>jinahya-github</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <surefire.systemPropertiesFile>src/test/resources/surefire.system.properties</surefire.systemPropertiesFile>
-    <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
-    <version.io.projectreactor>3.4.1</version.io.projectreactor>
+    <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
+    <version.io.projectreactor>3.4.2</version.io.projectreactor>
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
     <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
     <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
@@ -59,14 +60,14 @@
     <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.0.0-M5</version.maven-surefire>
-    <version.org.apache.johnzon>1.2.8</version.org.apache.johnzon>
+    <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
     <version.org.apache.maven.wagon>3.4.2</version.org.apache.maven.wagon>
     <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
     <version.org.projectlombok>1.18.16</version.org.projectlombok>
     <version.org.slf4j>1.7.30</version.org.slf4j>
-    <version.org.springframework>5.3.2</version.org.springframework>
+    <version.org.springframework>5.3.3</version.org.springframework>
     <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
-    <version.org.springframework.hateoas>1.2.2</version.org.springframework.hateoas>
+    <version.org.springframework.hateoas>1.2.3</version.org.springframework.hateoas>
   </properties>
 
   <dependencyManagement>
@@ -273,7 +274,7 @@
             <configuration>
               <skip>true</skip>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
           </execution>
@@ -474,17 +475,24 @@
       </build>
     </profile>
     <profile>
-      <id>spring-boot-2_4_1</id>
-      <!-- https://docs.spring.io/spring-boot/docs/2.4.1/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <id>spring-boot-2_4_2</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
-        <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
+        <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.4.2</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
         <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
-        <version.org.springframework>5.3.2</version.org.springframework>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
+        <version.org.springframework>5.3.3</version.org.springframework>
         <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.2.3</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -492,42 +500,182 @@
       <!-- https://docs.spring.io/spring-boot/docs/2.4.0/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.4.0</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
         <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.8</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.3.1</version.org.springframework>
         <version.org.springframework.boot>2.4.0</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.2.1</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_3_7_RELEASE</id>
-      <!-- https://docs.spring.io/spring-boot/docs/2.3.7.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <id>spring-boot-2_3_8_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
-        <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
+        <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.3.13</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.2.12.RELEASE</version.org.springframework>
-        <version.org.springframework.boot>2.3.7.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.boot>2.3.8.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.1.3.RELEASE</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_3_6_RELEASE</id>
+      <id>spring-boot-2_3_0_RELEASE</id>
       <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
-        <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
+        <version.com.fasterxml.jackson.core>2.11.0</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.3.5.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
+        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.5</version.org.apache.johnzon>
+        <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.12</version.org.projectlombok>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
+        <version.org.springframework>5.2.6.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.3.0.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.1.0.RELEASE</version.org.springframework.hateoas>
+      </properties>
+    </profile>
+    <profile>
+      <id>spring-boot-2_2_13_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.2.13.RELEASE/reference/html/appendix-dependency-versions.html -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.10.5</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.3.13.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
+        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
-        <version.org.springframework>5.2.11.RELEASE</version.org.springframework>
-        <version.org.springframework.boot>2.3.6.RELEASE</version.org.springframework.boot>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
+        <version.org.springframework>5.2.12.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.2.13.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.0.5.RELEASE</version.org.springframework.hateoas>
       </properties>
+    </profile>
+    <profile>
+      <id>spring-boot-2_2_0_RELEASE_NOT_SUPPORTED</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.10.0</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.3.0.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
+        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
+        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
+        <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api>
+        <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api>
+        <version.org.apache.johnzon>1.2.1</version.org.apache.johnzon>
+        <version.org.glassfish.jaxb>2.3.2</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.10</version.org.projectlombok>
+        <version.org.slf4j>1.7.28</version.org.slf4j>
+        <version.org.springframework>5.2.0.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.2.0.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.hateoas>1.0.0.RELEASE</version.org.springframework.hateoas>
+      </properties>
+    </profile>
+    <profile>
+      <id>spring-boot-2_0_0_RELEASE_NOT_SUPPORTED</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.9.4</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.1.5.RELEASE</version.io.projectreactor>
+        <!--        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>-->
+        <!--        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>-->
+        <!--        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>-->
+        <!--        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>-->
+        <!--        <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>-->
+        <!--        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>-->
+        <version.org.apache.johnzon>1.1.6</version.org.apache.johnzon>
+        <!--        <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>-->
+        <version.org.projectlombok>1.16.20</version.org.projectlombok>
+        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.org.springframework>5.0.4.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.0.0.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.hateoas>0.24.0.RELEASE</version.org.springframework.hateoas>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>javax.validation</groupId>
+          <artifactId>validation-api</artifactId>
+          <version>2.0.1.Final</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+          <version>1.3.2</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.json</groupId>
+          <artifactId>javax.json-api</artifactId>
+          <version>1.1.2</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.json.bind</groupId>
+          <artifactId>javax.json.bind-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.validation</groupId>
+          <artifactId>validation-api</artifactId>
+          <version>2.0.1.Final</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <version>2.3.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <!--        <dependency>-->
+        <!--          <groupId>org.glassfish</groupId>-->
+        <!--          <artifactId>json</artifactId>-->
+        <!--          <version>1.1.2</version>-->
+        <!--          <scope>provided</scope>-->
+        <!--        </dependency>-->
+      </dependencies>
+      <!--      <build>-->
+      <!--        <plugins>-->
+      <!--          <plugin>-->
+      <!--            <groupId>org.apache.maven.plugins</groupId>-->
+      <!--            <artifactId>maven-compiler-plugin</artifactId>-->
+      <!--            <configuration>-->
+      <!--              <excludes>-->
+      <!--                <exclude>**/LrsrCldInfoServiceReactiveClient.java</exclude>-->
+      <!--              </excludes>-->
+      <!--            </configuration>-->
+      <!--          </plugin>-->
+      <!--        </plugins>-->
+      <!--      </build>-->
     </profile>
   </profiles>
 </project>

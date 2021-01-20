@@ -16,6 +16,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.tcp.TcpClient;
 
 import java.time.Duration;
 
@@ -26,6 +27,8 @@ import java.time.Duration;
         }
 )
 @Slf4j
+// https://stackoverflow.com/q/48992992/330457
+// https://stackoverflow.com/q/48096573/330457
 abstract class LrsrCldInfoServiceReactiveClientIT
         extends AbstractLrsrCldInfoServiceClientIT<LrsrCldInfoServiceReactiveClient> {
 
@@ -39,15 +42,27 @@ abstract class LrsrCldInfoServiceReactiveClientIT
 
         static final int WRITE_TIMEOUT_SECONDS = 10;
 
+        @Deprecated
+        @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
+        @Bean
+        TcpClient tcpClient() {
+            return TcpClient.create()
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIME_MILLIS)
+                    .doOnConnected(c -> c.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS))
+                            .addHandlerLast(new WriteTimeoutHandler(WRITE_TIMEOUT_SECONDS)));
+        }
+
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
         @Bean
         HttpClient httpClient() {
-            return HttpClient.create()
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIME_MILLIS)
-                    .doOnConnected(c -> {
-                        c.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS))
-                                .addHandlerLast(new WriteTimeoutHandler(WRITE_TIMEOUT_SECONDS));
-                    });
+//            return HttpClient.create() // Spring Boot 2.4.X
+//                    //.responseTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS)) // since reactor-netty:0.9.11
+//                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIME_MILLIS)
+//                    .doOnConnected(c -> {
+//                        c.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS))
+//                                .addHandlerLast(new WriteTimeoutHandler(WRITE_TIMEOUT_SECONDS));
+//                    });
+            return HttpClient.from(tcpClient());
         }
 
         @LrsrCldInfoServiceReactiveClient.LrsrCldInfoServiceWebClient
