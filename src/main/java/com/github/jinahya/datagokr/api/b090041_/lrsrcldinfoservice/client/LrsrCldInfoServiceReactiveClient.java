@@ -167,7 +167,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                             .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
 //                            .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
 //                            .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
-                            ;
+                    ;
                     Optional.ofNullable(lunDay)
                             .map(Item::formatDay)
                             .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
