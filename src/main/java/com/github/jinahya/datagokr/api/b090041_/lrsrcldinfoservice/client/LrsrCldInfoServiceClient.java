@@ -399,13 +399,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return items;
     }
 
-    public @NotNull List<@Valid @NotNull Item> getSpcifyLunCalInfo2(
-            @NotNull final Year solarYear, @NotNull final Period period, @NotNull final Month lunarMonth,
-            @Max(30) @Min(1) final int lunarDayOfMonth, final boolean lunarLeapMonth) {
-        return getSpcifyLunCalInfo(
-                solarYear, Year.from(period.addTo(solarYear)), lunarMonth, lunarDayOfMonth, lunarLeapMonth);
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
