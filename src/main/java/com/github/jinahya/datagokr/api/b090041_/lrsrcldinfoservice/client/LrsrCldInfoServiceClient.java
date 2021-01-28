@@ -40,9 +40,14 @@ import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 /**
  * A client implementation uses an instance of {@link RestTemplate}.
@@ -199,6 +204,34 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return items;
     }
 
+    /**
+     * Reads all items for specified year in solar calendar.
+     *
+     * @param year       the year of solar calendar.
+     * @param executor   an executor for concurrently execute {@link #getLunCalInfo(YearMonth)} for each {@link Month}
+     *                   in {@code year}.
+     * @param collection a collection to which retrieved items are added.
+     * @param <T>        collection type parameter
+     * @return given {@code collection}.
+     */
+    @NotEmpty
+    public <T extends Collection<? super Item>> T getLunCalInfo(
+            @NotNull final Year year, @NotNull final Executor executor, @NotNull final T collection) {
+        Arrays.stream(Month.values())
+                .map(v -> YearMonth.of(year.getValue(), v))
+                .map(v -> CompletableFuture.supplyAsync(() -> getLunCalInfo(v), executor))
+                .map(f -> {
+                    try {
+                        return f.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .forEach(collection::addAll)
+        ;
+        return collection;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -275,6 +308,34 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             }
         }
         return items;
+    }
+
+    /**
+     * Reads all items for specified year in lunar calendar.
+     *
+     * @param year       the year of lunar calendar.
+     * @param executor   an executor for concurrently execute {@link #getSolCalInfo(YearMonth)} for each {@link Month}
+     *                   in {@code year}.
+     * @param collection a collection to which retrieved items are added.
+     * @param <T>        collection type parameter
+     * @return given {@code collection}.
+     */
+    @NotEmpty
+    public <T extends Collection<? super Item>> T getSolCalInfo(
+            @NotNull final Year year, @NotNull final Executor executor, @NotNull final T collection) {
+        Arrays.stream(Month.values())
+                .map(v -> YearMonth.of(year.getValue(), v))
+                .map(v -> CompletableFuture.supplyAsync(() -> getSolCalInfo(v), executor))
+                .map(f -> {
+                    try {
+                        return f.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .forEach(collection::addAll)
+        ;
+        return collection;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -383,4 +444,9 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private URI rootUri;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Lazy
+    @Autowired
+    private LrsrCldInfoServiceClient self;
 }

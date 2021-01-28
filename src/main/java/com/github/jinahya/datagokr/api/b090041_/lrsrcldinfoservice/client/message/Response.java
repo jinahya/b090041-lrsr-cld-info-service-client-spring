@@ -185,23 +185,53 @@ public class Response implements Serializable {
 
             // ---------------------------------------------------------------------------------------------------------
             public static final Comparator<Item> COMPARING_IN_LUNAR = Comparator.comparing(Item::getLunarYear)
-                    .thenComparing(Item::getLunMonth)
-                    .thenComparing(Item::getLunDay);
+                    .thenComparing(Item::getLunarMonth)
+                    .thenComparing(Item::getLunarDayOfMonth);
 
             public static final Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);
+
+            // ---------------------------------------------------------------------------------------------------------
+
+            /**
+             * The minimum value of day-of-month in lunar calendar which is {@value}.
+             *
+             * @see #MAX_DAY_OF_MONTH_LUNAR
+             */
+            public static final int MIN_DAY_OF_MONTH_LUNAR = 1;
+
+            /**
+             * The maximum value of day-of-month in lunar calendar which is {@value}.
+             *
+             * @see #MIN_DAY_OF_MONTH_LUNAR
+             */
+            public static final int MAX_DAY_OF_MONTH_LUNAR = 30;
+
+            /**
+             * The minimum value of day-of-month in solar calendar which is {@value}.
+             *
+             * @see #MAX_DAY_OF_MONTH_SOLAR
+             */
+            public static final int MIN_DAY_OF_MONTH_SOLAR = 1;
+
+            /**
+             * The maximum value of day-of-month in solar calendar which is {@value}.
+             *
+             * @see #MIN_DAY_OF_MONTH_SOLAR
+             */
+            public static final int MAX_DAY_OF_MONTH_SOLAR = 31;
 
             // ---------------------------------------------------------------------------------------------------------
             public static final String REL_YEAR_LUNAR = "yearLunar";
 
             public static final String REL_MONTH_LUNAR = "monthLunar";
 
-            public static final String REL_SELF_LUNAR = "selfLunar";
+            public static final String REL_DATE_LUNAR = "dateLunar";
 
             public static final String REL_YEAR_SOLAR = "yearSolar";
 
             public static final String REL_MONTH_SOLAR = "monthSolar";
 
-            public static final String REL_SELF_SOLAR = "selfSolar";
+            public static final String REL_DATE_SOLAR = "dateSolar";
 
             // ---------------------------------------------------------------------------------------------------------
 
@@ -276,29 +306,81 @@ public class Response implements Serializable {
             // ------------------------------------------------------------------------------------- lunYear / lunarYear
             @JsonbTransient
             @JsonIgnore
-            public @NotNull Year getLunarYear() {
-                return Optional.ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
+            @NotNull
+            public Year getLunarYear() {
+                return Optional.ofNullable(getLunYear())
+                        .map(v -> Year.parse(v, YEAR_FORMATTER))
+                        .orElse(null);
             }
 
             public void setLunarYear(final Year lunarYear) {
-                setLunYear(Optional.ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
+                setLunYear(
+                        Optional.ofNullable(lunarYear)
+                                .map(YEAR_FORMATTER::format)
+                                .orElse(null)
+                );
+            }
+
+            @JsonbProperty
+            @JsonProperty
+            @NotNull
+            public Integer getLunarYearValue() {
+                return Optional.ofNullable(getLunarYear())
+                        .map(Year::getValue)
+                        .orElse(null);
+            }
+
+            public void setLunarYearValue(final Integer lunarYearValue) {
+                setLunarYear(
+                        Optional.ofNullable(lunarYearValue)
+                                .map(Year::of)
+                                .orElse(null)
+                );
             }
 
             // ----------------------------------------------------------------------------------- lunMonth / lunarMonth
             @JsonbTransient
             @JsonIgnore
-            public @NotNull Month getLunarMonth() {
-                return Optional.ofNullable(getLunMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
+            @NotNull
+            public Month getLunarMonth() {
+                return Optional.ofNullable(getLunMonth())
+                        .map(Integer::parseInt)
+                        .map(Month::of)
+                        .orElse(null);
             }
 
             public void setLunarMonth(final Month lunarMonth) {
-                setLunMonth(Optional.ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
+                setLunMonth(
+                        Optional.ofNullable(lunarMonth)
+                                .map(MONTH_FORMATTER::format)
+                                .orElse(null)
+                );
+            }
+
+            @JsonbProperty
+            @JsonProperty
+            @NotNull
+            public Integer getLunarMonthValue() {
+                return Optional.ofNullable(getLunarMonth())
+                        .map(Month::getValue)
+                        .orElse(null);
+            }
+
+            public void setLunarMonthValue(final Integer lunarMonthValue) {
+                setLunarMonth(
+                        Optional.ofNullable(lunarMonthValue)
+                                .map(Month::of)
+                                .orElse(null)
+                );
             }
 
             // -------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
-            @JsonbTransient
-            @JsonIgnore
-            public @Max(30) @Min(1) @NotNull Integer getLunarDayOfMonth() {
+            @JsonbProperty
+            @JsonProperty
+            @Max(MAX_DAY_OF_MONTH_LUNAR)
+            @Min(MIN_DAY_OF_MONTH_LUNAR)
+            @NotNull
+            public Integer getLunarDayOfMonth() {
                 return Optional.ofNullable(getLunDay()).map(Integer::parseInt).orElse(null);
             }
 
@@ -307,9 +389,10 @@ public class Response implements Serializable {
             }
 
             // --------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
-            @JsonbTransient
-            @JsonIgnore
-            public @NotNull Boolean getLunarLeapMonth() {
+            @JsonbProperty
+            @JsonProperty
+            @NotNull
+            public Boolean getLunarLeapMonth() {
                 return LEAP.equals(getLunLeapmonth());
             }
 
@@ -320,52 +403,61 @@ public class Response implements Serializable {
             }
 
             // ------------------------------------------------------------------------------------------------ lunSecha
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2) @NotNull String getLunarGanzhiForYearKore() {
+            @JsonbProperty()
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
+            @NotNull
+            public String getLunarGanzhiForYearKore() {
                 return Optional.ofNullable(getLunSecha()).map(s -> s.substring(0, 2)).orElse(null);
             }
 
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2) @NotNull String getLunarGanzhiForYearHans() {
+            @JsonbProperty
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
+            @NotNull
+            public String getLunarGanzhiForYearHans() {
                 return Optional.ofNullable(getLunSecha()).map(s -> s.substring(3, 5)).orElse(null);
             }
 
             // ---------------------------------------------------------------------------------------------- lunWolgeon
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2)
+            @JsonbProperty
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
             @Nullable
-            String getLunarGanzhiForMonthKore() {
+            public String getLunarGanzhiForMonthKore() {
                 return Optional.ofNullable(getLunWolgeon()).map(s -> s.substring(0, 2)).orElse(null);
             }
 
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2)
+            @JsonbProperty
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
             @Nullable
-            String getLunarGanzhiForMonthHans() {
+            public String getLunarGanzhiForMonthHans() {
                 return Optional.ofNullable(getLunWolgeon()).map(s -> s.substring(3, 5)).orElse(null);
             }
 
             // -----------------------------------------------------------------------------------------------  lunIljin
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2) @NotNull String getLunarGanzhiForDayOfMonthKore() {
+            @JsonbProperty
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
+            @NotNull
+            public String getLunarGanzhiForDayOfMonthKore() {
                 return Optional.ofNullable(getLunIljin()).map(s -> s.substring(0, 2)).orElse(null);
             }
 
-            @JsonbTransient
-            @JsonIgnore
-            public @Size(min = 2, max = 2) @NotNull String getLunarGanzhiForDayOfMonthHans() {
+            @JsonbProperty
+            @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+            @Size(min = 2, max = 2)
+            @NotNull
+            public String getLunarGanzhiForDayOfMonthHans() {
                 return Optional.ofNullable(getLunIljin()).map(s -> s.substring(3, 5)).orElse(null);
             }
 
             // ------------------------------------------------------------------------------------- solYear / solarYear
             @JsonbTransient
             @JsonIgnore
-            public @NotNull Year getSolarYear() {
+            @NotNull
+            public Year getSolarYear() {
                 return Optional.ofNullable(getSolYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
             }
 
@@ -376,7 +468,8 @@ public class Response implements Serializable {
             // ----------------------------------------------------------------------------------- solMonth / solarMonth
             @JsonbTransient
             @JsonIgnore
-            public @NotNull Month getSolarMonth() {
+            @NotNull
+            public Month getSolarMonth() {
                 return Optional.ofNullable(getSolMonth()).map(Integer::parseInt).map(Month::of).orElse(null);
             }
 
@@ -387,7 +480,10 @@ public class Response implements Serializable {
             // -------------------------------------------------------------------------------- solDay / solarDayOfMonth
             @JsonbTransient
             @JsonIgnore
-            public @Max(31) @Min(1) @NotNull Integer getSolarDayOfMonth() {
+            @Max(MAX_DAY_OF_MONTH_SOLAR)
+            @Min(MIN_DAY_OF_MONTH_SOLAR)
+            @NotNull
+            public Integer getSolarDayOfMonth() {
                 return Optional.ofNullable(getSolDay()).map(Integer::parseInt).orElse(null);
             }
 
@@ -398,7 +494,8 @@ public class Response implements Serializable {
             // ----------------------------------------------------------------------------------------------- solarDate
             @JsonbProperty
             @JsonProperty
-            public @NotNull LocalDate getSolarDate() {
+            @NotNull
+            public LocalDate getSolarDate() {
                 return LocalDate.of(getSolarYear().getValue(), getSolarMonth(), getSolarDayOfMonth());
             }
 
@@ -420,7 +517,8 @@ public class Response implements Serializable {
 
             @JsonbTransient
             @JsonIgnore
-            public @NotNull Boolean getSolarLeapYear() {
+            @NotNull
+            public Boolean getSolarLeapYear() {
                 return Optional.ofNullable(getSolLeapyear()).map(v -> v.equals(LEAP)).orElse(null);
             }
 
@@ -435,7 +533,8 @@ public class Response implements Serializable {
             // -------------------------------------------------------------------------------- solWeek / solarDayOfWeek
             @JsonbTransient
             @JsonIgnore
-            public @NotNull DayOfWeek getSolarDayOfWeek() {
+            @NotNull
+            public DayOfWeek getSolarDayOfWeek() {
                 return Optional.ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
             }
 
@@ -451,12 +550,14 @@ public class Response implements Serializable {
 
             @JsonbTransient
             @JsonIgnore
-            public @PositiveOrZero @NotNull Long getSolarJulianDay() {
+            @PositiveOrZero
+            @NotNull
+            public Long getSolarJulianDay() {
                 return getSolJd();
             }
 
-            void setSolarJulianDay(final Long julianDay) {
-                setSolJd(julianDay);
+            void setSolarJulianDay(final Long solarJulianDay) {
+                setSolJd(solarJulianDay);
             }
 
             // ---------------------------------------------------------------------------------------------------------

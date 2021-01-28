@@ -44,11 +44,11 @@ class LrsrCldInfoServiceClientIT
                     )
                     .additionalInterceptors(
                             (r, b, e) -> {
-                                log.debug("1 executing with ({}, {})", r, b);
+//                                log.debug("1 executing with ({}, {})", r, b);
                                 return e.execute(r, b);
                             },
                             (r, b, e) -> {
-                                log.debug("2 executing with ({}, {})", r, b);
+//                                log.debug("2 executing with ({}, {})", r, b);
                                 return e.execute(r, b);
                             }
                     )

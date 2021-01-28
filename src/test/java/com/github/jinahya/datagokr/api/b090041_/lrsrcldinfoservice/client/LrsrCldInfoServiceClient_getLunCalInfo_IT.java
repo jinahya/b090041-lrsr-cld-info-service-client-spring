@@ -12,8 +12,10 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.concurrent.ForkJoinPool.commonPool;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -81,5 +83,21 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
             assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
             assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
         });
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getLunCalInfo(year, executor, collection)")
+    @Test
+    void getLunCalInfo_Expected_SolarYear() {
+        final Year year = Year.now();
+        final List<Item> items = new ArrayList<>(400);
+        clientInstance().getLunCalInfo(year, commonPool(), items);
+        items.sort(Item.COMPARING_IN_SOLAR);
+        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
+            assertThat(i.getSolarYear()).isEqualTo(year);
+        });
+        log.debug("first: {}", items.get(0));
+        log.debug("last: {}", items.get(items.size() - 1));
     }
 }
