@@ -48,6 +48,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MAX_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MIN_DAY_OF_MONTH_LUNAR;
+
 /**
  * A client implementation uses an instance of {@link RestTemplate}.
  *

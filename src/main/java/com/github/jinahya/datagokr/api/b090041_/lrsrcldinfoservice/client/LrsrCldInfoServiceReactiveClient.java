@@ -35,6 +35,11 @@ import java.time.YearMonth;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MAX_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MAX_DAY_OF_MONTH_SOLAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MIN_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MIN_DAY_OF_MONTH_SOLAR;
+
 /**
  * A client implementation uses an instance of {@link WebClient}.
  *
