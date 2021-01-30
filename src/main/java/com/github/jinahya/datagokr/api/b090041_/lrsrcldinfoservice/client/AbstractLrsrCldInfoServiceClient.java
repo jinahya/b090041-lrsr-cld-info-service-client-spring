@@ -124,6 +124,15 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     public static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
 
     // -----------------------------------------------------------------------------------------------------------------
+    protected static final int MIN_DAY_OF_MONTH_LUNAR = 1;
+
+    protected static final int MAX_DAY_OF_MONTH_LUNAR = 30;
+
+    protected static final int MIN_DAY_OF_MONTH_SOLAR = 1;
+
+    protected static final int MAX_DAY_OF_MONTH_SOLAR = 31;
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * An injection qualifier for the {@code ServiceKey} parameter.
@@ -137,7 +146,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected Response requireValid(final Response response) {
+    private Response requireValid(final Response response) {
         Objects.requireNonNull(response, "response is null");
         final Set<ConstraintViolation<Response>> violations = validator().validate(response);
         if (!violations.isEmpty()) {

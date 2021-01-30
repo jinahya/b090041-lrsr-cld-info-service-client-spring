@@ -186,6 +186,7 @@ public class Response implements Serializable {
             // ---------------------------------------------------------------------------------------------------------
             public static final Comparator<Item> COMPARING_IN_LUNAR = Comparator.comparing(Item::getLunarYear)
                     .thenComparing(Item::getLunarMonth)
+                    .thenComparing(Item::getLunarLeapMonth)
                     .thenComparing(Item::getLunarDayOfMonth);
 
             public static final Comparator<Item> COMPARING_IN_SOLAR = Comparator.comparing(Item::getSolarDate);

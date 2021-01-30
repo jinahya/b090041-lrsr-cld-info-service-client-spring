@@ -36,7 +36,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -122,7 +121,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**
-     * Exchanges a response from {@code /getLunCalInfo} with specified arguments.
+     * Reads a response from {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
@@ -148,7 +147,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .map(v -> MonthDay.of(solMonth, v))
                 .map(Item.DAY_FORMATTER::format)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_SOL_DAY, v));
-        Optional.ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+        Optional.ofNullable(pageNo)
+                .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
@@ -157,7 +157,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Exchanges all items from {@code /getLunCalInfo} for specified date in solar calendar.
+     * Reads all items from {@code /getLunCalInfo} for specified date in solar calendar.
      *
      * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
      *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
@@ -183,7 +183,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Exchanges all items from {@code /getLunCalInfo} for specified solar month.
+     * Reads all items from {@code /getLunCalInfo} for specified solar month.
      *
      * @param solarYearMonth the solar month from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear} and {@link
      *                       #QUERY_PARAM_NAME_SOL_MONTH ?solMonth} are derived.
@@ -213,6 +213,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param collection a collection to which retrieved items are added.
      * @param <T>        collection type parameter
      * @return given {@code collection}.
+     * @see #getLunCalInfo(YearMonth)
      */
     @NotEmpty
     public <T extends Collection<? super Item>> T getLunCalInfo(
@@ -235,7 +236,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Exchanges a response from {@code /getSolCalInfo} with specified arguments.
+     * Reads a response from {@code /getSolCalInfo} with specified arguments.
      *
      * @param lunYear  a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunMonth a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
@@ -245,7 +246,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     protected @NotNull ResponseEntity<Response> getSolCalInfo(
             @NotNull final Year lunYear, @NotNull final Month lunMonth,
-            @Max(30) @Min(1) @Nullable final Integer lunDay, @Positive @Nullable final Integer pageNo) {
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) @Nullable final Integer lunDay,
+            @Positive @Nullable final Integer pageNo) {
         final UriComponentsBuilder builder = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -254,8 +256,11 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 //                .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
 //                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                 ;
-        Optional.ofNullable(lunDay).map(Item::formatDay).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
-        Optional.ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+        Optional.ofNullable(lunDay)
+                .map(Item::formatDay)
+                .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
+        Optional.ofNullable(pageNo)
+                .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
@@ -264,7 +269,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Exchanges all items from {@code /getSolCalInfo} with specified arguments.
+     * Reads all items from {@code /getSolCalInfo} with specified arguments.
      *
      * @param lunarYear       a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
@@ -319,6 +324,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param collection a collection to which retrieved items are added.
      * @param <T>        collection type parameter
      * @return given {@code collection}.
+     * @see #getSolCalInfo(YearMonth)
      */
     @NotEmpty
     public <T extends Collection<? super Item>> T getSolCalInfo(
@@ -341,7 +347,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Exchanges a response from {@code /getSpcifyLunCalInfo} with specified arguments.
+     * Reads a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
@@ -353,7 +359,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     protected @NotNull ResponseEntity<Response> getSpcifyLunCalInfo(
             @NotNull final Year fromSolYear, @NotNull final Year toSolYear, @NotNull final Month lunMonth,
-            @Max(30) @Min(1) final int lunDay, final boolean leapMonth, @Positive int pageNo) {
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunDay, final boolean leapMonth,
+            @Positive int pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -370,7 +377,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Exchanges all items from {@code /getSpcifyLunCalInfo} with specified arguments.
+     * Reads all items from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolarYear   a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolarYear     a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
@@ -382,7 +389,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     public @NotNull List<@Valid @NotNull Item> getSpcifyLunCalInfo(
             @NotNull final Year fromSolarYear, @NotNull final Year toSolarYear, @NotNull final Month lunarMonth,
-            @Max(30) @Min(1) final int lunarDayOfMonth, final boolean lunarLeapMonth) {
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunarDayOfMonth,
+            final boolean lunarLeapMonth) {
         if (toSolarYear.isBefore(fromSolarYear)) {
             throw new IllegalArgumentException(
                     "toSolarYear(" + toSolarYear + ") is before fromSolarYear(" + fromSolarYear + ")");

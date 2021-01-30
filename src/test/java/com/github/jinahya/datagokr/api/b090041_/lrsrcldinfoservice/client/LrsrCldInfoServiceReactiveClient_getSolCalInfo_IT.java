@@ -5,12 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,5 +78,29 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
                     assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonthExpected);
                 })
                 .blockLast();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getSolCalInfo(year)")
+    @Test
+    void getSolCalInfo_Expected_Year() {
+        final Year lunarYear = Year.now();
+        final Map<Month, List<Integer>> map
+                = clientInstance().getSolCalInfo(lunarYear, Schedulers.parallel())
+                .doOnNext(i -> {
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(lunarYear);
+                    log.debug("{}-{}", i.getLunarMonth(), i.getLunarDayOfMonth());
+                })
+                .<Map<Month, List<Integer>>>collect(
+                        TreeMap::new,
+                        (m, i) -> m.compute(i.getLunarMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
+                                .add(i.getLunarDayOfMonth()))
+                .block();
+        assert map != null;
+        map.forEach((m, l) -> {
+            l.sort(naturalOrder());
+            log.debug("{}: {}", m, l);
+        });
     }
 }

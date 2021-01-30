@@ -88,12 +88,12 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
     @DisplayName("getSolCalInfo(year, executor, collection)")
     @Test
     void getSolCalInfo_Expected_Year() {
-        final Year year = Year.now();
-        final List<Item> items = new ArrayList<>(400);
-        clientInstance().getSolCalInfo(year, commonPool(), items);
+        final List<Item> items = new ArrayList<>();
+        final Year lunarYear = Year.now();
+        clientInstance().getSolCalInfo(lunarYear, commonPool(), items);
         items.sort(Item.COMPARING_IN_LUNAR);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunarYear()).isEqualTo(year);
+            assertThat(i.getLunarYear()).isEqualTo(lunarYear);
         });
         log.debug("first: {}", items.get(0));
         log.debug("last: {}", items.get(items.size() - 1));

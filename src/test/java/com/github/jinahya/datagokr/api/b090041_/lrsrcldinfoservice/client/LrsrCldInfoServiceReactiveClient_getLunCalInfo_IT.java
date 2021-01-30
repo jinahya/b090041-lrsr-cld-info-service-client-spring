@@ -5,13 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,5 +85,29 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                     assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
                 })
                 .blockLast();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
+    @DisplayName("getLunCalInfo(year)")
+    @Test
+    void getLunCalInfo_Expected_Year() {
+        final Year solarYear = Year.now();
+        final Map<Month, List<Integer>> map
+                = clientInstance().getLunCalInfo(solarYear, Schedulers.parallel())
+                .doOnNext(i -> {
+                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(solarYear);
+                    log.debug("{}-{}", i.getLunarMonth(), i.getLunarDayOfMonth());
+                })
+                .<Map<Month, List<Integer>>>collect(
+                        TreeMap::new,
+                        (m, i) -> m.compute(i.getLunarMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
+                                .add(i.getLunarDayOfMonth()))
+                .block();
+        assert map != null;
+        map.forEach((m, l) -> {
+            l.sort(naturalOrder());
+            log.debug("{}: {}", m, l);
+        });
     }
 }

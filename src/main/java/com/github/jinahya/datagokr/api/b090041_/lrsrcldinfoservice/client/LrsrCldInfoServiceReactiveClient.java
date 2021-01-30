@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -62,7 +63,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
+     * Reads a response from {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
@@ -70,9 +71,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a mono of response.
      */
-    protected @NotNull Mono<Response> getLunCalInfo(@NotNull final Year solYear, @NotNull final Month solMonth,
-                                                    @Max(31) @Min(1) @Nullable final Integer solDay,
-                                                    @Positive @Nullable final Integer pageNo) {
+    protected @NotNull Mono<Response> getLunCalInfo(
+            @NotNull final Year solYear, @NotNull final Month solMonth,
+            @Max(MAX_DAY_OF_MONTH_SOLAR) @Min(MIN_DAY_OF_MONTH_SOLAR) @Nullable final Integer solDay,
+            @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
                 .uri(b -> {
@@ -108,7 +110,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @return a flux of all items from all pages.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
-    public Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
+    public @NotNull Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
@@ -120,7 +122,8 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                     }
                     return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet());
                 })
-                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()))
+                ;
     }
 
     /**
@@ -130,7 +133,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @return a flux of all items from all pages.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
-    public Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
+    public @NotNull Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
         final AtomicInteger pageNo = new AtomicInteger();
@@ -141,7 +144,24 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                     }
                     return getLunCalInfo(solYear, solMonth, null, pageNo.incrementAndGet());
                 })
-                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
+                .flatMap(r -> Flux.fromIterable(r.getBody().getItems()))
+                ;
+    }
+
+    public @NotNull Flux<Item> getLunCalInfo(@NotNull final Year year, @Positive final int parallelism,
+                                             @NotNull final Scheduler scheduler) {
+        return Flux.fromArray(Month.values())
+                .map(m -> YearMonth.of(year.getValue(), m))
+                .parallel(parallelism)
+                .runOn(scheduler)
+                .flatMap(this::getLunCalInfo)
+                .sequential(1)
+                ;
+    }
+
+    public @NotNull Flux<Item> getLunCalInfo(@NotNull final Year year, @NotNull final Scheduler scheduler) {
+        final int parallelism = Runtime.getRuntime().availableProcessors();
+        return getLunCalInfo(year, parallelism, scheduler);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -155,9 +175,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a mono of response.
      */
-    protected @NotNull Mono<Response> getSolCalInfo(@NotNull final Year lunYear, @NotNull final Month lunMonth,
-                                                    @Max(30) @Min(1) @Nullable final Integer lunDay,
-                                                    @Positive @Nullable final Integer pageNo) {
+    protected @NotNull Mono<Response> getSolCalInfo(
+            @NotNull final Year lunYear, @NotNull final Month lunMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) @Nullable final Integer lunDay,
+            @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
                 .uri(b -> {
@@ -190,8 +211,9 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @return a flux of items from all pages.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
-    public Flux<Item> getSolCalInfo(@NotNull final Year lunarYear, @NotNull final Month lunarMonth,
-                                    @Max(30) @Min(1) @Nullable final Integer lunarDayOfMonth) {
+    public Flux<Item> getSolCalInfo(
+            @NotNull final Year lunarYear, @NotNull final Month lunarMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) @Nullable final Integer lunarDayOfMonth) {
         final AtomicInteger pageNo = new AtomicInteger();
         return getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, pageNo.incrementAndGet())
                 .expand(r -> {
@@ -225,6 +247,22 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .flatMap(r -> Flux.fromIterable(r.getBody().getItems()));
     }
 
+    public @NotNull Flux<Item> getSolCalInfo(@NotNull final Year year, @Positive final int parallelism,
+                                             @NotNull final Scheduler scheduler) {
+        return Flux.fromArray(Month.values())
+                .map(m -> YearMonth.of(year.getValue(), m))
+                .parallel(parallelism)
+                .runOn(scheduler)
+                .flatMap(this::getSolCalInfo)
+                .sequential()
+                ;
+    }
+
+    public @NotNull Flux<Item> getSolCalInfo(@NotNull final Year year, @NotNull final Scheduler scheduler) {
+        final int parallelism = Runtime.getRuntime().availableProcessors();
+        return getSolCalInfo(year, parallelism, scheduler);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -238,9 +276,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param pageNo      a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a mono of response.
      */
-    protected Mono<Response> getSpcifyLunCalInfo(@NotNull final Year fromSolYear, @NotNull final Year toSolYear,
-                                                 @NotNull final Month lunMonth, @Max(30) @Min(1) final int lunDay,
-                                                 final boolean leapMonth, @Positive final int pageNo) {
+    protected Mono<Response> getSpcifyLunCalInfo(
+            @NotNull final Year fromSolYear, @NotNull final Year toSolYear, @NotNull final Month lunMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunDay,
+            final boolean leapMonth, @Positive final int pageNo) {
         if (toSolYear.isBefore(fromSolYear)) {
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
@@ -280,9 +319,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @return a flux of all items from all pages.
      * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
      */
-    public Flux<Item> getSpcifyLunCalInfo(@NotNull final Year fromSolarYear, @NotNull final Year toSolarYear,
-                                          @NotNull final Month lunarMonth, @Max(30) @Min(1) final int lunarDayOfMonth,
-                                          final boolean lunarLeapMonth) {
+    public Flux<Item> getSpcifyLunCalInfo(
+            @NotNull final Year fromSolarYear, @NotNull final Year toSolarYear, @NotNull final Month lunarMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunarDayOfMonth,
+            final boolean lunarLeapMonth) {
         if (toSolarYear.isBefore(fromSolarYear)) {
             throw new IllegalArgumentException(
                     "toSolarYear(" + toSolarYear + ") is before fromSolYear(" + fromSolarYear + ")");
