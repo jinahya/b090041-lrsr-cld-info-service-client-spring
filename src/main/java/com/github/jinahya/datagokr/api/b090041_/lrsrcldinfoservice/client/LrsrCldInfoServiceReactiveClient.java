@@ -81,7 +81,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     public @NotNull Mono<Response> getLunCalInfo(
             @NotNull final Year solYear, @NotNull final Month solMonth,
             @Max(MAX_DAY_OF_MONTH_SOLAR) @Min(MIN_DAY_OF_MONTH_SOLAR) @Nullable final Integer solDay,
-            @PositiveOrZero @Nullable final Integer pageNo) {
+            @Positive @Nullable final Integer pageNo) {
         return webClient()
                 .get()
                 .uri(b -> {

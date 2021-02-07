@@ -43,13 +43,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MAX_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MAX_DAY_OF_MONTH_SOLAR;
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_SOLAR;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A client implementation uses an instance of {@link RestTemplate}.
@@ -132,7 +135,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a response entity of response.
      */
-    public @NotNull ResponseEntity<Response> getLunCalInfo(
+    public @NotNull Response getLunCalInfo(
             @NotNull final Year solYear, @NotNull final Month solMonth,
             @Max(31) @Min(1) @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
         final UriComponentsBuilder builder = uriBuilderFromRootUri()
@@ -146,17 +149,31 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 //                                             .map(Item.DAY_FORMATTER::format))
 //                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                 ;
-        Optional.ofNullable(solDay)
+        ofNullable(solDay)
                 .map(v -> MonthDay.of(solMonth, v))
                 .map(Item.DAY_FORMATTER::format)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_SOL_DAY, v));
-        Optional.ofNullable(pageNo)
+        ofNullable(pageNo)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();
-        return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
+        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+    }
+
+    public @NotNull List<Response> getLunCalInfoForAllPages(
+            @NotNull final Year solYear, @NotNull final Month solMonth,
+            @Max(MAX_DAY_OF_MONTH_SOLAR) @Min(MIN_DAY_OF_MONTH_SOLAR) @Nullable final Integer solDay) {
+        final List<Response> result = new ArrayList<>();
+        for (int pageNo = 1; ; pageNo++) {
+            final Response response = getLunCalInfo(solYear, solMonth, solDay, pageNo);
+            result.add(response);
+            if (response.getBody().isLastPage()) {
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -169,20 +186,12 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
     public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
-        final List<Item> items = new ArrayList<>();
         final Year solYear = Year.from(solarDate);
         final Month solMonth = Month.from(solarDate);
         final int solDay = solarDate.getDayOfMonth();
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(getLunCalInfo(solYear, solMonth, solDay, pageNo));
-            items.addAll(response.getBody().getItems());
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        assert !items.isEmpty();
-        assert items.size() == 1;
-        return items;
+        return getLunCalInfoForAllPages(solYear, solMonth, solDay)
+                .stream().flatMap(r -> r.getBody().getItems().stream())
+                .collect(toList());
     }
 
     /**
@@ -194,17 +203,11 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
     public @NotEmpty List<@Valid @NotNull Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
-        final List<Item> items = new ArrayList<>();
         final Year solYear = Year.from(solarYearMonth);
         final Month solMonth = Month.from(solarYearMonth);
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(getLunCalInfo(solYear, solMonth, null, pageNo));
-            items.addAll(response.getBody().getItems());
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        return items;
+        return getLunCalInfoForAllPages(solYear, solMonth, null)
+                .stream().flatMap(r -> r.getBody().getItems().stream())
+                .collect(toList());
     }
 
     /**
@@ -247,7 +250,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a response entity of response.
      */
-    protected @NotNull ResponseEntity<Response> getSolCalInfo(
+    public @NotNull Response getSolCalInfo(
             @NotNull final Year lunYear, @NotNull final Month lunMonth,
             @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) @Nullable final Integer lunDay,
             @Positive @Nullable final Integer pageNo) {
@@ -259,16 +262,30 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 //                .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
 //                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                 ;
-        Optional.ofNullable(lunDay)
+        ofNullable(lunDay)
                 .map(Item::formatDay)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
-        Optional.ofNullable(pageNo)
+        ofNullable(pageNo)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();
-        return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
+        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+    }
+
+    public @NotNull List<@Valid @NotNull Response> getSolCalInfoForAllPages(
+            @NotNull final Year lunYear, @NotNull final Month lunMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) @Nullable final Integer lunDay) {
+        final List<Response> responses = new ArrayList<>();
+        for (int pageNo = 1; ; pageNo++) {
+            final Response response = getSolCalInfo(lunYear, lunMonth, lunDay, pageNo);
+            responses.add(response);
+            if (response.getBody().isLastPage()) {
+                break;
+            }
+        }
+        return responses;
     }
 
     /**
@@ -282,40 +299,28 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      */
     public @Size(min = 1, max = 2) @NotNull List<@Valid @NotNull Item> getSolCalInfo(
             @NotNull final Year lunarYear, @NotNull final Month lunarMonth,
-            @Max(30) @Min(1) final int lunarDayOfMonth) {
-        final List<Item> items = new ArrayList<>();
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth, pageNo));
-            items.addAll(response.getBody().getItems());
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        assert !items.isEmpty();
-        assert items.size() <= 2;
-        return items;
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunarDayOfMonth) {
+        return getSolCalInfoForAllPages(lunarYear, lunarMonth, lunarDayOfMonth)
+                .stream()
+                .flatMap(r -> r.getBody().getItems().stream())
+                .collect(toList());
     }
 
     /**
-     * Exchanges all items from {@code /getSolCalInfo} with parameters derived from specified lunar month.
+     * Retrieves all items from {@code /getSolCalInfo} with parameters derived from specified lunar month.
      *
      * @param lunarYearMonth the lunar month from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
      *                       #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
-     * @return a list of items from all pages.
-     * @see #getSolCalInfo(Year, Month, Integer, Integer)
+     * @return a list of all items in {@code lunarYearMonth}.
+     * @see #getSolCalInfoForAllPages(Year, Month, Integer)
      */
     public @NotNull List<@Valid @NotNull Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
-        final List<Item> items = new ArrayList<>();
         final Year lunYear = Year.from(lunarYearMonth);
         final Month lunMonth = Month.from(lunarYearMonth);
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(getSolCalInfo(lunYear, lunMonth, null, pageNo));
-            items.addAll(response.getBody().getItems());
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        return items;
+        return getSolCalInfoForAllPages(lunYear, lunMonth, null)
+                .stream()
+                .flatMap(r -> r.getBody().getItems().stream())
+                .collect(toList());
     }
 
     /**
@@ -360,10 +365,10 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param pageNo      a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a response entity of response.
      */
-    protected @NotNull ResponseEntity<Response> getSpcifyLunCalInfo(
+    public @Valid @NotNull Response getSpcifyLunCalInfo(
             @NotNull final Year fromSolYear, @NotNull final Year toSolYear, @NotNull final Month lunMonth,
             @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunDay, final boolean leapMonth,
-            @Positive int pageNo) {
+            @Positive @Nullable Integer pageNo) {
         final URI url = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
@@ -372,11 +377,26 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                 .queryParam(QUERY_PARAM_NAME_LUN_DAY, Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay)))
                 .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP)
-                .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
+                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
                 .encode()
                 .build()
                 .toUri();
-        return restTemplate().exchange(url, HttpMethod.GET, null, Response.class);
+        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+    }
+
+    public @NotNull List<@Valid @NotNull Response> getSpcifyLunCalInfoForAllPages(
+            @NotNull final Year fromSolYear, @NotNull final Year toSolYear, @NotNull final Month lunMonth,
+            @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunDay, final boolean leapMonth) {
+        final List<Response> responses = new ArrayList<>();
+        for (int pageNo = 1; ; pageNo++) {
+            final Response response = getSpcifyLunCalInfo(
+                    fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo);
+            responses.add(response);
+            if (response.getBody().isLastPage()) {
+                break;
+            }
+        }
+        return responses;
     }
 
     /**
@@ -388,7 +408,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
      * @param lunarLeapMonth  a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
      * @return a list of all items from all pages.
-     * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
+     * @see #getSpcifyLunCalInfoForAllPages(Year, Year, Month, int, boolean)
      */
     public @NotNull List<@Valid @NotNull Item> getSpcifyLunCalInfo(
             @NotNull final Year fromSolarYear, @NotNull final Year toSolarYear, @NotNull final Month lunarMonth,
@@ -398,16 +418,10 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             throw new IllegalArgumentException(
                     "toSolarYear(" + toSolarYear + ") is before fromSolarYear(" + fromSolarYear + ")");
         }
-        final List<Item> items = new ArrayList<>();
-        for (int pageNo = 1; ; pageNo++) {
-            final Response response = getResponse(getSpcifyLunCalInfo(
-                    fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth, pageNo));
-            items.addAll(response.getBody().getItems());
-            if (response.getBody().isLastPage()) {
-                break;
-            }
-        }
-        return items;
+        return getSpcifyLunCalInfoForAllPages(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)
+                .stream()
+                .flatMap(r -> r.getBody().getItems().stream())
+                .collect(toList());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
