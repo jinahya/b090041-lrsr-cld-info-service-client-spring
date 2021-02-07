@@ -1,7 +1,7 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,12 +44,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MAX_DAY_OF_MONTH_LUNAR;
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response.Body.Item.MIN_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MAX_DAY_OF_MONTH_LUNAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_LUNAR;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 /**
  * A client implementation uses an instance of {@link RestTemplate}.
@@ -132,7 +132,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
      * @param pageNo   a value for {@link #QUERY_PARAM_NAME_PAGE_NO ?pageNo}.
      * @return a response entity of response.
      */
-    protected @NotNull ResponseEntity<Response> getLunCalInfo(
+    public @NotNull ResponseEntity<Response> getLunCalInfo(
             @NotNull final Year solYear, @NotNull final Month solMonth,
             @Max(31) @Min(1) @Nullable final Integer solDay, @Positive @Nullable final Integer pageNo) {
         final UriComponentsBuilder builder = uriBuilderFromRootUri()
@@ -223,7 +223,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             @NotNull final Year year, @NotNull final Executor executor, @NotNull final T collection) {
         Arrays.stream(Month.values())
                 .map(v -> YearMonth.of(year.getValue(), v))
-                .map(v -> CompletableFuture.supplyAsync(() -> getLunCalInfo(v), executor))
+                .map(v -> supplyAsync(() -> getLunCalInfo(v), executor))
                 .map(f -> {
                     try {
                         return f.get();
@@ -319,10 +319,10 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     /**
-     * Reads all items for specified year in lunar calendar.
+     * Reads all items for specified lunar year.
      *
-     * @param year       the year of lunar calendar.
-     * @param executor   an executor for concurrently execute {@link #getSolCalInfo(YearMonth)} for each {@link Month}
+     * @param year       the lunar year.
+     * @param executor   an executor for concurrently executing {@link #getSolCalInfo(YearMonth)} for each {@link Month}
      *                   in {@code year}.
      * @param collection a collection to which retrieved items are added.
      * @param <T>        collection type parameter
@@ -334,7 +334,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             @NotNull final Year year, @NotNull final Executor executor, @NotNull final T collection) {
         Arrays.stream(Month.values())
                 .map(v -> YearMonth.of(year.getValue(), v))
-                .map(v -> CompletableFuture.supplyAsync(() -> getSolCalInfo(v), executor))
+                .map(v -> supplyAsync(() -> getSolCalInfo(v), executor))
                 .map(f -> {
                     try {
                         return f.get();
@@ -371,7 +371,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, Item.YEAR_FORMATTER.format(toSolYear))
                 .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                 .queryParam(QUERY_PARAM_NAME_LUN_DAY, Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay)))
-                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NORMAL)
+                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP)
                 .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
                 .encode()
                 .build()
@@ -448,9 +448,4 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private URI rootUri;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Lazy
-    @Autowired
-    private LrsrCldInfoServiceClient self;
 }

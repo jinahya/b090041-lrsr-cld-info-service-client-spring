@@ -1,6 +1,6 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,9 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     void getSolCalInfo_() {
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
         final Integer lunDay = current().nextBoolean() ? lunarDate.getDayOfMonth() : null;
-        final String lunYearExpected = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-        final String lunMonthExpected = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-        final String lunDayExpected = ofNullable(lunDay).map(Response.Body.Item::formatDay).orElse(null);
+        final String lunYearExpected = Item.YEAR_FORMATTER.format(lunarDate);
+        final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarDate);
+        final String lunDayExpected = ofNullable(lunDay).map(Item::formatDay).orElse(null);
         clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunDay, null)
                 .doOnNext(r -> {
                     assertThat(r.getBody().getItems()).isNotEmpty().doesNotContainNull().allSatisfy(i -> {
@@ -49,13 +49,13 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
 
     // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunarYear, lunarMonth, lunarDayOfMonth")
+    @DisplayName("getSolCalInfo(lunarYear,lunarMonth,lunarDayOfMonth")
     @Test
     void getSolCalInfo_Expected_LunarDate() {
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
-        final String lunYear = Response.Body.Item.YEAR_FORMATTER.format(lunarDate);
-        final String lunMonth = Response.Body.Item.MONTH_FORMATTER.format(lunarDate);
-        final String lunDay = Response.Body.Item.DAY_FORMATTER.format(lunarDate);
+        final String lunYear = Item.YEAR_FORMATTER.format(lunarDate);
+        final String lunMonth = Item.MONTH_FORMATTER.format(lunarDate);
+        final String lunDay = Item.DAY_FORMATTER.format(lunarDate);
         clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunarDate.getDayOfMonth())
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
@@ -68,10 +68,10 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSolCalInfo(lunarYearMonth)")
     @Test
-    void getSolCalInfo_Expected_YearMonth() {
+    void getSolCalInfo_Expected_LunarYearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
-        final String lunYearExpected = Response.Body.Item.YEAR_FORMATTER.format(lunarYearMonth);
-        final String lunMonthExpected = Response.Body.Item.MONTH_FORMATTER.format(lunarYearMonth);
+        final String lunYearExpected = Item.YEAR_FORMATTER.format(lunarYearMonth);
+        final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarYearMonth);
         clientInstance().getSolCalInfo(lunarYearMonth)
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYearExpected);
@@ -86,16 +86,16 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_Year() {
         final Year lunarYear = Year.now();
-        final Map<Month, List<Integer>> map
+        final String expectedLunYear = Item.YEAR_FORMATTER.format(lunarYear);
+        final Map<String, List<String>> map
                 = clientInstance().getSolCalInfo(lunarYear, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(lunarYear);
-                    log.debug("{}-{}", i.getLunarMonth(), i.getLunarDayOfMonth());
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(expectedLunYear);
                 })
-                .<Map<Month, List<Integer>>>collect(
+                .<Map<String, List<String>>>collect(
                         TreeMap::new,
-                        (m, i) -> m.compute(i.getLunarMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
-                                .add(i.getLunarDayOfMonth()))
+                        (m, i) -> m.compute(i.getLunMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
+                                .add(i.getLunDay()))
                 .block();
         assert map != null;
         map.forEach((m, l) -> {

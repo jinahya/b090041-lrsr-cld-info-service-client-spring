@@ -2,8 +2,20 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * An abstract base class for testing subclasses of {@link AbstractLrsrCldInfoServiceClient} class.
+ *
+ * @param <T> subclass type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 abstract class AbstractLrsrCldInfoServiceClientTest<T extends AbstractLrsrCldInfoServiceClient> {
 
+    /**
+     * Creates a new instance with specified client class.
+     *
+     * @param clientClass the client class.
+     * @see #clientClass
+     */
     AbstractLrsrCldInfoServiceClientTest(final Class<T> clientClass) {
         super();
         this.clientClass = requireNonNull(clientClass, "clientClass is null");
@@ -22,5 +34,8 @@ abstract class AbstractLrsrCldInfoServiceClientTest<T extends AbstractLrsrCldInf
         }
     }
 
+    /**
+     * The client class to test.
+     */
     protected final Class<T> clientClass;
 }

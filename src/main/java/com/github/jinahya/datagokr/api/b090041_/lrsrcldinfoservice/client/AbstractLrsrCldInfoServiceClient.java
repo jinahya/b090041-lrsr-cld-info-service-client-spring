@@ -8,10 +8,13 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -137,7 +140,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private Response requireValid(final Response response) {
+    private @Valid @NotNull Response requireValid(@NotNull final Response response) {
         Objects.requireNonNull(response, "response is null");
         final Set<ConstraintViolation<Response>> violations = validator().validate(response);
         if (!violations.isEmpty()) {
@@ -146,7 +149,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
         return response;
     }
 
-    protected Response requireResultSuccessful(final Response response) {
+    protected @Valid @NotNull Response requireResultSuccessful(@Valid @NotNull final Response response) {
         if (!requireValid(response).getHeader().isResultCodeSuccess()) {
             throw new RuntimeException("unsuccessful result: " + response.getHeader());
         }
