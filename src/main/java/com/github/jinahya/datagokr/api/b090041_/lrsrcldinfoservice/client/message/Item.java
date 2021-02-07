@@ -143,12 +143,13 @@ public class Item implements Serializable {
     /**
      * The comparator compares items by lunar dates, leap months have precedences over non-leap months.
      */
-    public static final Comparator<Item> comparingInLunarLeapMonthFirst = comparingInLunar(LEAP_MONTH_FIRST);
+    public static final Comparator<Item> COMPARING_IN_LUNAR_LEAP_MONTH_FIRST = comparingInLunar(LEAP_MONTH_FIRST);
 
     /**
      * The comparator compares items by lunar dates, non-leap months have precedences over leap months.
      */
-    public static final Comparator<Item> comparingInLunarLeapMonthLast = comparingInLunar(LEAP_MONTH_FIRST.reversed());
+    public static final Comparator<Item> COMPARING_IN_LUNAR_LEAP_MONTH_LAST
+            = comparingInLunar(LEAP_MONTH_FIRST.reversed());
 
     /**
      * The comparator compares items by {@code #solYear}, {@code #solMonth}, and {@code #solDay}.
