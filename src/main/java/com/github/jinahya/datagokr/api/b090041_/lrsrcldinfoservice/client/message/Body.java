@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -67,7 +65,6 @@ public class Body implements Serializable {
     // ------------------------------------------------------------------------------------------------------ totalCount
 
     // -----------------------------------------------------------------------------------------------------------------
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public boolean isLastPage() {
@@ -76,28 +73,24 @@ public class Body implements Serializable {
 
     // -----------------------------------------------------------------------------------------------------------------
     @NotNull
-    @JsonbProperty
     @JsonProperty(required = true)
     @XmlElementWrapper
     @XmlElement(name = "item")
     private List<@Valid @NotNull Item> items;
 
     @PositiveOrZero
-    @JsonbProperty
     @JsonProperty(required = true)
     @Positive
     @XmlElement(required = true)
     private int numOfRows;
 
     @PositiveOrZero
-    @JsonbProperty
     @JsonProperty(required = true)
     @Positive
     @XmlElement(required = true)
     private int pageNo;
 
     @PositiveOrZero
-    @JsonbProperty
     @JsonProperty(required = true)
     @PositiveOrZero
     @XmlElement(required = true)

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -52,21 +53,16 @@
     <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
     <version.io.projectreactor>3.4.2</version.io.projectreactor>
     <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-    <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-    <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-    <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
     <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
     <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.0.0-M5</version.maven-surefire>
-    <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
     <version.org.apache.maven.wagon>3.4.2</version.org.apache.maven.wagon>
     <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
     <version.org.projectlombok>1.18.16</version.org.projectlombok>
     <version.org.slf4j>1.7.30</version.org.slf4j>
     <version.org.springframework>5.3.3</version.org.springframework>
-    <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
-    <version.org.springframework.hateoas>1.2.3</version.org.springframework.hateoas>
+    <version.org.springframework.boot>2.4.2</version.org.springframework.boot>
   </properties>
 
   <dependencyManagement>
@@ -97,12 +93,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>jakarta.json.bind</groupId>
-      <artifactId>jakarta.json.bind-api</artifactId>
-      <version>${version.jakarta.json.bind-api}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <version>${version.jakarta.xml.bind-api}</version>
@@ -113,18 +103,6 @@
       <artifactId>jakarta.validation-api</artifactId>
       <version>${version.jakarta.validation-api}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency> <!-- jakarta.json.bind-api -->
-      <groupId>org.apache.johnzon</groupId>
-      <artifactId>johnzon-jsonb</artifactId>
-      <version>${version.org.apache.johnzon}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency> <!-- jakarta.json-api -->
-      <groupId>org.glassfish</groupId>
-      <artifactId>jakarta.json</artifactId>
-      <version>${version.jakarta.json-api}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
@@ -183,12 +161,6 @@
       <version>${version.org.springframework.boot}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.hateoas</groupId>
-      <artifactId>spring-hateoas</artifactId>
-      <version>${version.org.springframework.hateoas}</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -210,11 +182,11 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.2.0</version>
           <configuration>
+            <source>${project.build.directory}delombok</source>
             <links>
               <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
               <link>https://docs.spring.io/spring-framework/docs/${version.org.springframework}/javadoc-api/</link>
               <link>https://javadoc.io/doc/jakarta.annotation/jakarta.annotation-api/${version.jakarta.annotation-api}/</link>
-              <link>${version.jakarta.json.bind-api.javadoc.url}</link>
               <link>https://javadoc.io/doc/jakarta.validation/jakarta.validation-api/${version.jakarta.validation-api}/</link>
               <link>https://projectreactor.io/docs/core/${version.io.projectreactor}/api/</link>
             </links>
@@ -273,7 +245,7 @@
             <configuration>
               <skip>true</skip>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
           </execution>
@@ -370,6 +342,24 @@
             <id>default-report</id>
             <goals>
               <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok-maven-plugin</artifactId>
+        <version>1.18.16.0</version>
+        <configuration>
+          <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+          <outputDirectory>${project.build.directory}/delombok</outputDirectory>
+          <addOutputDirectory>false</addOutputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>delombok</goal>
             </goals>
           </execution>
         </executions>
@@ -480,9 +470,6 @@
         <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.4.2</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
         <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
@@ -491,7 +478,6 @@
         <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.3.3</version.org.springframework>
         <version.org.springframework.boot>2.4.1</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.2.3</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -501,9 +487,6 @@
         <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.4.0</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
         <version.org.apache.johnzon>1.2.8</version.org.apache.johnzon>
@@ -512,7 +495,6 @@
         <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.3.1</version.org.springframework>
         <version.org.springframework.boot>2.4.0</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.2.1</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -522,17 +504,13 @@
         <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.13</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.2.12.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.3.8.RELEASE</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.1.3.RELEASE</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -542,9 +520,6 @@
         <version.com.fasterxml.jackson.core>2.11.0</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.5.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
         <version.org.apache.johnzon>1.2.5</version.org.apache.johnzon>
@@ -553,7 +528,6 @@
         <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.2.6.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.3.0.RELEASE</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.1.0.RELEASE</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -563,9 +537,6 @@
         <version.com.fasterxml.jackson.core>2.10.5</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.13.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
         <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
@@ -574,7 +545,6 @@
         <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.org.springframework>5.2.12.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.2.13.RELEASE</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.0.5.RELEASE</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -584,9 +554,6 @@
         <version.com.fasterxml.jackson.core>2.10.0</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.0.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
-        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>
-        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>
-        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>
         <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api>
         <version.org.apache.johnzon>1.2.1</version.org.apache.johnzon>
@@ -595,7 +562,6 @@
         <version.org.slf4j>1.7.28</version.org.slf4j>
         <version.org.springframework>5.2.0.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.2.0.RELEASE</version.org.springframework.boot>
-        <version.org.springframework.hateoas>1.0.0.RELEASE</version.org.springframework.hateoas>
       </properties>
     </profile>
     <profile>
@@ -605,9 +571,6 @@
         <version.com.fasterxml.jackson.core>2.9.4</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.1.5.RELEASE</version.io.projectreactor>
         <!--        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>-->
-        <!--        <version.jakarta.json-api>1.1.6</version.jakarta.json-api>-->
-        <!--        <version.jakarta.json.bind-api>1.0.2</version.jakarta.json.bind-api>-->
-        <!--        <version.jakarta.json.bind-api.javadoc.url>https://jakarta.ee/specifications/jsonb/1.0/apidocs/</version.jakarta.json.bind-api.javadoc.url>-->
         <!--        <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>-->
         <!--        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>-->
         <version.org.apache.johnzon>1.1.6</version.org.apache.johnzon>
@@ -616,25 +579,12 @@
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.org.springframework>5.0.4.RELEASE</version.org.springframework>
         <version.org.springframework.boot>2.0.0.RELEASE</version.org.springframework.boot>
-        <version.org.springframework.hateoas>0.24.0.RELEASE</version.org.springframework.hateoas>
       </properties>
       <dependencies>
         <dependency>
           <groupId>javax.annotation</groupId>
           <artifactId>javax.annotation-api</artifactId>
           <version>1.3.2</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.json</groupId>
-          <artifactId>javax.json-api</artifactId>
-          <version>1.1.2</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.json.bind</groupId>
-          <artifactId>javax.json.bind-api</artifactId>
-          <version>1.0</version>
           <scope>provided</scope>
         </dependency>
         <dependency>

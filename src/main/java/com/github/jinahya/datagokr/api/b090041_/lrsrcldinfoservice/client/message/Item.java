@@ -7,8 +7,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -121,24 +119,6 @@ public class Item implements Serializable {
     public static final int MAX_DAY_OF_MONTH_SOLAR = 31;
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static final String REL_YEAR_LUNAR = "yearLunar";
-
-    public static final String REL_MONTH_LUNAR = "monthLunar";
-
-    public static final String REL_DATE_LUNAR = "dateLunar";
-
-    public static final String REL_YEAR_SOLAR = "yearSolar";
-
-    public static final String REL_MONTH_SOLAR = "monthSolar";
-
-    public static final String REL_DATE_SOLAR = "dateSolar";
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The comparator compares items by {@link #getLunLeapmonth()}.
-     */
-    private static final Comparator<Item> LEAP_MONTH_FIRST = comparing(Item::getLunarLeapMonth);
 
     /**
      * Returns a comparator {@link #getLunYear()}, {@link #getLunMonth()}, and {@link #getLunDay()}.
@@ -156,6 +136,11 @@ public class Item implements Serializable {
     }
 
     /**
+     * The comparator compares items by {@link #getLunLeapmonth()}.
+     */
+    private static final Comparator<Item> LEAP_MONTH_FIRST = comparing(Item::getLunarLeapMonth);
+
+    /**
      * The comparator compares items by lunar dates, leap months have precedences over non-leap months.
      */
     public static final Comparator<Item> comparingInLunarLeapMonthFirst = comparingInLunar(LEAP_MONTH_FIRST);
@@ -166,22 +151,7 @@ public class Item implements Serializable {
     public static final Comparator<Item> comparingInLunarLeapMonthLast = comparingInLunar(LEAP_MONTH_FIRST.reversed());
 
     /**
-     * The comparator compares items by {@link #getLunYear()}, {@link #getLunMonth()}, and {@link #getLunDay()},
-     * regardless {@link #getLunLeapmonth()}.
-     *
-     * @see #COMPARING_IN_SOLAR
-     * @see #comparingInLunarLeapMonthFirst
-     * @see #comparingInLunarLeapMonthLast
-     */
-    public static final Comparator<Item> COMPARING_IN_LUNAR
-            = comparing(Item::getLunYear)
-            .thenComparing(Item::getLunMonth)
-            .thenComparing(Item::getLunDay);
-
-    /**
-     * The comparator compares items by {@link #getSolYear()}, {@link #getSolMonth()}, and {@link #getSolDay()}.
-     *
-     * @see #COMPARING_IN_LUNAR
+     * The comparator compares items by {@code #solYear}, {@code #solMonth}, and {@code #solDay}.
      */
     public static final Comparator<Item> COMPARING_IN_SOLAR
             = comparing(Item::getSolYear)
@@ -272,7 +242,6 @@ public class Item implements Serializable {
     }
 
     // ---------------------------------------------------------------------------- lunYear / lunarYearValue / lunarYear
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getLunarYearValue() {
@@ -285,7 +254,6 @@ public class Item implements Serializable {
         setLunYear(ofNullable(lunarYearValue).map(v -> format("%1$d", v)).orElse(null));
     }
 
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Year getLunarYear() {
@@ -297,7 +265,6 @@ public class Item implements Serializable {
     }
 
     // ------------------------------------------------------------------------- lunMonth / lunarMonthValue / lunarMonth
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getLunarMonthValue() {
@@ -310,7 +277,6 @@ public class Item implements Serializable {
         setLunMonth(ofNullable(lunarMonthValue).map(v -> format("%1$02d", v)).orElse(null));
     }
 
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Month getLunarMonth() {
@@ -322,7 +288,6 @@ public class Item implements Serializable {
     }
 
     // ---------------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getLunarDayOfMonth() {
@@ -336,7 +301,6 @@ public class Item implements Serializable {
     }
 
     // ----------------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Boolean getLunarLeapMonth() {
@@ -354,7 +318,6 @@ public class Item implements Serializable {
     // -------------------------------------------------------------------------------------------------------  lunIljin
 
     // ---------------------------------------------------------------------------------------- solYear / solarYearValue
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getSolarYearValue() {
@@ -367,7 +330,6 @@ public class Item implements Serializable {
         setSolYear(ofNullable(solarYearValue).map(v -> format("%1$d", v)).orElse(null));
     }
 
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Year getSolarYear() {
@@ -379,7 +341,6 @@ public class Item implements Serializable {
     }
 
     // ------------------------------------------------------------------------- solMonth / solarMonthValue / solarMonth
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getSolarMonthValue() {
@@ -392,7 +353,6 @@ public class Item implements Serializable {
         setSolMonth(ofNullable(solarMonthValue).map(v -> format("%1$02d", v)).orElse(null));
     }
 
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Month getSolarMonth() {
@@ -404,7 +364,6 @@ public class Item implements Serializable {
     }
 
     // ---------------------------------------------------------------------------------------- solDay / solarDayOfMonth
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public Integer getSolarDayOfMonth() {
@@ -424,7 +383,6 @@ public class Item implements Serializable {
     // ----------------------------------------------------------------------------------------------------------- solJd
 
     // ------------------------------------------------------------------------------------------------------- solarDate
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public LocalDate getSolarDate() {
@@ -446,88 +404,74 @@ public class Item implements Serializable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String lunYear;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String lunMonth;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String lunDay;
 
-    @JsonbProperty
     @JsonProperty
     @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
     @NotNull
     @XmlElement
     private String lunLeapmonth;
 
-    @JsonbProperty
     @JsonProperty
     @XmlElement
     private int lunNday;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String lunSecha;
 
-    @JsonbProperty
     @JsonProperty
     @Nullable
     @XmlElement(required = false)
     private String lunWolgeon;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String lunIljin;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String solYear;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String solMonth;
 
-    @JsonbProperty
     @JsonProperty
     @NotBlank
     @XmlElement
     private String solDay;
 
-    @JsonbProperty
     @JsonProperty
     @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
     @NotNull
     @XmlElement
     private String solLeapyear;
 
-    @JsonbProperty
     @JsonProperty
     @Pattern(regexp = "[\uc6d4\ud654\uc218\ubaa9\uae08\ud1a0\uc77c]")
     @NotNull
     @XmlElement
     private String solWeek;
 
-    @JsonbProperty
     @JsonProperty
     @PositiveOrZero
     @NotNull

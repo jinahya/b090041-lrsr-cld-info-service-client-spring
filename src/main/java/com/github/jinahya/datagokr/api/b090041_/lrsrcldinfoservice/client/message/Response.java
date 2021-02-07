@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.json.bind.annotation.JsonbProperty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -53,14 +52,12 @@ public class Response implements Serializable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @JsonbProperty
     @JsonProperty
     @Valid
     @NotNull
     @XmlElement(required = true)
     private Header header;
 
-    @JsonbProperty
     @JsonProperty
     @Valid
     @NotNull

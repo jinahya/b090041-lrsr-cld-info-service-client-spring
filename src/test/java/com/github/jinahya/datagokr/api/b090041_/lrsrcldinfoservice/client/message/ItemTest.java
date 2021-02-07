@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.util.stream.Stream;
 
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest.responses;
@@ -20,20 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class ItemTest {
 
-    public static Stream<Item> items() {
+    static Stream<Item> items() {
         return responses().flatMap(r -> r.getBody().getItems().stream());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @MethodSource({"items"})
-    @ParameterizedTest
-    void items_Jsonb(final Item expected) {
-        final Jsonb jsonb = JsonbBuilder.create();
-        final String json = jsonb.toJson(expected);
-        final Item actual = jsonb.fromJson(json, Item.class);
-        assertThat(actual).isEqualTo(expected);
-    }
-
     @MethodSource({"items"})
     @ParameterizedTest
     void items_Jackson(final Item expected) throws JsonProcessingException {

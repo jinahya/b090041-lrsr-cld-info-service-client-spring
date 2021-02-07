@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -56,15 +54,6 @@ class ResponseTest {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @MethodSource({"responses"})
-    @ParameterizedTest
-    void responses_Jsonb(final Response expected) {
-        final Jsonb jsonb = JsonbBuilder.create();
-        final String json = jsonb.toJson(expected);
-        final Response actual = jsonb.fromJson(json, Response.class);
-        assertThat(actual).isEqualTo(expected);
-    }
-
     @MethodSource({"responses"})
     @ParameterizedTest
     void responses_Jackson(final Response expected) throws JsonProcessingException {

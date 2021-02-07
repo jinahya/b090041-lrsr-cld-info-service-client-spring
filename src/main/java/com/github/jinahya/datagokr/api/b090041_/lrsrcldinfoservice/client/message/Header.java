@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.constraints.NotBlank;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -61,7 +59,6 @@ public class Header implements Serializable {
     }
 
     // ------------------------------------------------------------------------------------------------------ resultCode
-    @JsonbTransient
     @JsonIgnore
     @XmlTransient
     public boolean isResultCodeSuccess() {
@@ -71,13 +68,11 @@ public class Header implements Serializable {
     // ------------------------------------------------------------------------------------------------------- resultMsg
 
     // -----------------------------------------------------------------------------------------------------------------
-    @JsonbProperty
     @JsonProperty(required = true)
     @NotBlank
     @XmlElement(required = true)
     private String resultCode;
 
-    @JsonbProperty
     @JsonProperty(required = true)
     @NotBlank
     @XmlElement(required = true)
