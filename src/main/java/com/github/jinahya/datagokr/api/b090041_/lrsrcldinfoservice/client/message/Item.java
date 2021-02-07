@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.lang.Nullable;
 
 import javax.json.bind.annotation.JsonbProperty;
@@ -42,7 +41,7 @@ import static java.util.Optional.ofNullable;
 @Setter
 @Getter
 @Slf4j
-public class Item extends RepresentationModel<Item> implements Serializable {
+public class Item implements Serializable {
 
     private static final long serialVersionUID = -4071620406720872635L;
 
