@@ -240,6 +240,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                     try {
                         return f.get();
                     } catch (InterruptedException | ExecutionException e) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
                     }
                 })
@@ -361,6 +362,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                     try {
                         return f.get();
                     } catch (InterruptedException | ExecutionException e) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
                     }
                 })
