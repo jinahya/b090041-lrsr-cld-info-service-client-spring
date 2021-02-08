@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.time.temporal.JulianFields;
 import java.util.stream.Stream;
 
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest.responses;
@@ -32,6 +33,13 @@ class ItemTest {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getSolJd_Equals_SolarDateJulianDay(final Item item) {
+        assertThat(item.getSolJd())
+                .isNotNull()
+                .isEqualTo(item.getSolarDate().getLong(JulianFields.JULIAN_DAY));
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private final Validator validator;

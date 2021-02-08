@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -347,6 +348,12 @@ public class Item implements Serializable {
     // --------------------------------------------------------------------------------------------------------- solWeek
 
     // ----------------------------------------------------------------------------------------------------------- solJd
+    private @AssertTrue boolean isSolJdValid() {
+        if (solJd == null) {
+            return true;
+        }
+        return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
+    }
 
     // ------------------------------------------------------------------------------------------------------- solarDate
     @JsonIgnore

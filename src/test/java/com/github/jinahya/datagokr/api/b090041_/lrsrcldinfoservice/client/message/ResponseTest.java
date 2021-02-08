@@ -12,13 +12,16 @@ import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.readAllLines;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -35,7 +38,13 @@ class ResponseTest {
     static {
         final List<Response> responses = new ArrayList<>();
         try {
-            for (final String name : readAllLines(Paths.get(ResponseTest.class.getResource("index.txt").toURI()))) {
+            final Path path = Paths.get(ResponseTest.class.getResource("index.txt").toURI());
+            final List<String> names = readAllLines(path).stream()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .filter(s -> !s.startsWith("#"))
+                    .collect(toList());
+            for (String name : names) {
                 responses.add(unmarshal(ResponseTest.class.getResource(name)));
             }
         } catch (URISyntaxException | IOException | JAXBException e) {
