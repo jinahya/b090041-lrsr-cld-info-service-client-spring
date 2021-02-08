@@ -109,7 +109,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Reads all responses of all pages from {@code /getLunCalInfo} with specified arguments.
+     * Reads all responses from all pages of {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
@@ -131,13 +131,12 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all items from {@code /.../getLunCalInfo} with parameters derived from specified date in solar
-     * calendar.
+     * Reads all items from {@code /.../getLunCalInfo} with parameters derived from specified solar date.
      *
-     * @param solarDate the date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
+     * @param solarDate the solar date from which {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}, {@link
      *                  #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}, and {@link #QUERY_PARAM_NAME_SOL_DAY ?solDay} are
      *                  derived.
-     * @return a flux of all items from all pages.
+     * @return a flux of items.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
     public @NotNull Flux<Item> getLunCalInfo(@NotNull final LocalDate solarDate) {
@@ -150,10 +149,10 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all items from {@code /getLunCalInfo} with arguments derived from specified month in solar calendar.
+     * Reads all items from {@code /getLunCalInfo} with parameters derived from specified solar month.
      *
-     * @param solarYearMonth the month from which {@code ?solYear} and {@code ?solMonth} are derived.
-     * @return a flux of all items from all pages.
+     * @param solarYearMonth the solar month from which {@code ?solYear} and {@code ?solMonth} are derived.
+     * @return a flux of items.
      * @see #getLunCalInfo(Year, Month, Integer, Integer)
      */
     public @NotNull Flux<Item> getLunCalInfo(@NotNull final YearMonth solarYearMonth) {
@@ -165,7 +164,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all items in specified solar year.
+     * Reads all items in specified solar year.
      *
      * @param year        the solar year whose all items are retrieved.
      * @param parallelism a value for parallelism.
@@ -236,7 +235,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all responses of all pages from {@code /getSolCalInfo} with specified arguments.
+     * Retrieves all responses from {@code /getSolCalInfo} with specified arguments.
      *
      * @param lunYear  a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunMonth a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
@@ -263,7 +262,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param lunarYear       a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
      * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
-     * @return a flux of items from all pages.
+     * @return a flux of items.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
     public Flux<Item> getSolCalInfo(
@@ -278,7 +277,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      *
      * @param lunarYearMonth the month from which {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear} and {@link
      *                       #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth} are derived.
-     * @return a flux of all items from all pages.
+     * @return a flux of items.
      * @see #getSolCalInfo(Year, Month, Integer, Integer)
      */
     public Flux<Item> getSolCalInfo(@NotNull final YearMonth lunarYearMonth) {
@@ -365,7 +364,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     /**
-     * Retrieves all responses of all pages from {@code /getSpcifyLunCalInfo} with specified arguments.
+     * Retrieves all responses from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.
@@ -401,7 +400,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
      * @param lunarMonth      a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
      * @param lunarDayOfMonth a value for {@link #QUERY_PARAM_NAME_LUN_DAY ?lunDay}.
      * @param lunarLeapMonth  a value for {@link #QUERY_PARAM_NAME_LEAP_MONTH ?leapMonth}.
-     * @return a flux of all items from all pages.
+     * @return a flux of items.
      * @see #getSpcifyLunCalInfo(Year, Year, Month, int, boolean, int)
      */
     public Flux<Item> getSpcifyLunCalInfo(

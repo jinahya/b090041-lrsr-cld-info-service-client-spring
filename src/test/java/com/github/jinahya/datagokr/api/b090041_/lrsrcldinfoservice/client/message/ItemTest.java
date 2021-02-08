@@ -1,15 +1,11 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.stream.Stream;
 
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest.responses;
@@ -23,16 +19,20 @@ class ItemTest {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @MethodSource({"items"})
-    @ParameterizedTest
-    void items_Jackson(final Item expected) throws JsonProcessingException {
-        final ObjectMapper mapper = JsonMapper.builder()
-                .addModule(new ParameterNamesModule())
-                .addModule(new Jdk8Module())
-                .addModule(new JavaTimeModule())
-                .build();
-        final String string = mapper.writeValueAsString(expected);
-        final Item actual = mapper.readValue(string, Item.class);
-        assertThat(actual).isEqualTo(expected);
+    public ItemTest() {
+        super();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void _Valid_(final Item item) {
+        assertThat(validator.validate(item)).isEmpty();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private final Validator validator;
 }

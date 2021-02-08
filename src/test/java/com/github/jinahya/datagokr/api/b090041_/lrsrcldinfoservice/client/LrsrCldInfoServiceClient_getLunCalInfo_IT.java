@@ -65,7 +65,7 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
         final Year solarYear = Year.now();
         final String expectedSolYear = YEAR_FORMATTER.format(solarYear);
         clientInstance().getLunCalInfo(solarYear, commonPool(), items);
-        items.sort(Item.COMPARING_IN_SOLAR);
+        items.sort(Item.COMPARING_SOLAR_DATE);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
             assertThat(i.getSolYear()).isEqualTo(expectedSolYear);
         });
