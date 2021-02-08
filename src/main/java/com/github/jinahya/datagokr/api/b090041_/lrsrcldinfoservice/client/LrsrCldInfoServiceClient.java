@@ -127,7 +127,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**
-     * Reads a response from {@code /getLunCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
@@ -251,7 +251,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Reads a response from {@code /getSolCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
      * @param lunYear  a value for {@link #QUERY_PARAM_NAME_LUN_YEAR ?lunYear}.
      * @param lunMonth a value for {@link #QUERY_PARAM_NAME_LUN_MONTH ?lunMonth}.
@@ -372,7 +372,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Reads a response from {@code /getSpcifyLunCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
      * @param fromSolYear a value for {@link #QUERY_PARAM_NAME_FROM_SOL_YEAR ?fromSolYear}.
      * @param toSolYear   a value for {@link #QUERY_PARAM_NAME_TO_SOL_YEAR ?toSolYear}.

@@ -71,7 +71,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Reads a response from {@code /getLunCalInfo} with specified arguments.
+     * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
      *
      * @param solYear  a value for {@link #QUERY_PARAM_NAME_SOL_YEAR ?solYear}.
      * @param solMonth a value for {@link #QUERY_PARAM_NAME_SOL_MONTH ?solMonth}.
