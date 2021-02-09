@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,6 +50,7 @@ import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MAX_DAY_OF_MONTH_SOLAR;
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_LUNAR;
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_SOLAR;
+import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Responses.requireResultSuccessful;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
@@ -89,6 +91,36 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Returns the body of specified response entity while validating it.
+     *
+     * @param responseEntity the response entity.
+     * @return the body of the {@code responseEntity}.
+     */
+    protected static @NotNull Response unwrap(@NotNull final ResponseEntity<Response> responseEntity) {
+        Objects.requireNonNull(responseEntity, "responseEntity is null");
+        final HttpStatus statusCode = responseEntity.getStatusCode();
+        if (!statusCode.is2xxSuccessful()) {
+            throw new RestClientException("unsuccessful response status: " + statusCode);
+        }
+        final Response response = responseEntity.getBody();
+        if (response == null) {
+            throw new RestClientException("no entity body received");
+        }
+        return requireResultSuccessful(response, h -> new RestClientException("unsuccessful result: " + h));
+    }
+
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    public LrsrCldInfoServiceClient() {
+        super();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     private void onPostConstruct() {
         rootUri = restTemplate.getUriTemplateHandler().expand("/");
@@ -98,24 +130,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         }
     }
 
-    /**
-     * Returns the body of specified response entity while validating it.
-     *
-     * @param responseEntity the response entity.
-     * @return the body of the {@code responseEntity}.
-     */
-    protected @NotNull Response getResponse(@NotNull final ResponseEntity<Response> responseEntity) {
-        Objects.requireNonNull(responseEntity, "responseEntity is null");
-        final HttpStatus statusCode = responseEntity.getStatusCode();
-        if (!statusCode.is2xxSuccessful()) {
-            throw new RuntimeException("unsuccessful response status code: " + statusCode);
-        }
-        final Response response = responseEntity.getBody();
-        if (response == null) {
-            throw new RuntimeException("null body from the response entity");
-        }
-        return requireResultSuccessful(response);
-    }
+    // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**
      * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
@@ -150,7 +165,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();
-        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+        return unwrap(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
     }
 
     /**
@@ -240,6 +255,8 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return collection;
     }
 
+    // -------------------------------------------------------------------------------------------------- /getSolCalInfo
+
     /**
      * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
@@ -270,7 +287,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .encode() // ?ServiceKey
                 .build()
                 .toUri();
-        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+        return unwrap(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
     }
 
     /**
@@ -360,6 +377,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return collection;
     }
 
+    // -------------------------------------------------------------------------------------------- /getSpcifyLunCalInfo
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
@@ -389,7 +407,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP);
         ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder.encode().build().toUri();
-        return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
+        return unwrap(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
     }
 
     /**
@@ -442,6 +460,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .collect(toList());
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     /**
      * Returns a uri builder built from the {@code rootUri}.
      *
@@ -451,6 +470,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return UriComponentsBuilder.fromUri(rootUri);
     }
 
+    // ------------------------------------------------------------------------------------------------- instance fields
     @LrsrCldInfoServiceRestTemplate
     @Autowired
     @Accessors(fluent = true)

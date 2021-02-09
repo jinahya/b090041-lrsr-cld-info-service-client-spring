@@ -28,6 +28,22 @@ public class Response implements Serializable {
 
     private static final long serialVersionUID = -383243653796767676L;
 
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    public Response() {
+        super();
+    }
+
+    // -------------------------------------------------------------------------------- overridden from java.lang.Object
+
+    /**
+     * Returns the string representation of this object.
+     *
+     * @return the string representation of this object.
+     */
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -50,6 +66,7 @@ public class Response implements Serializable {
         return Objects.hash(header, body);
     }
 
+    // ------------------------------------------------------------------------------------------------- instance fields
     @JsonProperty
     @Valid
     @NotNull

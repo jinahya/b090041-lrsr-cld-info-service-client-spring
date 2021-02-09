@@ -1,6 +1,5 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,6 +22,7 @@ import java.lang.annotation.Target;
 @Slf4j
 public abstract class AbstractLrsrCldInfoServiceClient {
 
+    // ------------------------------------------------------------------------------------------------ urls \ constants
     static final String BASE_URL = "http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService";
 
     /**
@@ -36,6 +34,8 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      * The value url for production environment. The value is {@value}.
      */
     public static final String BASE_URL_PRODUCTION = BASE_URL_DEVELOPMENT;
+
+    // --------------------------------------------------------------------------------------------- methods \ constants
 
     /**
      * A path segment for retrieves lunar dates with a solar date. The value is {@value}.
@@ -51,6 +51,8 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      * A path segment for retrieves lunar dates for a rage of solar years. The value is {@value}.
      */
     public static final String PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO = "getSpcifyLunCalInfo";
+
+    // ------------------------------------------------------------------------------------------ parameters \ constants
 
     /**
      * A query parameter name for assigned service key. The value is {@value}.
@@ -107,6 +109,8 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      */
     public static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
 
+    // -------------------------------------------------------------------------------------------- injection qualifiers
+
     /**
      * An injection qualifier for the {@code serviceKey} provided by service provider.
      *
@@ -120,13 +124,16 @@ public abstract class AbstractLrsrCldInfoServiceClient {
 
     }
 
-    protected @Valid @NotNull Response requireResultSuccessful(@Valid @NotNull final Response response) {
-        if (!response.getHeader().isResultCodeSuccess()) {
-            throw new RuntimeException("unsuccessful result: " + response.getHeader());
-        }
-        return response;
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    protected AbstractLrsrCldInfoServiceClient() {
+        super();
     }
 
+    // ------------------------------------------------------------------------------------------------- instance fields
     @LrsrCldInfoServiceServiceKey
     @Autowired
     @Accessors(fluent = true)

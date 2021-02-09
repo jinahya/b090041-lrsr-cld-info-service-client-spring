@@ -2,6 +2,7 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Responses;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -39,6 +41,7 @@ import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_LUNAR;
 import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.MIN_DAY_OF_MONTH_SOLAR;
 import static java.lang.Runtime.getRuntime;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static reactor.core.publisher.Flux.fromIterable;
 
@@ -63,6 +66,29 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     public @interface LrsrCldInfoServiceWebClient {
 
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected static Mono<Response> handle(final Mono<Response> mono) {
+        return requireNonNull(mono, "mono is null").handle((r, h) -> {
+            if (!Responses.isResultSuccessful(r)) {
+                h.error(new WebClientException("unsuccessful result: " + r.getHeader()) {
+                });
+            } else {
+                h.next(r);
+            }
+        });
+    }
+
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    public LrsrCldInfoServiceReactiveClient() {
+        super();
+    }
+
+    // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**
      * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
@@ -98,7 +124,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 })
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireResultSuccessful)
+                .as(LrsrCldInfoServiceReactiveClient::handle)
                 ;
     }
 
@@ -190,6 +216,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         return getLunCalInfo(year, parallelism, scheduler);
     }
 
+    // -------------------------------------------------------------------------------------------------- /getSolCalInfo
     /**
      * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
@@ -222,7 +249,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 })
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireResultSuccessful)
+                .as(LrsrCldInfoServiceReactiveClient::handle)
                 ;
     }
 
@@ -310,6 +337,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         return getSolCalInfo(year, parallelism, scheduler);
     }
 
+    // -------------------------------------------------------------------------------------------- /getSpcifyLunCalInfo
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
@@ -349,7 +377,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 )
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(this::requireResultSuccessful)
+                .as(LrsrCldInfoServiceReactiveClient::handle)
                 ;
     }
 
@@ -366,10 +394,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     public Flux<Response> getSpcifyLunCalInfoForAllPages(@NotNull final Year fromSolYear, @NotNull final Year toSolYear,
                                                          @NotNull final Month lunMonth, final int lunDay,
                                                          final boolean leapMonth) {
-        if (toSolYear.isBefore(fromSolYear)) {
-            throw new IllegalArgumentException(
-                    "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
-        }
         final AtomicInteger pageNo = new AtomicInteger(0);
         return getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet())
                 .expand(r -> {
@@ -397,14 +421,11 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
             @NotNull final Year fromSolarYear, @NotNull final Year toSolarYear, @NotNull final Month lunarMonth,
             @Max(MAX_DAY_OF_MONTH_LUNAR) @Min(MIN_DAY_OF_MONTH_LUNAR) final int lunarDayOfMonth,
             final boolean lunarLeapMonth) {
-        if (toSolarYear.isBefore(fromSolarYear)) {
-            throw new IllegalArgumentException(
-                    "toSolarYear(" + toSolarYear + ") is before fromSolYear(" + fromSolarYear + ")");
-        }
         return getSpcifyLunCalInfoForAllPages(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)
                 .flatMap(r -> fromIterable(r.getBody().getItems()));
     }
 
+    // ------------------------------------------------------------------------------------------------- instance fields
     @Autowired
     @LrsrCldInfoServiceWebClient
     @Accessors(fluent = true)

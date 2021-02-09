@@ -28,6 +28,22 @@ public class Body implements Serializable {
 
     private static final long serialVersionUID = -4780774139453333151L;
 
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    public Body() {
+        super();
+    }
+
+    // -------------------------------------------------------------------------------- overridden from java.lang.Object
+
+    /**
+     * Returns the string representation of this object.
+     *
+     * @return the string representation of this object.
+     */
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -54,12 +70,14 @@ public class Body implements Serializable {
         return Objects.hash(items, numOfRows, pageNo, totalCount);
     }
 
+    // ------------------------------------------------------------------------------------------------------ pagination
     @JsonIgnore
     @XmlTransient
     public boolean isLastPage() {
         return numOfRows * pageNo >= totalCount;
     }
 
+    // ------------------------------------------------------------------------------------------------- instance fields
     @NotNull
     @JsonProperty(required = true)
     @XmlElementWrapper

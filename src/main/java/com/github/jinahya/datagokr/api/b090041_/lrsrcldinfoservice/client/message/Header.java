@@ -27,11 +27,29 @@ public class Header implements Serializable {
 
     private static final long serialVersionUID = -3266148101861301931L;
 
+    // ------------------------------------------------------------------------------------------------------- constants
+
     /**
      * A value of successful {@code :/resultCode}. The value is {@value}.
      */
     public static final String RESULT_CODE_SUCCESS = "00";
 
+    // ---------------------------------------------------------------------------------------------------- constructors
+
+    /**
+     * Creates a new instance.
+     */
+    public Header() {
+        super();
+    }
+
+    // -------------------------------------------------------------------------------- overridden from java.lang.Object
+
+    /**
+     * Returns the string representation of this object.
+     *
+     * @return the string representation of this object.
+     */
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -54,12 +72,16 @@ public class Header implements Serializable {
         return Objects.hash(resultCode, resultMsg);
     }
 
+    // ------------------------------------------------------------------------------------------------------ resultCode
     @JsonIgnore
     @XmlTransient
     public boolean isResultCodeSuccess() {
         return RESULT_CODE_SUCCESS.equals(resultCode);
     }
 
+    // ------------------------------------------------------------------------------------------------------- resultMsg
+
+    // ------------------------------------------------------------------------------------------------- instance fields
     @JsonProperty(required = true)
     @NotBlank
     @XmlElement(required = true)

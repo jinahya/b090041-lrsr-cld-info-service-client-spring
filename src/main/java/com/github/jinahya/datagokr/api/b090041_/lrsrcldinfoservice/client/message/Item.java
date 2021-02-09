@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -54,6 +56,8 @@ public class Item implements Serializable {
 
     private static final long serialVersionUID = -4071620406720872635L;
 
+    // ------------------------------------------------------------------------------------------------------- constants
+
     /**
      * A value for representing non-leaping year or month. The value is {@value}.
      *
@@ -67,6 +71,8 @@ public class Item implements Serializable {
     public static final String LEAP = "\uc724";
 
     private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NON_LEAP + LEAP + ']';
+
+    // ------------------------------------------------------------------------------------------------------ formatters
 
     /**
      * The formatter for {@code solYear} and {@code lunYear}.
@@ -83,20 +89,42 @@ public class Item implements Serializable {
      */
     public static final DateTimeFormatter DAY_FORMATTER = DateTimeFormatter.ofPattern("dd");
 
+    /**
+     * Formats specified day-of-month value as {@code %02d}.
+     *
+     * @param dayOfMonth the value to format.
+     * @return a formatted string.
+     */
     public static String formatDay(final int dayOfMonth) {
-        if (dayOfMonth < 1 || dayOfMonth > 31) {
+        if (dayOfMonth < MIN_DAY_OF_MONTH_SOLAR || dayOfMonth > MAX_DAY_OF_MONTH_SOLAR) {
             throw new IllegalArgumentException("invalid dayOfMonth: " + dayOfMonth);
         }
         return format02d(dayOfMonth);
     }
 
+    /**
+     * Formats specified as {@code %02d}.
+     *
+     * @param parsed the value to format.
+     * @return a formatted string.
+     */
     static String format02d(final Integer parsed) {
         return ofNullable(parsed).map(v -> format("%1$02d", v)).orElse(null);
     }
 
+    // TODO: Remove, unused.
+    @Deprecated
     static Integer parse02d(final String formatted) {
         return ofNullable(formatted).map(Integer::parseInt).orElse(null);
     }
+
+    /**
+     * A formatter for formatting {@link java.time.temporal.ChronoField#DAY_OF_WEEK} with {@link Locale#KOREAN KOREAN}
+     * locale.
+     */
+    private static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The minimum value of day-of-month in lunar calendar which is {@value}.
@@ -118,6 +146,8 @@ public class Item implements Serializable {
      * @see #MAX_DAY_OF_MONTH_SOLAR
      */
     public static final int MIN_DAY_OF_MONTH_SOLAR = 1;
+
+    // ----------------------------------------------------------------------------------------------------- comparators
 
     /**
      * The maximum value of day-of-month in solar calendar which is {@value}.
@@ -149,12 +179,14 @@ public class Item implements Serializable {
      */
     public static final Comparator<Item> COMPARING_LUNAR_DATE_LEAP_MONTH_LAST = comparingLunarDate(LEAP_MONTH_LAST);
 
+    // ------------------------------------------------------------------------------------------- comparators for solar
+
     /**
      * The comparator compares items by {@link #getSolarDate()}
      */
     public static final Comparator<Item> COMPARING_SOLAR_DATE = comparing(Item::getSolarDate);
 
-    private static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
+    // ---------------------------------------------------------------------------------------------------- constructors
 
     /**
      * Creates a new instance.
@@ -163,6 +195,13 @@ public class Item implements Serializable {
         super();
     }
 
+    // -------------------------------------------------------------------------------- overridden from java.lang.Object
+
+    /**
+     * Returns the string representation of this object.
+     *
+     * @return the string representation of this object.
+     */
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -224,6 +263,7 @@ public class Item implements Serializable {
         );
     }
 
+    // ------------------------------------------------------------------------------------------------------------ JAXB
     void beforeUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
         // has nothing to do.
     }
@@ -235,6 +275,7 @@ public class Item implements Serializable {
         }
     }
 
+    // --------------------------------------------------------------------------------------------- lunYear / lunarYear
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -246,6 +287,7 @@ public class Item implements Serializable {
         setLunYear(ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
     }
 
+    // ------------------------------------------------------------------------------------------- lunMonth / lunarMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -257,8 +299,11 @@ public class Item implements Serializable {
         setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
     }
 
+    // ---------------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
     @JsonIgnore
     @XmlTransient
+    @Max(MAX_DAY_OF_MONTH_LUNAR)
+    @Min(MIN_DAY_OF_MONTH_LUNAR)
     @NotNull
     public Integer getLunarDayOfMonth() {
         return ofNullable(getLunDay())
@@ -270,6 +315,7 @@ public class Item implements Serializable {
         setLunDay(ofNullable(lunarDayOfMonth).map(Item::format02d).orElse(null));
     }
 
+    // ----------------------------------------------------------------------------------- lunLeapmomth / lunarLeapMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -281,6 +327,7 @@ public class Item implements Serializable {
         setLunLeapmonth(ofNullable(lunarLeapMonth).map(v -> v.equals(Boolean.TRUE) ? LEAP : NON_LEAP).orElse(null));
     }
 
+    // --------------------------------------------------------------------------------------------- solYear / solarYear
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -294,6 +341,7 @@ public class Item implements Serializable {
         setSolYear(ofNullable(solarYear).map(YEAR_FORMATTER::format).orElse(null));
     }
 
+    // ------------------------------------------------------------------------------------------- solMonth / solarMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -305,6 +353,7 @@ public class Item implements Serializable {
         setSolMonth(ofNullable(solarMonth).map(MONTH_FORMATTER::format).orElse(null));
     }
 
+    // ---------------------------------------------------------------------------------------- solDay / solarDayOfMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -318,6 +367,7 @@ public class Item implements Serializable {
         setSolDay(ofNullable(solarDayOfMonth).map(Item::format02d).orElse(null));
     }
 
+    // ----------------------------------------------------------------------------------------------------------- solJd
     private @AssertTrue boolean isSolJdValid() {
         if (solJd == null) {
             return true;
@@ -325,6 +375,7 @@ public class Item implements Serializable {
         return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
     }
 
+    // ------------------------------------------------------------------------------------------------------- solarDate
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -357,6 +408,7 @@ public class Item implements Serializable {
         return this;
     }
 
+    // ---------------------------------------------------------------------------------------------------------- fields
     @JsonProperty(required = true)
     @NotBlank
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
