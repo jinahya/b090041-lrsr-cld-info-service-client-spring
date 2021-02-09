@@ -24,20 +24,19 @@ $ mvn -Pfailsafe -DservcieKey=... clean verify
 |Qualifier|Type|Notes|
 |---------|----|-----------|
 |`@LrsrCldInfoServiceServiceKey`|`java.lang.String`|Provided by the service provider|
-|                               |`javax.validation.Validator`||
 
 ### For `RestTemplate`
 
 |Qualifier|Type|Notes|
 |---------|----|-----------|
-|`@LrsrCldInfoServiceRestTemplate`|`o.s.web.client.RestTemplate`||
+|`@LrsrCldInfoServiceRestTemplate`|[`RestTemplate`][RestTemplate]||
 |`@LrsrCldInfoServiceRestTemplateRootUri`|`j.l.String`|Optional|
 
 ### For `WebClient`
 
 |Qualifier|Type|Notes|
 |---------|----|-----------|
-|`@LrsrCldInfoServiceWebClient`|`o.s.w.r.function.client.WebClient`||
+|`@LrsrCldInfoServiceWebClient`|[`WebClient`][WebClient]||
 
 ## Usages
 
@@ -47,7 +46,7 @@ Expand the component-scanning path.
 
 @SpringBootApplication(
         scanBasePackageClasses = {
-                com.github.jinahya.datagokr.....client._NoOp.class,
+                com.github.jinahya.datagokr.....client.NoOp.class,
                 MyApplication.class
         }
 )
@@ -117,3 +116,7 @@ Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is
 @Autowired
 private LrsrCldInfoServiceReactiveClient client;
 ```
+
+
+[RestTemplate]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html
+[WebClient]: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/reactive/function/client/WebClient.html

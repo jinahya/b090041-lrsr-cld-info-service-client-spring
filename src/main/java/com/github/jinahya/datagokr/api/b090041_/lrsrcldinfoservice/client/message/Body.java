@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A class for binding {@code /:response/:body} path.
+ * A class for binding {@code /:response/:body} part.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter
@@ -27,8 +27,6 @@ import java.util.Objects;
 public class Body implements Serializable {
 
     private static final long serialVersionUID = -4780774139453333151L;
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
@@ -56,22 +54,12 @@ public class Body implements Serializable {
         return Objects.hash(items, numOfRows, pageNo, totalCount);
     }
 
-    // ----------------------------------------------------------------------------------------------------------- items
-
-    // ------------------------------------------------------------------------------------------------------- numOfRows
-
-    // ---------------------------------------------------------------------------------------------------------- pageNo
-
-    // ------------------------------------------------------------------------------------------------------ totalCount
-
-    // -----------------------------------------------------------------------------------------------------------------
     @JsonIgnore
     @XmlTransient
     public boolean isLastPage() {
         return numOfRows * pageNo >= totalCount;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @NotNull
     @JsonProperty(required = true)
     @XmlElementWrapper

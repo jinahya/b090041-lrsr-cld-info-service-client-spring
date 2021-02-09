@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -61,12 +60,9 @@ import static java.util.stream.Collectors.toList;
  * @see LrsrCldInfoServiceReactiveClient
  */
 @Lazy
-@Validated
 @Component
 @Slf4j
 public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * An injection qualifier for an instance of {@link RestTemplate}.
@@ -93,7 +89,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     private void onPostConstruct() {
         rootUri = restTemplate.getUriTemplateHandler().expand("/");
@@ -102,8 +97,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             rootUri = URI.create(restTemplateRootUri);
         }
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Returns the body of specified response entity while validating it.
@@ -123,8 +116,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         }
         return requireResultSuccessful(response);
     }
-
-    // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**
      * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
@@ -249,8 +240,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return collection;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
@@ -371,8 +360,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return collection;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
@@ -392,18 +379,16 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolarYear(" + fromSolYear + ")");
         }
-        final URI url = uriBuilderFromRootUri()
+        final UriComponentsBuilder builder = uriBuilderFromRootUri()
                 .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                 .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, Item.YEAR_FORMATTER.format(fromSolYear))
                 .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, Item.YEAR_FORMATTER.format(toSolYear))
                 .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                 .queryParam(QUERY_PARAM_NAME_LUN_DAY, Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay)))
-                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP)
-                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, ofNullable(pageNo))
-                .encode()
-                .build()
-                .toUri();
+                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP);
+        ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
+        final URI url = builder.encode().build().toUri();
         return getResponse(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));
     }
 
@@ -457,8 +442,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .collect(toList());
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Returns a uri builder built from the {@code rootUri}.
      *
@@ -468,7 +451,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         return UriComponentsBuilder.fromUri(rootUri);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @LrsrCldInfoServiceRestTemplate
     @Autowired
     @Accessors(fluent = true)
@@ -485,8 +467,6 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private String restTemplateRootUri;
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The root uri expanded with {@code '/'} from {@code restTemplate.uriTemplateHandler}.

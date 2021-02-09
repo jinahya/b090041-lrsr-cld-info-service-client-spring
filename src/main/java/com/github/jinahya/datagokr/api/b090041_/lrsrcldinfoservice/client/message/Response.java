@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A class for binding {@code /:response} path.
+ * A class for binding {@code /:response} part.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -28,7 +28,6 @@ public class Response implements Serializable {
 
     private static final long serialVersionUID = -383243653796767676L;
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -41,9 +40,9 @@ public class Response implements Serializable {
     public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        final Response casted = (Response) obj;
-        return Objects.equals(header, casted.header)
-               && Objects.equals(body, casted.body);
+        final Response that = (Response) obj;
+        return Objects.equals(header, that.header)
+               && Objects.equals(body, that.body);
     }
 
     @Override
@@ -51,7 +50,6 @@ public class Response implements Serializable {
         return Objects.hash(header, body);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @JsonProperty
     @Valid
     @NotNull

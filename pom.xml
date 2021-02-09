@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -244,7 +245,7 @@
             <configuration>
               <skip>true</skip>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
           </execution>
@@ -463,7 +464,7 @@
       </build>
     </profile>
     <profile>
-      <id>spring-boot-2_4_2</id>
+      <id>spring-boot-2_4_-2</id>
       <!-- https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
@@ -471,7 +472,6 @@
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.slf4j>1.7.30</version.org.slf4j>
@@ -480,7 +480,7 @@
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_4_0</id>
+      <id>spring-boot-2_4_-0</id>
       <!-- https://docs.spring.io/spring-boot/docs/2.4.0/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.11.3</version.com.fasterxml.jackson.core>
@@ -488,7 +488,6 @@
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.8</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.slf4j>1.7.30</version.org.slf4j>
@@ -497,7 +496,7 @@
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_3_8_RELEASE</id>
+      <id>spring-boot-2_3_-8_RELEASE</id>
       <!-- https://docs.spring.io/spring-boot/docs/2.3.8.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.11.4</version.com.fasterxml.jackson.core>
@@ -513,15 +512,14 @@
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_3_0_RELEASE</id>
-      <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <id>spring-boot-2_3_-0_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.3.0.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.11.0</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.5.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.5</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.12</version.org.projectlombok>
         <version.org.slf4j>1.7.30</version.org.slf4j>
@@ -538,7 +536,6 @@
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.9</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.16</version.org.projectlombok>
         <version.org.slf4j>1.7.30</version.org.slf4j>
@@ -547,15 +544,14 @@
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_2_0_RELEASE_NOT_SUPPORTED</id>
-      <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <id>spring-boot-2_2_-0_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.2.0.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
         <version.com.fasterxml.jackson.core>2.10.0</version.com.fasterxml.jackson.core>
         <version.io.projectreactor>3.3.0.RELEASE</version.io.projectreactor>
         <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
         <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api>
         <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api>
-        <version.org.apache.johnzon>1.2.1</version.org.apache.johnzon>
         <version.org.glassfish.jaxb>2.3.2</version.org.glassfish.jaxb>
         <version.org.projectlombok>1.18.10</version.org.projectlombok>
         <version.org.slf4j>1.7.28</version.org.slf4j>
@@ -564,60 +560,128 @@
       </properties>
     </profile>
     <profile>
-      <id>spring-boot-2_0_0_RELEASE_NOT_SUPPORTED</id>
-      <!-- https://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <id>spring-boot-2_1_18_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.1.18.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
       <properties>
-        <version.com.fasterxml.jackson.core>2.9.4</version.com.fasterxml.jackson.core>
-        <version.io.projectreactor>3.1.5.RELEASE</version.io.projectreactor>
-        <!--        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>-->
-        <!--        <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>-->
-        <!--        <version.jakarta.xml.bind-api>2.3.3</version.jakarta.xml.bind-api>-->
-        <version.org.apache.johnzon>1.1.6</version.org.apache.johnzon>
-        <!--        <version.org.glassfish.jaxb>2.3.3</version.org.glassfish.jaxb>-->
-        <version.org.projectlombok>1.16.20</version.org.projectlombok>
-        <version.org.slf4j>1.7.25</version.org.slf4j>
-        <version.org.springframework>5.0.4.RELEASE</version.org.springframework>
-        <version.org.springframework.boot>2.0.0.RELEASE</version.org.springframework.boot>
+        <version.com.fasterxml.jackson.core>2.9.10</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.2.21.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.3</version.jakarta.annotation-api> <!--version.javax.annotation-api>1.3.2</version.javax.annotation-api>-->
+        <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api> <!--version.javax.validation-api>2.0.1.Final</version.javax.validation-api-->
+        <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api> <!--version.jaxb-api>2.3.1</version.jaxb-api-->
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.16</version.org.projectlombok>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
+        <version.org.springframework>5.1.19.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.1.18.RELEASE</version.org.springframework.boot>
+        <version.org.junit.jupiter>5.3.2</version.org.junit.jupiter>
       </properties>
       <dependencies>
         <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-          <version>1.3.2</version>
-          <scope>provided</scope>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>javax.validation</groupId>
-          <artifactId>validation-api</artifactId>
-          <version>2.0.1.Final</version>
-          <scope>provided</scope>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-          <version>2.3.0</version>
-          <scope>provided</scope>
-        </dependency>
-        <!--        <dependency>-->
-        <!--          <groupId>org.glassfish</groupId>-->
-        <!--          <artifactId>json</artifactId>-->
-        <!--          <version>1.1.2</version>-->
-        <!--          <scope>provided</scope>-->
-        <!--        </dependency>-->
       </dependencies>
-      <!--      <build>-->
-      <!--        <plugins>-->
-      <!--          <plugin>-->
-      <!--            <groupId>org.apache.maven.plugins</groupId>-->
-      <!--            <artifactId>maven-compiler-plugin</artifactId>-->
-      <!--            <configuration>-->
-      <!--              <excludes>-->
-      <!--                <exclude>**/LrsrCldInfoServiceReactiveClient.java</exclude>-->
-      <!--              </excludes>-->
-      <!--            </configuration>-->
-      <!--          </plugin>-->
-      <!--        </plugins>-->
-      <!--      </build>-->
+    </profile>
+    <profile>
+      <id>spring-boot-2_1_-0_RELEASE</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.1.0.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.9.0</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.2.2.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.3</version.jakarta.annotation-api> <!-- javax.annotation-api:1.3.2 -->
+        <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api> <!-- javax.validation-api:2.0.1.Final -->
+        <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api> <!-- jaxb-api:2.3.1 -->
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.18</version.org.projectlombok> <!-- latest against referenced 1.18.2 -->
+        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.org.springframework>5.1.2.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.1.0.RELEASE</version.org.springframework.boot>
+        <version.org.junit.jupiter>5.3.1</version.org.junit.jupiter>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>spring-boot-2_0_-9_RELEASE_NOT_SUPPORTED</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.0.9.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.9.0</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.1.16.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.3</version.jakarta.annotation-api> <!-- javax.annotation-api:1.3.2 -->
+        <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api> <!-- javax.validation-api:2.0.1.Final -->
+        <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api> <!-- jaxb-api:2.3.0 -->
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.18</version.org.projectlombok> <!-- latest against referenced 1.16.22 -->
+        <version.org.slf4j>1.7.26</version.org.slf4j>
+        <version.org.springframework>5.0.13.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.0.9.RELEASE</version.org.springframework.boot>
+        <version.org.junit.jupiter>5.1.1</version.org.junit.jupiter>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>spring-boot-2_0_-0_RELEASE_NOT_SUPPORTED</id>
+      <!-- https://docs.spring.io/spring-boot/docs/2.0.0.RELEASE/reference/html/appendix-dependency-versions.html#dependency-versions -->
+      <properties>
+        <version.com.fasterxml.jackson.core>2.9.0</version.com.fasterxml.jackson.core>
+        <version.io.projectreactor>3.1.5.RELEASE</version.io.projectreactor>
+        <version.jakarta.annotation-api>1.3.3</version.jakarta.annotation-api> <!-- javax.annotation-api:1.3.2 -->
+        <version.jakarta.validation-api>2.0.1</version.jakarta.validation-api> <!-- javax.validation-api:2.0.1.Final -->
+        <version.jakarta.xml.bind-api>2.3.2</version.jakarta.xml.bind-api> <!-- jaxb-api:2.3.0 -->
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
+        <version.org.projectlombok>1.18.18</version.org.projectlombok> <!-- latest against referenced 1.18.2 -->
+        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.org.springframework>5.0.4.RELEASE</version.org.springframework>
+        <version.org.springframework.boot>2.0.0.RELEASE</version.org.springframework.boot>
+        <version.org.junit.jupiter>5.1.0</version.org.junit.jupiter>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <version>${version.org.junit.jupiter}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>

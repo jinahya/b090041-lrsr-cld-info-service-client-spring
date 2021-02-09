@@ -5,9 +5,9 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class _NoOp {
+public final class NoOp {
 
-    private _NoOp() {
+    private NoOp() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

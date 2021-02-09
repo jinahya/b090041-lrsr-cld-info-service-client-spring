@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class Response_Xml_Test {
 
-    // -----------------------------------------------------------------------------------------------------------------
     @MethodSource({"com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest#responses"})
     @ParameterizedTest
     void _Jaxb_(final Response expected) throws JAXBException {

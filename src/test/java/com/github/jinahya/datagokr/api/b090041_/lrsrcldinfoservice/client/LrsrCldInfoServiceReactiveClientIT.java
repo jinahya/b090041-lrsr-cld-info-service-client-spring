@@ -78,7 +78,7 @@ abstract class LrsrCldInfoServiceReactiveClientIT
             final int byteCount = 256 * 1000; // 256K by default
             return ExchangeStrategies.builder()
                     .codecs(c -> {
-                        c.defaultCodecs().maxInMemorySize(byteCount);
+                        //c.defaultCodecs().maxInMemorySize(byteCount);
                     })
                     .build();
         }
@@ -102,8 +102,6 @@ abstract class LrsrCldInfoServiceReactiveClientIT
             return new MethodValidationPostProcessor();
         }
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Creates a new instance.

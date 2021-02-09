@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,12 +49,9 @@ import static reactor.core.publisher.Flux.fromIterable;
  * @see LrsrCldInfoServiceClient
  */
 @Lazy
-@Validated
 @Component
 @Slf4j
 public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoServiceClient {
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * An injection qualifier for an instance of {@link WebClient}.
@@ -67,8 +63,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     public @interface LrsrCldInfoServiceWebClient {
 
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Retrieves a response from {@code /getLunCalInfo} with specified arguments.
@@ -196,8 +190,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         return getLunCalInfo(year, parallelism, scheduler);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
@@ -318,8 +310,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         return getSolCalInfo(year, parallelism, scheduler);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
@@ -415,7 +405,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .flatMap(r -> fromIterable(r.getBody().getItems()));
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Autowired
     @LrsrCldInfoServiceWebClient
     @Accessors(fluent = true)

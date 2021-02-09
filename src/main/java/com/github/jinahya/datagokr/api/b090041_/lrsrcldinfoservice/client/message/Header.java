@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A class for binding {@code /:response/:header} path.
+ * A class for binding {@code /:response/:header} part.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -27,14 +27,10 @@ public class Header implements Serializable {
 
     private static final long serialVersionUID = -3266148101861301931L;
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * A value of successful {@code :/resultCode}. The value is {@value}.
      */
     public static final String RESULT_CODE_SUCCESS = "00";
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
@@ -58,16 +54,12 @@ public class Header implements Serializable {
         return Objects.hash(resultCode, resultMsg);
     }
 
-    // ------------------------------------------------------------------------------------------------------ resultCode
     @JsonIgnore
     @XmlTransient
     public boolean isResultCodeSuccess() {
         return RESULT_CODE_SUCCESS.equals(resultCode);
     }
 
-    // ------------------------------------------------------------------------------------------------------- resultMsg
-
-    // -----------------------------------------------------------------------------------------------------------------
     @JsonProperty(required = true)
     @NotBlank
     @XmlElement(required = true)

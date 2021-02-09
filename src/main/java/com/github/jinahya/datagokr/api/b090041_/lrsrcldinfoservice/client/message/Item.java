@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 /**
- * A class for binding {@code /:response/:body/:item} path.
+ * A class for binding {@code /:response/:body/:item} part.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -53,8 +53,6 @@ import static java.util.Optional.ofNullable;
 public class Item implements Serializable {
 
     private static final long serialVersionUID = -4071620406720872635L;
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * A value for representing non-leaping year or month. The value is {@value}.
@@ -69,8 +67,6 @@ public class Item implements Serializable {
     public static final String LEAP = "\uc724";
 
     private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NON_LEAP + LEAP + ']';
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The formatter for {@code solYear} and {@code lunYear}.
@@ -102,8 +98,6 @@ public class Item implements Serializable {
         return ofNullable(formatted).map(Integer::parseInt).orElse(null);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * The minimum value of day-of-month in lunar calendar which is {@value}.
      *
@@ -132,7 +126,6 @@ public class Item implements Serializable {
      */
     public static final int MAX_DAY_OF_MONTH_SOLAR = 31;
 
-    // -----------------------------------------------------------------------------------------------------------------
     private static Comparator<Item> comparingLunarDate(final Comparator<Item> leapMonthComparator) {
         requireNonNull(leapMonthComparator, "leapMonthComparator is null");
         return comparing(Item::getLunarYear)
@@ -161,10 +154,7 @@ public class Item implements Serializable {
      */
     public static final Comparator<Item> COMPARING_SOLAR_DATE = comparing(Item::getSolarDate);
 
-    // -----------------------------------------------------------------------------------------------------------------
     private static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Creates a new instance.
@@ -173,7 +163,6 @@ public class Item implements Serializable {
         super();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String toString() {
         return super.toString() + '{'
@@ -235,7 +224,6 @@ public class Item implements Serializable {
         );
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     void beforeUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
         // has nothing to do.
     }
@@ -247,7 +235,6 @@ public class Item implements Serializable {
         }
     }
 
-    // --------------------------------------------------------------------------------------------- lunYear / lunarYear
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -259,7 +246,6 @@ public class Item implements Serializable {
         setLunYear(ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
     }
 
-    // ------------------------------------------------------------------------------------------- lunMonth / lunarMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -271,7 +257,6 @@ public class Item implements Serializable {
         setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
     }
 
-    // ---------------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -285,7 +270,6 @@ public class Item implements Serializable {
         setLunDay(ofNullable(lunarDayOfMonth).map(Item::format02d).orElse(null));
     }
 
-    // ----------------------------------------------------------------------------------- lunLeapmonth / lunarLeapMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -297,13 +281,6 @@ public class Item implements Serializable {
         setLunLeapmonth(ofNullable(lunarLeapMonth).map(v -> v.equals(Boolean.TRUE) ? LEAP : NON_LEAP).orElse(null));
     }
 
-    // -------------------------------------------------------------------------------------------------------- lunSecha
-
-    // ------------------------------------------------------------------------------------------------------ lunWolgeon
-
-    // -------------------------------------------------------------------------------------------------------  lunIljin
-
-    // --------------------------------------------------------------------------------------------- solYear / solarYear
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -317,7 +294,6 @@ public class Item implements Serializable {
         setSolYear(ofNullable(solarYear).map(YEAR_FORMATTER::format).orElse(null));
     }
 
-    // ------------------------------------------------------------------------------------------- solMonth / solarMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -329,7 +305,6 @@ public class Item implements Serializable {
         setSolMonth(ofNullable(solarMonth).map(MONTH_FORMATTER::format).orElse(null));
     }
 
-    // ---------------------------------------------------------------------------------------- solDay / solarDayOfMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -343,11 +318,6 @@ public class Item implements Serializable {
         setSolDay(ofNullable(solarDayOfMonth).map(Item::format02d).orElse(null));
     }
 
-    // ----------------------------------------------------------------------------------------------------- solLeapyear
-
-    // --------------------------------------------------------------------------------------------------------- solWeek
-
-    // ----------------------------------------------------------------------------------------------------------- solJd
     private @AssertTrue boolean isSolJdValid() {
         if (solJd == null) {
             return true;
@@ -355,7 +325,6 @@ public class Item implements Serializable {
         return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
     }
 
-    // ------------------------------------------------------------------------------------------------------- solarDate
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -388,7 +357,6 @@ public class Item implements Serializable {
         return this;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @JsonProperty(required = true)
     @NotBlank
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -445,7 +413,6 @@ public class Item implements Serializable {
     @XmlElement(required = true)
     private String lunIljin;
 
-    // -----------------------------------------------------------------------------------------------------------------
     @JsonProperty(required = true)
     @NotBlank
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

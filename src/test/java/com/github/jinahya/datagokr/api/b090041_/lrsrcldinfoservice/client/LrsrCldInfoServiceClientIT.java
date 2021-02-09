@@ -6,8 +6,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.client.RestTemplate;
@@ -24,7 +22,6 @@ import java.time.Duration;
 class LrsrCldInfoServiceClientIT
         extends AbstractLrsrCldInfoServiceClientIT<LrsrCldInfoServiceClient> {
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Import(AbstractLrsrCldInfoServiceClientIT._Configuration.class)
     @Configuration
     static class _Configuration {
@@ -55,7 +52,7 @@ class LrsrCldInfoServiceClientIT
                     .setConnectTimeout(Duration.ofSeconds(10L))
                     .setReadTimeout(Duration.ofSeconds(30L))
                     .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
-                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+//                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE) // n/a with 2.1.18.RELEASE
                     .build();
         }
 
@@ -64,8 +61,6 @@ class LrsrCldInfoServiceClientIT
             return new MethodValidationPostProcessor();
         }
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Creates a new instance.

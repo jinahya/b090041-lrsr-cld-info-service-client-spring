@@ -17,7 +17,6 @@ abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoS
 
     static final String SYSTEM_PROPERTY_SERVICE_KEY = "serviceKey";
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Configuration
     static class _Configuration {
 
@@ -33,8 +32,6 @@ abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoS
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Creates a new instance with specified client class.
      *
@@ -45,8 +42,6 @@ abstract class AbstractLrsrCldInfoServiceClientIT<T extends AbstractLrsrCldInfoS
         super();
         this.clientClass = requireNonNull(clientClass, "clientClass is null");
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The client class to test.

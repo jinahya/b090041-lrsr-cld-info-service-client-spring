@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoServiceReactiveClientIT {
 
-    // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSpcifyLunCalInfo(fromSolarYear,toSolarYear,lunarMonth,lunarDayOfMonth,lunarLeapMonth)")
     @Test

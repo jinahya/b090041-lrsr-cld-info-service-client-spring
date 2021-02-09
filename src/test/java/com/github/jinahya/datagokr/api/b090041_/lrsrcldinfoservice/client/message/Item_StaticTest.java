@@ -67,12 +67,10 @@ class Item_StaticTest {
         assertThat(items.get(1)).isEqualTo(leap);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     public Item_StaticTest() {
         super();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     private final Validator validator;
 }

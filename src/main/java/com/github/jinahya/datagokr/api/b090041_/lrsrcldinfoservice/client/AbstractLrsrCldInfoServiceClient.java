@@ -9,18 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * An abstract parent class for client classes.
@@ -30,7 +25,6 @@ import java.util.Set;
 @Slf4j
 public abstract class AbstractLrsrCldInfoServiceClient {
 
-    // -----------------------------------------------------------------------------------------------------------------
     static final String BASE_URL = "http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService";
 
     /**
@@ -42,8 +36,6 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      * The value url for production environment. The value is {@value}.
      */
     public static final String BASE_URL_PRODUCTION = BASE_URL_DEVELOPMENT;
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * A path segment for retrieves lunar dates with a solar date. The value is {@value}.
@@ -60,14 +52,10 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      */
     public static final String PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO = "getSpcifyLunCalInfo";
 
-    // ---------------------------------------------------------------------------------------------------- ?ServiceKey=
-
     /**
      * A query parameter name for assigned service key. The value is {@value}.
      */
     public static final String QUERY_PARAM_NAME_SERVICE_KEY = "ServiceKey";
-
-    // ---------------------------------------------------------------------------------------------------------- ?sol*=
 
     /**
      * A query parameter name for a solar year. The value is {@value}.
@@ -84,8 +72,6 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      */
     public static final String QUERY_PARAM_NAME_SOL_DAY = "solDay";
 
-    // ---------------------------------------------------------------------------------------------------------- ?lun*=
-
     /**
      * A query parameter name for a lunar year. The value is {@value}.
      */
@@ -100,8 +86,6 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      * A query parameter name for a lunar day of month. The value is {@value}.
      */
     public static final String QUERY_PARAM_NAME_LUN_DAY = "lunDay";
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * A query parameter name for the starting solar year. The value is {@value}.
@@ -118,17 +102,15 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      */
     public static final String QUERY_PARAM_NAME_LEAP_MONTH = "leapMonth";
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * A query parameter name for the page number. The value is {@value}.
      */
     public static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
-     * An injection qualifier for the {@code ServiceKey} parameter.
+     * An injection qualifier for the {@code serviceKey} provided by service provider.
+     *
+     * @see AbstractLrsrCldInfoServiceClient#QUERY_PARAM_NAME_SERVICE_KEY
      */
     @Qualifier
     @Documented
@@ -138,34 +120,17 @@ public abstract class AbstractLrsrCldInfoServiceClient {
 
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private @Valid @NotNull Response requireValid(@NotNull final Response response) {
-        Objects.requireNonNull(response, "response is null");
-        final Set<ConstraintViolation<Response>> violations = validator().validate(response);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
-        return response;
-    }
-
     protected @Valid @NotNull Response requireResultSuccessful(@Valid @NotNull final Response response) {
-        if (!requireValid(response).getHeader().isResultCodeSuccess()) {
+        if (!response.getHeader().isResultCodeSuccess()) {
             throw new RuntimeException("unsuccessful result: " + response.getHeader());
         }
         return response;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @LrsrCldInfoServiceServiceKey
     @Autowired
     @Accessors(fluent = true)
     @Setter(AccessLevel.NONE)
     @Getter(value = AccessLevel.PROTECTED)
     private String serviceKey;
-
-    @Autowired
-    @Accessors(fluent = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(value = AccessLevel.PROTECTED)
-    private Validator validator;
 }

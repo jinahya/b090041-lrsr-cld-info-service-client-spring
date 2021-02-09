@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServiceReactiveClientIT {
 
-    // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(solarDate)")
     @Test
@@ -39,7 +38,6 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                 .blockLast();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(solarYearMonth)")
     @Test
@@ -55,7 +53,6 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                 .blockLast();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(year)")
     @Test

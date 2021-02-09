@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class Item_Extended_Test {
 
-    // -----------------------------------------------------------------------------------------------------------------
     @ParameterizedTest
     @MethodSource({"com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ItemTest#items"})
     void getLunarYear__(final Item item) {

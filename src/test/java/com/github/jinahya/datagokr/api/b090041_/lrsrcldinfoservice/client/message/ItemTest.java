@@ -19,20 +19,17 @@ class ItemTest {
         return responses().flatMap(r -> r.getBody().getItems().stream());
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     public ItemTest() {
         super();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @ParameterizedTest
     @MethodSource({"items"})
     void _Valid_(final Item item) {
         assertThat(validator.validate(item)).isEmpty();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @ParameterizedTest
     @MethodSource({"items"})
     void getSolJd_Equals_SolarDateJulianDay(final Item item) {
@@ -41,6 +38,5 @@ class ItemTest {
                 .isEqualTo(item.getSolarDate().getLong(JulianFields.JULIAN_DAY));
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     private final Validator validator;
 }
