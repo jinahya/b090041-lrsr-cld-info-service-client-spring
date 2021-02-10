@@ -61,18 +61,30 @@ public class Response implements Serializable {
                && Objects.equals(body, that.body);
     }
 
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(header, body);
     }
 
     // ------------------------------------------------------------------------------------------------- instance fields
+
+    /**
+     * An attribute for {@code /:response/:header}.
+     */
     @JsonProperty
     @Valid
     @NotNull
     @XmlElement(required = true)
     private Header header;
 
+    /**
+     * An attribute for {@code /:response/:body}.
+     */
     @JsonProperty
     @Valid
     @NotNull

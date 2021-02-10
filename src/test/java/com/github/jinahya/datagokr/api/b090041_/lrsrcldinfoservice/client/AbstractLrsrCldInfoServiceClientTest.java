@@ -34,8 +34,5 @@ abstract class AbstractLrsrCldInfoServiceClientTest<T extends AbstractLrsrCldInf
         }
     }
 
-    /**
-     * The client class to test.
-     */
     protected final Class<T> clientClass;
 }

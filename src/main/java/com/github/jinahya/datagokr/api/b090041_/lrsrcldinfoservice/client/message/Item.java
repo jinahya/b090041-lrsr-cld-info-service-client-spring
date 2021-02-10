@@ -243,6 +243,11 @@ public class Item implements Serializable {
                && Objects.equals(solJd, that.solJd);
     }
 
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(

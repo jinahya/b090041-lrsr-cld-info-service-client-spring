@@ -110,10 +110,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                             .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                             .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
                             .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
-//                            .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-//                                                 Optional.ofNullable(solDay).map(v -> MonthDay.of(solMonth, v))
-//                                                         .map(Item.DAY_FORMATTER::format))
-//                            .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                     ;
                     ofNullable(solDay)
                             .map(v -> MonthDay.of(solMonth, v))
@@ -217,6 +213,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -------------------------------------------------------------------------------------------------- /getSolCalInfo
+
     /**
      * Retrieves a response from {@code /getSolCalInfo} with specified arguments.
      *
@@ -237,8 +234,6 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                             .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                             .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
                             .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
-//                            .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
-//                            .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
                     ;
                     ofNullable(lunDay)
                             .map(Item::formatDay)
@@ -338,6 +333,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
     }
 
     // -------------------------------------------------------------------------------------------- /getSpcifyLunCalInfo
+
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *

@@ -134,6 +134,10 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     }
 
     // ------------------------------------------------------------------------------------------------- instance fields
+
+    /**
+     * A value for {@link #QUERY_PARAM_NAME_SERVICE_KEY}.
+     */
     @LrsrCldInfoServiceServiceKey
     @Autowired
     @Accessors(fluent = true)

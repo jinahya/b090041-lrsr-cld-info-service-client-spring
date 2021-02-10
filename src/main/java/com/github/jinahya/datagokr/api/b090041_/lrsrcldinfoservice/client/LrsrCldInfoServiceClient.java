@@ -92,6 +92,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns the body of specified response entity while validating it.
      *
@@ -148,13 +149,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                 .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
-                .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
-//                .queryParamIfPresent(QUERY_PARAM_NAME_SOL_DAY,
-//                                     Optional.ofNullable(solDay)
-//                                             .map(v -> MonthDay.of(solMonth, v))
-//                                             .map(Item.DAY_FORMATTER::format))
-//                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
-                ;
+                .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth));
         ofNullable(solDay)
                 .map(v -> MonthDay.of(solMonth, v))
                 .map(Item.DAY_FORMATTER::format)
@@ -274,10 +269,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                 .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
                 .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
-                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
-//                .queryParamIfPresent(QUERY_PARAM_NAME_LUN_DAY, Optional.ofNullable(lunDay).map(Item::formatDay))
-//                .queryParamIfPresent(QUERY_PARAM_NAME_PAGE_NO, Optional.ofNullable(pageNo))
-                ;
+                .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth));
         ofNullable(lunDay)
                 .map(Item::formatDay)
                 .ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
@@ -378,6 +370,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -------------------------------------------------------------------------------------------- /getSpcifyLunCalInfo
+
     /**
      * Retrieves a response from {@code /getSpcifyLunCalInfo} with specified arguments.
      *
@@ -461,6 +454,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns a uri builder built from the {@code rootUri}.
      *

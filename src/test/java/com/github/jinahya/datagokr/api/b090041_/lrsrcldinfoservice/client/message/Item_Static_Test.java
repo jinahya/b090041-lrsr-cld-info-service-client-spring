@@ -12,8 +12,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * A class for static fields/methods of {@link Item}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @Slf4j
-class Item_StaticTest {
+class Item_Static_Test {
 
     static Item i20230229l() {
         return Item.builder()
@@ -67,7 +72,7 @@ class Item_StaticTest {
         assertThat(items.get(1)).isEqualTo(leap);
     }
 
-    public Item_StaticTest() {
+    public Item_Static_Test() {
         super();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }

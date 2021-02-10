@@ -65,6 +65,11 @@ public class Body implements Serializable {
                && Objects.equals(items, that.items);
     }
 
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(items, numOfRows, pageNo, totalCount);

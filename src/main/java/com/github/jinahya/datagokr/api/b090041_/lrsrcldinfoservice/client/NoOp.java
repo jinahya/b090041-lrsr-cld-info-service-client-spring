@@ -7,6 +7,9 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
  */
 public final class NoOp {
 
+    /**
+     * Creates a new instance, my ass.
+     */
     private NoOp() {
         throw new AssertionError("instantiation is not allowed");
     }
