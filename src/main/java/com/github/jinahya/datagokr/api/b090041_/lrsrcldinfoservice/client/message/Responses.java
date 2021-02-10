@@ -37,7 +37,7 @@ public final class Responses {
      */
     public static <T extends RuntimeException> Response requireResultSuccessful(
             final Response response, final Function<? super Header, ? extends T> function) {
-        if (isResultSuccessful(response)) {
+        if (!isResultSuccessful(response)) {
             throw function.apply(response.getHeader());
         }
         return response;

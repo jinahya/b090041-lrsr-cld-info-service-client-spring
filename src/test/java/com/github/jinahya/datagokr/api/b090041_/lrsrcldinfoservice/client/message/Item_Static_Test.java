@@ -22,11 +22,11 @@ class Item_Static_Test {
 
     static Item i20230229l() {
         return Item.builder()
-                .lunYear("2023")
+                .lunYear(2023)
                 .lunMonth("02")
                 .lunDay("29")
                 .lunLeapmonth(Item.LEAP)
-                .solYear("2023")
+                .solYear(2023)
                 .solMonth("04")
                 .solDay("19")
                 .build()
@@ -35,11 +35,11 @@ class Item_Static_Test {
 
     static Item i20230229n() {
         return Item.builder()
-                .lunYear("2023")
+                .lunYear(2023)
                 .lunMonth("02")
                 .lunDay("29")
                 .lunLeapmonth(Item.NON_LEAP)
-                .solYear("2023")
+                .solYear(2023)
                 .solMonth("04")
                 .solDay("19")
                 .build()

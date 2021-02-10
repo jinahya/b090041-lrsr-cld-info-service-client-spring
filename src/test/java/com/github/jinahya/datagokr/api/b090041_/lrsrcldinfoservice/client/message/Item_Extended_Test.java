@@ -17,7 +17,7 @@ class Item_Extended_Test {
     void getLunarYear__(final Item item) {
         assertThat(item.getLunarYear())
                 .isNotNull()
-                .isEqualTo(Year.of(Integer.parseInt(item.getLunYear())));
+                .isEqualTo(Year.of(item.getLunYear()));
     }
 
     @ParameterizedTest

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 
-import static java.lang.Integer.parseInt;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -22,18 +21,19 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     void getSpcifyLunCalInfo() {
         final Item item = clientInstance().getLunCalInfo(LocalDate.now().withDayOfMonth(1)).blockLast();
         assertThat(item).isNotNull();
-        final Year solarYear = Year.parse(item.getSolYear(), Item.YEAR_FORMATTER);
+        final LocalDate solarDate = item.getSolarDate();
+        final Year solarYear = Year.from(solarDate);
         final Year fromSolarYear = solarYear.minusYears(10L);
         final Year toSolarYear = solarYear.plusYears(5L);
-        final Month lunarMonth = Month.of(parseInt(item.getLunMonth()));
-        final int lunarDayOfMonth = parseInt(item.getLunDay());
+        final Month lunarMonth = item.getLunarMonth();
+        final int lunarDayOfMonth = item.getLunarDayOfMonth();
         final boolean lunarLeapMonth = item.getLunarLeapMonth();
         assertThat(item).isNotNull();
         clientInstance().getSpcifyLunCalInfo(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(item.getLunMonth());
-                    assertThat(i.getLunDay()).isNotNull().isEqualTo(item.getLunDay());
-                    assertThat(i.getLunLeapmonth()).isNotNull().isEqualTo(item.getLunLeapmonth());
+                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarMonth);
+                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDayOfMonth);
+                    assertThat(i.getLunarLeapMonth()).isNotNull().isEqualTo(lunarLeapMonth);
                 })
                 .blockLast();
     }

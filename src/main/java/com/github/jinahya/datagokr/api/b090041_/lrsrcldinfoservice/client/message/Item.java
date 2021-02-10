@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -71,6 +72,14 @@ public class Item implements Serializable {
     public static final String LEAP = "\uc724";
 
     private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NON_LEAP + LEAP + ']';
+
+    static Boolean leapFlag(final String text) {
+        return ofNullable(text).map(LEAP::equals).orElse(null);
+    }
+
+    static String leapText(final Boolean flag) {
+        return ofNullable(flag).map(v -> v ? LEAP : NON_LEAP).orElse(null);
+    }
 
     // ------------------------------------------------------------------------------------------------------ formatters
 
@@ -285,11 +294,11 @@ public class Item implements Serializable {
     @XmlTransient
     @NotNull
     public Year getLunarYear() {
-        return ofNullable(getLunYear()).map(v -> Year.parse(v, YEAR_FORMATTER)).orElse(null);
+        return ofNullable(getLunYear()).map(Year::of).orElse(null);
     }
 
-    public void setLunarYear(final Year lunarYear) {
-        setLunYear(ofNullable(lunarYear).map(YEAR_FORMATTER::format).orElse(null));
+    void setLunarYear(final Year lunarYear) {
+        setLunYear(ofNullable(lunarYear).map(Year::getValue).orElse(null));
     }
 
     // ------------------------------------------------------------------------------------------- lunMonth / lunarMonth
@@ -300,7 +309,7 @@ public class Item implements Serializable {
         return ofNullable(getLunMonth()).map(MONTH_FORMATTER::parse).map(Month::from).orElse(null);
     }
 
-    public void setLunarMonth(final Month lunarMonth) {
+    void setLunarMonth(final Month lunarMonth) {
         setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
     }
 
@@ -325,32 +334,30 @@ public class Item implements Serializable {
     @XmlTransient
     @NotNull
     public Boolean getLunarLeapMonth() {
-        return ofNullable(getLunLeapmonth()).map(LEAP::equals).orElse(null);
+        return leapFlag(getLunLeapmonth());
     }
 
-    public void setLunarLeapMonth(final Boolean lunarLeapMonth) {
-        setLunLeapmonth(ofNullable(lunarLeapMonth).map(v -> v.equals(Boolean.TRUE) ? LEAP : NON_LEAP).orElse(null));
+    void setLunarLeapMonth(final Boolean lunarLeapMonth) {
+        setLunLeapmonth(leapText(lunarLeapMonth));
     }
 
     // --------------------------------------------------------------------------------------------- solYear / solarYear
     @JsonIgnore
     @XmlTransient
     @NotNull
-    Year getSolarYear() {
-        return ofNullable(getSolYear())
-                .map(v -> Year.parse(v, YEAR_FORMATTER))
-                .orElse(null);
+    public Year getSolarYear() {
+        return ofNullable(getSolYear()).map(Year::of).orElse(null);
     }
 
-    public void setSolarYear(final Year solarYear) {
-        setSolYear(ofNullable(solarYear).map(YEAR_FORMATTER::format).orElse(null));
+    void setSolarYear(final Year solarYear) {
+        setSolYear(ofNullable(solarYear).map(Year::getValue).orElse(null));
     }
 
     // ------------------------------------------------------------------------------------------- solMonth / solarMonth
     @JsonIgnore
     @XmlTransient
     @NotNull
-    Month getSolarMonth() {
+    public Month getSolarMonth() {
         return ofNullable(getSolMonth()).map(MONTH_FORMATTER::parse).map(Month::from).orElse(null);
     }
 
@@ -359,10 +366,16 @@ public class Item implements Serializable {
     }
 
     // ---------------------------------------------------------------------------------------- solDay / solarDayOfMonth
+
+    /**
+     * Returns current value of {@code solDay} as an integer.
+     *
+     * @return current value of {@code solDay} as an integer
+     */
     @JsonIgnore
     @XmlTransient
     @NotNull
-    Integer getSolarDayOfMonth() {
+    public Integer getSolarDayOfMonth() {
         return ofNullable(getSolDay())
                 .map(Integer::parseInt)
                 .orElse(null);
@@ -370,6 +383,24 @@ public class Item implements Serializable {
 
     void setSolarDayOfMonth(final Integer solarDayOfMonth) {
         setSolDay(ofNullable(solarDayOfMonth).map(Item::format02d).orElse(null));
+    }
+
+    // -------------------------------------------------------------------------------------- solLeapyear / solarLepYear
+    public Boolean getSolarLeapYear() {
+        return leapFlag(getSolLeapyear());
+    }
+
+    void setSolarLeapYear(final Boolean solarLeapYear) {
+        setSolLeapyear(leapText(solarLeapYear));
+    }
+
+    // ---------------------------------------------------------------------------------------- solWeek / solarDayOfWeek
+    public DayOfWeek getSolarDayOfWeek() {
+        return ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
+    }
+
+    void setSolarDayOfWeek(final DayOfWeek solarDayOfWeek) {
+        setSolWeek(ofNullable(solarDayOfWeek).map(WEEK_FORMATTER::format).orElse(null));
     }
 
     // ----------------------------------------------------------------------------------------------------------- solJd
@@ -380,7 +411,21 @@ public class Item implements Serializable {
         return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
     }
 
+    public Long getSolarJulianDay() {
+        return getSolJd();
+    }
+
+    void setSolarJulianDay(final Long solarJulianDay) {
+        setSolJd(solarJulianDay);
+    }
+
     // ------------------------------------------------------------------------------------------------------- solarDate
+
+    /**
+     * Returns a local date of {@code solYear}, {@code solMonth}, and {@code solDay}.
+     *
+     * @return a local date of {@code solYear}, {@code solMonth}, and {@code solDay}.
+     */
     @JsonIgnore
     @XmlTransient
     @NotNull
@@ -390,22 +435,28 @@ public class Item implements Serializable {
                             requireNonNull(getSolarDayOfMonth(), "getSolarDayOfMonth() is null"));
     }
 
-    public void setSolarDate(final LocalDate solarDate) {
+    /**
+     * Replaces {@code solYear}, {@code solMonth}, {@code solDay}, {@code solLeapyear}, {@code solWeek}, and {@code
+     * solJd} with specified solar local date.
+     *
+     * @param solarDate the solar local date.
+     */
+    void setSolarDate(final LocalDate solarDate) {
         if (solarDate == null) {
             setSolarYear(null);
             setSolarMonth(null);
             setSolarDayOfMonth(null);
-            setSolLeapyear(null);
-            setSolWeek(null);
-            setSolJd(null);
+            setSolarLeapYear(null);
+            setSolarDayOfWeek(null);
+            setSolarJulianDay(null);
             return;
         }
         setSolarYear(Year.from(solarDate));
         setSolarMonth(solarDate.getMonth());
         setSolarDayOfMonth(solarDate.getDayOfMonth());
-        setSolLeapyear(solarDate.isLeapYear() ? LEAP : NON_LEAP);
-        setSolWeek(WEEK_FORMATTER.format(solarDate));
-        setSolJd(solarDate.getLong(JulianFields.JULIAN_DAY));
+        setSolarLeapYear(solarDate.isLeapYear());
+        setSolarDayOfWeek(solarDate.getDayOfWeek());
+        setSolarJulianDay(solarDate.getLong(JulianFields.JULIAN_DAY));
     }
 
     Item solarDate(final LocalDate solarDate) {
@@ -413,13 +464,13 @@ public class Item implements Serializable {
         return this;
     }
 
-    // ---------------------------------------------------------------------------------------------------------- fields
+    // ----------------------------------------------------------------------------------------- lunar \ instance fields
     @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
+    @Positive
+    @NotNull
+    @XmlSchemaType(name = "unsignedShort")
     @XmlElement(required = true)
-    private String lunYear;
+    private Integer lunYear;
 
     @JsonProperty(required = true)
     @NotBlank
@@ -470,12 +521,13 @@ public class Item implements Serializable {
     @XmlElement(required = true)
     private String lunIljin;
 
+    // ----------------------------------------------------------------------------------------- solar \ instance fields
     @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
+    @Positive
+    @NotNull
+    @XmlSchemaType(name = "unsignedShort")
     @XmlElement(required = true)
-    private String solYear;
+    private Integer solYear;
 
     @JsonProperty(required = true)
     @NotBlank

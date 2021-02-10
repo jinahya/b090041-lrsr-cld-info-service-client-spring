@@ -50,7 +50,7 @@ class LrsrCldInfoServiceClientIT
                             }
                     )
                     .setConnectTimeout(Duration.ofSeconds(10L))
-                    .setReadTimeout(Duration.ofSeconds(30L))
+                    .setReadTimeout(Duration.ofSeconds(60L))
                     .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
 //                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE) // n/a with 2.1.18.RELEASE
                     .build();

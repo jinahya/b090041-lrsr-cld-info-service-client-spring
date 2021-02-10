@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.util.Comparator.naturalOrder;
-import static java.util.Optional.ofNullable;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,16 +29,13 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     void getSolCalInfo_() {
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
         final Integer lunDay = current().nextBoolean() ? lunarDate.getDayOfMonth() : null;
-        final String lunYearExpected = Item.YEAR_FORMATTER.format(lunarDate);
-        final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarDate);
-        final String lunDayExpected = ofNullable(lunDay).map(Item::formatDay).orElse(null);
         clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunDay, null)
                 .doOnNext(r -> {
                     assertThat(r.getBody().getItems()).isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-                        assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYearExpected);
-                        assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonthExpected);
+                        assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarDate));
+                        assertThat(i.getLunarMonth()).isNotNull().isSameAs(Month.from(lunarDate));
                         if (lunDay != null) {
-                            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDayExpected);
+                            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
                         }
                     });
                 })
@@ -51,14 +47,11 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_LunarDate() {
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
-        final String lunYear = Item.YEAR_FORMATTER.format(lunarDate);
-        final String lunMonth = Item.MONTH_FORMATTER.format(lunarDate);
-        final String lunDay = Item.DAY_FORMATTER.format(lunarDate);
-        clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunarDate.getDayOfMonth())
+        clientInstance().getSolCalInfo(Year.from(lunarDate), lunarDate.getMonth(), lunarDate.getDayOfMonth())
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
-                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
-                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarDate));
+                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarDate.getMonth());
+                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
                 })
                 .blockLast();
     }
@@ -68,12 +61,12 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_LunarYearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
-        final String lunYearExpected = Item.YEAR_FORMATTER.format(lunarYearMonth);
+        final int lunYearExpected = lunarYearMonth.getYear();
         final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarYearMonth);
         clientInstance().getSolCalInfo(lunarYearMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYearExpected);
-                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonthExpected);
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
+                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarYearMonth.getMonth());
                 })
                 .blockLast();
     }
@@ -83,11 +76,10 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_Year() {
         final Year lunarYear = Year.now();
-        final String expectedLunYear = Item.YEAR_FORMATTER.format(lunarYear);
         final Map<String, List<String>> map
                 = clientInstance().getSolCalInfo(lunarYear, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(expectedLunYear);
+                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(lunarYear);
                 })
                 .<Map<String, List<String>>>collect(
                         TreeMap::new,

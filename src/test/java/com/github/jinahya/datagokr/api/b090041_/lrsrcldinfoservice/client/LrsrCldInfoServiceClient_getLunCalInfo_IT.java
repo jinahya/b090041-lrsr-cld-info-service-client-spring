@@ -13,9 +13,6 @@ import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.LEAP;
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.NON_LEAP;
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item.YEAR_FORMATTER;
 import static java.util.concurrent.ForkJoinPool.commonPool;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,17 +24,19 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     @Test
     void getLunCalInfo_Expected_SolarDate() {
         final LocalDate solarDate = LocalDate.now();
-        final String solYear = Item.YEAR_FORMATTER.format(solarDate);
-        final String solMonth = Item.MONTH_FORMATTER.format(solarDate);
-        final String solDay = Item.DAY_FORMATTER.format(solarDate);
-        assertThat(clientInstance().getLunCalInfo(solarDate)).isNotNull().isNotEmpty().allSatisfy(i -> {
-            assertThat(i).isNotNull();
-            assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
-            assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
-            assertThat(i.getSolDay()).isNotNull().isEqualTo(solDay);
-            assertThat(i.getSolLeapyear()).isEqualTo(solarDate.isLeapYear() ? LEAP : NON_LEAP);
-            assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
-        });
+        assertThat(clientInstance().getLunCalInfo(solarDate))
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarDate));
+                    assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarDate.getMonth());
+                    assertThat(i.getSolarDayOfMonth()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
+                    assertThat(i.getSolarDayOfWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
+                    assertThat(i.getSolarLeapYear()).isNotNull().isEqualTo(solarDate.isLeapYear());
+                    assertThat(i.getSolarJulianDay()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
+                })
+        ;
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
@@ -47,10 +46,8 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
         final YearMonth solarYearMonth = YearMonth.now();
         final List<Item> items = clientInstance().getLunCalInfo(solarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            final String solYear = Item.YEAR_FORMATTER.format(solarYearMonth);
-            final String solMonth = Item.MONTH_FORMATTER.format(solarYearMonth);
-            assertThat(i.getSolYear()).isNotNull().isEqualTo(solYear);
-            assertThat(i.getSolMonth()).isNotNull().isEqualTo(solMonth);
+            assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
+            assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
         });
     }
 
@@ -60,13 +57,9 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
     void getLunCalInfo_Expected_SolarYear() {
         final List<Item> items = new ArrayList<>();
         final Year solarYear = Year.now();
-        final String expectedSolYear = YEAR_FORMATTER.format(solarYear);
         clientInstance().getLunCalInfo(solarYear, commonPool(), items);
-        items.sort(Item.COMPARING_SOLAR_DATE);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getSolYear()).isEqualTo(expectedSolYear);
+            assertThat(i.getSolarYear()).isNotNull().isEqualTo(solarYear);
         });
-        log.debug("first: {}", items.get(0));
-        log.debug("last: {}", items.get(items.size() - 1));
     }
 }
