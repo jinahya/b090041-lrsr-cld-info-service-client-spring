@@ -25,15 +25,15 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
         final Year solarYear = Year.from(solarDate);
         final Year fromSolarYear = solarYear.minusYears(10L);
         final Year toSolarYear = solarYear.plusYears(5L);
-        final Month lunarMonth = item.getLunarMonth();
-        final int lunarDayOfMonth = item.getLunarDayOfMonth();
-        final boolean lunarLeapMonth = item.getLunarLeapMonth();
+        final Month lunarMonth = item.getLunMonth();
+        final int lunarDayOfMonth = item.getLunDay();
+        final boolean lunarLeapMonth = item.getLunLeapmonth();
         assertThat(item).isNotNull();
         clientInstance().getSpcifyLunCalInfo(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarMonth);
-                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDayOfMonth);
-                    assertThat(i.getLunarLeapMonth()).isNotNull().isEqualTo(lunarLeapMonth);
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDayOfMonth);
+                    assertThat(i.getLunLeapmonth()).isNotNull().isEqualTo(lunarLeapMonth);
                 })
                 .blockLast();
     }

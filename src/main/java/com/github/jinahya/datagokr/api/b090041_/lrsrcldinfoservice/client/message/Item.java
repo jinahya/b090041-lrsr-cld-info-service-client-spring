@@ -1,21 +1,22 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.Format02dIntegerAdapter;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.LeapBooleanAdapter;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.MmMonthAdapter;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.SingleKoreanDayOfWeekAdapter;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.UuuuYearAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.xml.bind.Unmarshaller;
@@ -48,10 +49,8 @@ import static java.util.Optional.ofNullable;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@Setter
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@Builder(access = AccessLevel.PACKAGE)
+@Setter//(AccessLevel.PROTECTED)
+@Getter//(AccessLevel.PROTECTED)
 @Slf4j
 public class Item implements Serializable {
 
@@ -64,21 +63,21 @@ public class Item implements Serializable {
      *
      * @see #LEAP
      */
-    public static final String NON_LEAP = "\ud3c9";
+    public static final String NORMAL = "\ud3c9";
 
     /**
      * A value for representing a leaping year or month. The value is {@value}.
      */
     public static final String LEAP = "\uc724";
 
-    private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NON_LEAP + LEAP + ']';
+    private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NORMAL + LEAP + ']';
 
     static Boolean leapFlag(final String text) {
         return ofNullable(text).map(LEAP::equals).orElse(null);
     }
 
     static String leapText(final Boolean flag) {
-        return ofNullable(flag).map(v -> v ? LEAP : NON_LEAP).orElse(null);
+        return ofNullable(flag).map(v -> Boolean.TRUE.equals(v) ? LEAP : NORMAL).orElse(null);
     }
 
     // ------------------------------------------------------------------------------------------------------ formatters
@@ -131,7 +130,7 @@ public class Item implements Serializable {
      * A formatter for formatting {@link java.time.temporal.ChronoField#DAY_OF_WEEK} with {@link Locale#KOREAN KOREAN}
      * locale.
      */
-    private static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
+    static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -167,14 +166,14 @@ public class Item implements Serializable {
 
     private static Comparator<Item> comparingLunarDate(final Comparator<Item> leapMonthComparator) {
         requireNonNull(leapMonthComparator, "leapMonthComparator is null");
-        return comparing(Item::getLunarYear)
-                .thenComparing(Item::getLunarMonth)
+        return comparing(Item::getLunYear)
+                .thenComparing(Item::getLunMonth)
                 .thenComparing(leapMonthComparator)
-                .thenComparing(Item::getLunarDayOfMonth)
+                .thenComparing(Item::getLunDay)
                 ;
     }
 
-    private static final Comparator<Item> LEAP_MONTH_LAST = comparing(Item::getLunarLeapMonth);
+    private static final Comparator<Item> LEAP_MONTH_LAST = comparing(Item::getLunLeapmonth);
 
     private static final Comparator<Item> LEAP_MONTH_FIRST = LEAP_MONTH_LAST.reversed();
 
@@ -289,128 +288,36 @@ public class Item implements Serializable {
         }
     }
 
-    // --------------------------------------------------------------------------------------------- lunYear / lunarYear
-    @JsonIgnore
+    // --------------------------------------------------------------------------------------------------------- lunYear
+
+    // -------------------------------------------------------------------------------------------------------- lunMonth
+
+    // ---------------------------------------------------------------------------------------------------------- lunDay
+
+    // ---------------------------------------------------------------------------------------------------- lunLeapmomth
+
+    // --------------------------------------------------------------------------------------------------------- solYear
+
+    // -------------------------------------------------------------------------------------------------------- solMonth
+
+    // ---------------------------------------------------------------------------------------------------------- solDay
+
+    // ----------------------------------------------------------------------------------------------------- solLeapyear
+
+    // --------------------------------------------------------------------------------------------------------- solWeek
+    @JsonProperty(value = "solWeek", required = true)
     @XmlTransient
-    @NotNull
-    public Year getLunarYear() {
-        return ofNullable(getLunYear()).map(Year::of).orElse(null);
+    public Integer getSolWeekAsInteger() {
+        return ofNullable(getSolWeek()).map(DayOfWeek::getValue).orElse(null);
     }
 
-    void setLunarYear(final Year lunarYear) {
-        setLunYear(ofNullable(lunarYear).map(Year::getValue).orElse(null));
-    }
-
-    // ------------------------------------------------------------------------------------------- lunMonth / lunarMonth
-    @JsonIgnore
-    @XmlTransient
-    @NotNull
-    public Month getLunarMonth() {
-        return ofNullable(getLunMonth()).map(MONTH_FORMATTER::parse).map(Month::from).orElse(null);
-    }
-
-    void setLunarMonth(final Month lunarMonth) {
-        setLunMonth(ofNullable(lunarMonth).map(MONTH_FORMATTER::format).orElse(null));
-    }
-
-    // ---------------------------------------------------------------------------------------- lunDay / lunarDayOfMonth
-    @JsonIgnore
-    @XmlTransient
-    @Max(MAX_DAY_OF_MONTH_LUNAR)
-    @Min(MIN_DAY_OF_MONTH_LUNAR)
-    @NotNull
-    public Integer getLunarDayOfMonth() {
-        return ofNullable(getLunDay())
-                .map(Integer::parseInt)
-                .orElse(null);
-    }
-
-    public void setLunarDayOfMonth(final Integer lunarDayOfMonth) {
-        setLunDay(ofNullable(lunarDayOfMonth).map(Item::format02d).orElse(null));
-    }
-
-    // ----------------------------------------------------------------------------------- lunLeapmomth / lunarLeapMonth
-    @JsonIgnore
-    @XmlTransient
-    @NotNull
-    public Boolean getLunarLeapMonth() {
-        return leapFlag(getLunLeapmonth());
-    }
-
-    void setLunarLeapMonth(final Boolean lunarLeapMonth) {
-        setLunLeapmonth(leapText(lunarLeapMonth));
-    }
-
-    // --------------------------------------------------------------------------------------------- solYear / solarYear
-    @JsonIgnore
-    @XmlTransient
-    @NotNull
-    public Year getSolarYear() {
-        return ofNullable(getSolYear()).map(Year::of).orElse(null);
-    }
-
-    void setSolarYear(final Year solarYear) {
-        setSolYear(ofNullable(solarYear).map(Year::getValue).orElse(null));
-    }
-
-    // ------------------------------------------------------------------------------------------- solMonth / solarMonth
-    @JsonIgnore
-    @XmlTransient
-    @NotNull
-    public Month getSolarMonth() {
-        return ofNullable(getSolMonth()).map(MONTH_FORMATTER::parse).map(Month::from).orElse(null);
-    }
-
-    void setSolarMonth(final Month solarMonth) {
-        setSolMonth(ofNullable(solarMonth).map(MONTH_FORMATTER::format).orElse(null));
-    }
-
-    // ---------------------------------------------------------------------------------------- solDay / solarDayOfMonth
-
-    /**
-     * Returns current value of {@code solDay} as an integer.
-     *
-     * @return current value of {@code solDay} as an integer
-     */
-    @JsonIgnore
-    @XmlTransient
-    @NotNull
-    public Integer getSolarDayOfMonth() {
-        return ofNullable(getSolDay())
-                .map(Integer::parseInt)
-                .orElse(null);
-    }
-
-    void setSolarDayOfMonth(final Integer solarDayOfMonth) {
-        setSolDay(ofNullable(solarDayOfMonth).map(Item::format02d).orElse(null));
-    }
-
-    // -------------------------------------------------------------------------------------- solLeapyear / solarLepYear
-    public Boolean getSolarLeapYear() {
-        return leapFlag(getSolLeapyear());
-    }
-
-    void setSolarLeapYear(final Boolean solarLeapYear) {
-        setSolLeapyear(leapText(solarLeapYear));
-    }
-
-    // ---------------------------------------------------------------------------------------- solWeek / solarDayOfWeek
-    public DayOfWeek getSolarDayOfWeek() {
-        return ofNullable(getSolWeek()).map(WEEK_FORMATTER::parse).map(DayOfWeek::from).orElse(null);
-    }
-
-    void setSolarDayOfWeek(final DayOfWeek solarDayOfWeek) {
-        setSolWeek(ofNullable(solarDayOfWeek).map(WEEK_FORMATTER::format).orElse(null));
+    public void setSolWeekAsInteger(final Integer solWeekAsInteger) {
+        setSolWeek(ofNullable(solWeekAsInteger).map(DayOfWeek::of).orElse(null));
     }
 
     // ----------------------------------------------------------------------------------------------------------- solJd
-    private @AssertTrue boolean isSolJdValid() {
-        if (solJd == null) {
-            return true;
-        }
-        return solJd == getSolarDate().getLong(JulianFields.JULIAN_DAY);
-    }
-
+    @JsonIgnore
+    @XmlTransient
     public Long getSolarJulianDay() {
         return getSolJd();
     }
@@ -428,11 +335,10 @@ public class Item implements Serializable {
      */
     @JsonIgnore
     @XmlTransient
-    @NotNull
     public LocalDate getSolarDate() {
-        return LocalDate.of(requireNonNull(getSolarYear(), "getSolarYear() is null").getValue(),
-                            requireNonNull(getSolarMonth(), "getSolarMonth() is null"),
-                            requireNonNull(getSolarDayOfMonth(), "getSolarDayOfMonth() is null"));
+        return LocalDate.of(requireNonNull(getSolYear(), "getSolYear() is null").getValue(),
+                            requireNonNull(getSolMonth(), "getSolMonth() is null"),
+                            requireNonNull(getSolDay(), "getSolDay() is null"));
     }
 
     /**
@@ -441,21 +347,21 @@ public class Item implements Serializable {
      *
      * @param solarDate the solar local date.
      */
-    void setSolarDate(final LocalDate solarDate) {
+    public void setSolarDate(final LocalDate solarDate) {
         if (solarDate == null) {
-            setSolarYear(null);
-            setSolarMonth(null);
-            setSolarDayOfMonth(null);
-            setSolarLeapYear(null);
-            setSolarDayOfWeek(null);
+            setSolYear(null);
+            setSolMonth(null);
+            setSolDay(null);
+            setSolLeapyear(null);
+            setSolWeek(null);
             setSolarJulianDay(null);
             return;
         }
-        setSolarYear(Year.from(solarDate));
-        setSolarMonth(solarDate.getMonth());
-        setSolarDayOfMonth(solarDate.getDayOfMonth());
-        setSolarLeapYear(solarDate.isLeapYear());
-        setSolarDayOfWeek(solarDate.getDayOfWeek());
+        setSolYear(Year.from(solarDate));
+        setSolMonth(solarDate.getMonth());
+        setSolDay(solarDate.getDayOfMonth());
+        setSolLeapyear(solarDate.isLeapYear());
+        setSolWeek(solarDate.getDayOfWeek());
         setSolarJulianDay(solarDate.getLong(JulianFields.JULIAN_DAY));
     }
 
@@ -465,40 +371,44 @@ public class Item implements Serializable {
     }
 
     // ----------------------------------------------------------------------------------------- lunar \ instance fields
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "yyyy")
     @JsonProperty(required = true)
-    @Positive
     @NotNull
+    @XmlJavaTypeAdapter(UuuuYearAdapter.class)
     @XmlSchemaType(name = "unsignedShort")
     @XmlElement(required = true)
-    private Integer lunYear;
+    private Year lunYear;
 
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "M")
     @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @NotNull
+    @XmlJavaTypeAdapter(MmMonthAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
-    private String lunMonth;
+    private Month lunMonth;
 
     @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @Max(MAX_DAY_OF_MONTH_LUNAR)
+    @Min(MIN_DAY_OF_MONTH_LUNAR)
+    @NotNull
+    @XmlJavaTypeAdapter(Format02dIntegerAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
-    private String lunDay;
+    private Integer lunDay;
 
     @JsonProperty
-    @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
     @NotNull
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlJavaTypeAdapter(LeapBooleanAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
-    private String lunLeapmonth;
+    private Boolean lunLeapmonth;
 
     @JsonProperty(required = true)
+    @Max(MAX_DAY_OF_MONTH_LUNAR)
     @Positive
     @XmlSchemaType(name = "unsignedByte")
     @XmlElement(required = true)
-    private int lunNday;
+    private Integer lunNday;
 
     @JsonProperty(required = true)
     @NotBlank
@@ -522,42 +432,46 @@ public class Item implements Serializable {
     private String lunIljin;
 
     // ----------------------------------------------------------------------------------------- solar \ instance fields
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "yyyy")
     @JsonProperty(required = true)
-    @Positive
     @NotNull
+    @XmlJavaTypeAdapter(UuuuYearAdapter.class)
     @XmlSchemaType(name = "unsignedShort")
     @XmlElement(required = true)
-    private Integer solYear;
+    private Year solYear;
 
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "M")
     @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
-    @XmlElement(required = true)
-    private String solMonth;
-
-    @JsonProperty(required = true)
-    @NotBlank
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
-    @XmlElement(required = true)
-    private String solDay;
-
-    @JsonProperty(required = true)
-    @Pattern(regexp = PATTERN_REGEXP_NORMAL_OR_LEAP)
     @NotNull
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlJavaTypeAdapter(MmMonthAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
-    private String solLeapyear;
+    private Month solMonth;
 
     @JsonProperty(required = true)
-    @Pattern(regexp = "[\uc6d4\ud654\uc218\ubaa9\uae08\ud1a0\uc77c]")
+    @Max(MAX_DAY_OF_MONTH_SOLAR)
+    @Min(MIN_DAY_OF_MONTH_SOLAR)
     @NotNull
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlJavaTypeAdapter(Format02dIntegerAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
-    private String solWeek;
+    private Integer solDay;
+
+    @JsonProperty(required = true)
+    @NotNull
+    @XmlJavaTypeAdapter(LeapBooleanAdapter.class)
+    @XmlSchemaType(name = "token")
+    @XmlElement(required = true)
+    private Boolean solLeapyear;
+
+    //@JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "E")
+    //@JsonProperty(required = true)
+    @JsonIgnore
+    @NotNull
+    @XmlJavaTypeAdapter(SingleKoreanDayOfWeekAdapter.class)
+    @XmlSchemaType(name = "token")
+    @XmlElement(required = true)
+    private DayOfWeek solWeek;
 
     @JsonProperty(required = true)
     @PositiveOrZero

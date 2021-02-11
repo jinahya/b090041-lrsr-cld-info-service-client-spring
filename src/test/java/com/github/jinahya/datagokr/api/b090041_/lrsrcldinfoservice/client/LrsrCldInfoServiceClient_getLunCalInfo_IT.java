@@ -29,11 +29,11 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
                 .isNotEmpty()
                 .doesNotContainNull()
                 .allSatisfy(i -> {
-                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarDate));
-                    assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarDate.getMonth());
-                    assertThat(i.getSolarDayOfMonth()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
-                    assertThat(i.getSolarDayOfWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
-                    assertThat(i.getSolarLeapYear()).isNotNull().isEqualTo(solarDate.isLeapYear());
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarDate));
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarDate.getMonth());
+                    assertThat(i.getSolDay()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
+                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(solarDate.isLeapYear());
+                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
                     assertThat(i.getSolarJulianDay()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
                 })
         ;
@@ -46,8 +46,8 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
         final YearMonth solarYearMonth = YearMonth.now();
         final List<Item> items = clientInstance().getLunCalInfo(solarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
-            assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
+            assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
+            assertThat(i.getSolMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
         });
     }
 
@@ -59,7 +59,7 @@ class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClient
         final Year solarYear = Year.now();
         clientInstance().getLunCalInfo(solarYear, commonPool(), items);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getSolarYear()).isNotNull().isEqualTo(solarYear);
+            assertThat(i.getSolYear()).isNotNull().isEqualTo(solarYear);
         });
     }
 }

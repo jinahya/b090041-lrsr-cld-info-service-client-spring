@@ -28,9 +28,9 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
         final List<Item> items = clientInstance().getSolCalInfo(
                 Year.from(lunarDate), Month.from(lunarDate), lunarDate.getDayOfMonth());
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-            assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
-            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+            assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
+            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
+            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
         });
     }
 
@@ -41,8 +41,8 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
         final YearMonth lunarYearMonth = YearMonth.now();
         final List<Item> items = clientInstance().getSolCalInfo(lunarYearMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
-            assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarYearMonth.getMonth());
+            assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
+            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunarYearMonth.getMonth());
         });
     }
 
@@ -54,7 +54,7 @@ class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClient
         final Year lunarYear = Year.now();
         clientInstance().getSolCalInfo(lunarYear, commonPool(), items);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunarYear()).isNotNull().isEqualTo(lunarYear);
+            assertThat(i.getLunYear()).isNotNull().isEqualTo(lunarYear);
         });
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
@@ -28,11 +29,11 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
         final LocalDate solarDate = LocalDate.now();
         clientInstance().getLunCalInfo(solarDate)
                 .doOnNext(i -> {
-                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarDate));
-                    assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarDate.getMonth());
-                    assertThat(i.getSolarDayOfMonth()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
-                    assertThat(i.getSolarDayOfWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
-                    assertThat(i.getSolarLeapYear()).isNotNull().isEqualTo(solarDate.isLeapYear());
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarDate));
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarDate.getMonth());
+                    assertThat(i.getSolDay()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
+                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(solarDate.isLeapYear());
+                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
                     assertThat(i.getSolarJulianDay()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
                 })
                 .blockLast();
@@ -45,8 +46,8 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
         final YearMonth solarYearMonth = YearMonth.now();
         clientInstance().getLunCalInfo(YearMonth.from(solarYearMonth))
                 .doOnNext(i -> {
-                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
-                    assertThat(i.getSolarMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
                 })
                 .blockLast();
     }
@@ -56,12 +57,12 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getLunCalInfo_Expected_Year() {
         final Year solarYear = Year.now();
-        final Map<String, List<String>> lunarMonthsAndDays
+        final Map<Month, List<Integer>> lunarMonthsAndDays
                 = clientInstance().getLunCalInfo(solarYear, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getSolarYear()).isNotNull().isEqualTo(Year.from(solarYear));
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYear));
                 })
-                .<Map<String, List<String>>>collect(
+                .<Map<Month, List<Integer>>>collect(
                         TreeMap::new,
                         (m, i) -> m.compute(i.getLunMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
                                 .add(i.getLunDay()))

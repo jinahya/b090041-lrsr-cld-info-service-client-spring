@@ -3,10 +3,9 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.messa
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,30 +19,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class Item_Static_Test {
 
-    static Item i20230229l() {
-        return Item.builder()
-                .lunYear(2023)
-                .lunMonth("02")
-                .lunDay("29")
-                .lunLeapmonth(Item.LEAP)
-                .solYear(2023)
-                .solMonth("04")
-                .solDay("19")
-                .build()
-                .solarDate(LocalDate.of(2023, Month.APRIL, 19));
+    /**
+     * Returns an item for {@code 2023-02-29(lunar/leap)} for {@code 2023-03-20(solar)}.
+     *
+     * @return an item for {@code 2023-02-29(lunar/leap)} for {@code 2023-03-20(solar)}.
+     * @see #itemOf20230229Leap()
+     */
+    static Item itemOf20230229Normal() {
+        final Item instance = new Item();
+        instance.setLunYear(Year.of(2023));
+        instance.setLunMonth(Month.FEBRUARY);
+        instance.setLunDay(29);
+        instance.setLunLeapmonth(Boolean.FALSE);
+        instance.setSolarDate(LocalDate.of(2023, Month.MARCH, 20));
+        return instance;
     }
 
-    static Item i20230229n() {
-        return Item.builder()
-                .lunYear(2023)
-                .lunMonth("02")
-                .lunDay("29")
-                .lunLeapmonth(Item.NON_LEAP)
-                .solYear(2023)
-                .solMonth("04")
-                .solDay("19")
-                .build()
-                .solarDate(LocalDate.of(2023, Month.MARCH, 20));
+    /**
+     * Returns an item for {@code 2023-02-29(lunar/normal)} for {@code 2023-04-19(solar)}.
+     *
+     * @return an item for {@code 2023-02-29(lunar/normal)} for {@code 2023-04-19(solar)}.
+     * @see #itemOf20230229Normal()
+     */
+    static Item itemOf20230229Leap() {
+        final Item instance = new Item();
+        instance.setLunYear(Year.of(2023));
+        instance.setLunMonth(Month.FEBRUARY);
+        instance.setLunDay(29);
+        instance.setLunLeapmonth(Boolean.TRUE);
+        instance.setSolarDate(LocalDate.of(2023, Month.APRIL, 19));
+        return instance;
     }
 
     /**
@@ -51,8 +56,8 @@ class Item_Static_Test {
      */
     @Test
     void COMPARING_LUNAR_DATE_LEAP_MONTH_FIRST_WorksAsExpected_() {
-        final Item leap = i20230229l();
-        final Item norm = i20230229n();
+        final Item leap = itemOf20230229Leap();
+        final Item norm = itemOf20230229Normal();
         final List<Item> items = Arrays.asList(norm, leap);
         items.sort(Item.COMPARING_LUNAR_DATE_LEAP_MONTH_FIRST);
         assertThat(items.get(0)).isEqualTo(leap);
@@ -64,18 +69,15 @@ class Item_Static_Test {
      */
     @Test
     void COMPARING_LUNAR_DATE_LEAP_MONTH_LAST_WorksAsExpected_() {
-        final Item leap = i20230229l();
-        final Item norm = i20230229n();
+        final Item leap = itemOf20230229Leap();
+        final Item norm = itemOf20230229Normal();
         final List<Item> items = Arrays.asList(leap, norm);
         items.sort(Item.COMPARING_LUNAR_DATE_LEAP_MONTH_LAST);
         assertThat(items.get(0)).isEqualTo(norm);
         assertThat(items.get(1)).isEqualTo(leap);
     }
 
-    public Item_Static_Test() {
+    Item_Static_Test() {
         super();
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
-
-    private final Validator validator;
 }

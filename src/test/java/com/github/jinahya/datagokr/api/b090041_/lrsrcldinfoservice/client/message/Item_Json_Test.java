@@ -8,12 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class Item_Json_Test {
 
-    @MethodSource({"com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ItemTest#items"})
+    static Stream<Item> items() {
+        return ItemTest.items();
+    }
+
+    @MethodSource({"items"})
     @ParameterizedTest
     void _Jackson_(final Item expected) throws Exception {
         // not available in 2.1.18.RELEASE
@@ -25,6 +31,7 @@ class Item_Json_Test {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.registerModules(new ParameterNamesModule(), new Jdk8Module(), new JavaTimeModule());
         final String string = mapper.writeValueAsString(expected);
+        log.debug("string: {}", string);
         final Item actual = mapper.readValue(string, Item.class);
         assertThat(actual).isEqualTo(expected);
     }

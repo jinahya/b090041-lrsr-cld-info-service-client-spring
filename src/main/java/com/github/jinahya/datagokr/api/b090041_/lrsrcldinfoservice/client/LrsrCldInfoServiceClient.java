@@ -397,7 +397,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
                 .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, Item.YEAR_FORMATTER.format(toSolYear))
                 .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
                 .queryParam(QUERY_PARAM_NAME_LUN_DAY, Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay)))
-                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NON_LEAP);
+                .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonth ? Item.LEAP : Item.NORMAL);
         ofNullable(pageNo).ifPresent(v -> builder.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
         final URI url = builder.encode().build().toUri();
         return unwrap(restTemplate().exchange(url, HttpMethod.GET, null, Response.class));

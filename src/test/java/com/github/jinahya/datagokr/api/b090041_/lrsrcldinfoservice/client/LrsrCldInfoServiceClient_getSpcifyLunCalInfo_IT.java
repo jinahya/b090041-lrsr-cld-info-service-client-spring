@@ -21,18 +21,18 @@ class LrsrCldInfoServiceClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoService
     @Test
     void getSpcifyLunCalInfo_() {
         final Item item = clientInstance().getLunCalInfo(LocalDate.now().withDayOfMonth(1)).get(0);
-        final Year solarYear = item.getSolarYear();
+        final Year solarYear = item.getSolYear();
         final Year fromSolarYear = solarYear.minusYears(10L);
         final Year toSolarYear = solarYear.plusYears(5L);
-        final Month lunarMonth = item.getLunarMonth();
-        final int lunarDayOfMonth = item.getLunarDayOfMonth();
-        final boolean lunarLeapMonth = item.getLunarLeapMonth();
+        final Month lunarMonth = item.getLunMonth();
+        final int lunarDayOfMonth = item.getLunDay();
+        final boolean lunarLeapMonth = item.getLunLeapmonth();
         final List<Item> items = clientInstance().getSpcifyLunCalInfo(
                 fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth);
         assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunarMonth()).isNotNull().isEqualTo(lunarMonth);
-            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDayOfMonth);
-            assertThat(i.getLunarLeapMonth()).isNotNull().isEqualTo(lunarLeapMonth);
+            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunarMonth);
+            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDayOfMonth);
+            assertThat(i.getLunLeapmonth()).isNotNull().isEqualTo(lunarLeapMonth);
         });
     }
 }

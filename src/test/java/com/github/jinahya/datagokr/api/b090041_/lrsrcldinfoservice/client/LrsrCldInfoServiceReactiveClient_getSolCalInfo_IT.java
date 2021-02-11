@@ -32,10 +32,10 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
         clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunDay, null)
                 .doOnNext(r -> {
                     assertThat(r.getBody().getItems()).isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-                        assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-                        assertThat(i.getLunarMonth()).isNotNull().isSameAs(Month.from(lunarDate));
+                        assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
+                        assertThat(i.getLunMonth()).isNotNull().isSameAs(Month.from(lunarDate));
                         if (lunDay != null) {
-                            assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+                            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
                         }
                     });
                 })
@@ -49,9 +49,9 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
         clientInstance().getSolCalInfo(Year.from(lunarDate), lunarDate.getMonth(), lunarDate.getDayOfMonth())
                 .doOnNext(i -> {
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarDate.getMonth());
-                    assertThat(i.getLunarDayOfMonth()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarDate.getMonth());
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
                 })
                 .blockLast();
     }
@@ -65,8 +65,8 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
         final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarYearMonth);
         clientInstance().getSolCalInfo(lunarYearMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
-                    assertThat(i.getLunarMonth()).isNotNull().isSameAs(lunarYearMonth.getMonth());
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarYearMonth.getMonth());
                 })
                 .blockLast();
     }
@@ -76,12 +76,12 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_Year() {
         final Year lunarYear = Year.now();
-        final Map<String, List<String>> map
+        final Map<Month, List<Integer>> map
                 = clientInstance().getSolCalInfo(lunarYear, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getLunarYear()).isNotNull().isEqualTo(lunarYear);
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunarYear);
                 })
-                .<Map<String, List<String>>>collect(
+                .<Map<Month, List<Integer>>>collect(
                         TreeMap::new,
                         (m, i) -> m.compute(i.getLunMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
                                 .add(i.getLunDay()))

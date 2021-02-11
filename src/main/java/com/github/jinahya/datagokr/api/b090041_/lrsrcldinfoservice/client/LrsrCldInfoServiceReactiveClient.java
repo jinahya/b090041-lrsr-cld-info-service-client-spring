@@ -357,7 +357,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         final String toSolYearValue = Item.YEAR_FORMATTER.format(toSolYear);
         final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
         final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
-        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NON_LEAP;
+        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
         return webClient
                 .get()
                 .uri(b -> b
