@@ -84,6 +84,17 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         super();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    @Autowired
+    private void onPostConstruct() {
+        if (webClient == null) {
+            log.warn("no web client autowired. using a default instance...");
+            webClient = WebClient.builder()
+                    .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
+                    .build();
+        }
+    }
+
     // -------------------------------------------------------------------------------------------------- /getLunCalInfo
 
     /**

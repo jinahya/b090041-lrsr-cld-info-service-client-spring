@@ -122,6 +122,11 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     private void onPostConstruct() {
+        if (restTemplate == null) {
+            log.warn("no rest template autowired. using default instance...");
+            restTemplate = new RestTemplate();
+            restTemplateRootUri = AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION;
+        }
         rootUri = restTemplate.getUriTemplateHandler().expand("/");
         if (restTemplateRootUri != null) {
             log.info("custom root uri specified: {}", restTemplateRootUri);
@@ -425,7 +430,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
 
     // ------------------------------------------------------------------------------------------------- instance fields
     @LrsrCldInfoServiceRestTemplate
-    @Autowired
+    @Autowired(required = false)
     @Accessors(fluent = true)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.PROTECTED)
@@ -438,7 +443,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @Autowired(required = false)
     @Accessors(fluent = true)
     @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
+    @Getter(AccessLevel.PACKAGE)
     private String restTemplateRootUri;
 
     /**
