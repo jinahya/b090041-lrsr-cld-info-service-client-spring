@@ -32,13 +32,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.JulianFields;
 import java.util.Comparator;
-import java.util.Locale;
 import java.util.Objects;
 
-import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -49,8 +46,8 @@ import static java.util.Optional.ofNullable;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@Setter//(AccessLevel.PROTECTED)
-@Getter//(AccessLevel.PROTECTED)
+@Setter
+@Getter
 @Slf4j
 public class Item implements Serializable {
 
@@ -69,68 +66,6 @@ public class Item implements Serializable {
      * A value for representing a leaping year or month. The value is {@value}.
      */
     public static final String LEAP = "\uc724";
-
-    private static final String PATTERN_REGEXP_NORMAL_OR_LEAP = '[' + NORMAL + LEAP + ']';
-
-    static Boolean leapFlag(final String text) {
-        return ofNullable(text).map(LEAP::equals).orElse(null);
-    }
-
-    static String leapText(final Boolean flag) {
-        return ofNullable(flag).map(v -> Boolean.TRUE.equals(v) ? LEAP : NORMAL).orElse(null);
-    }
-
-    // ------------------------------------------------------------------------------------------------------ formatters
-
-    /**
-     * The formatter for {@code solYear} and {@code lunYear}.
-     */
-    public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("uuuu");
-
-    /**
-     * The formatter for {@code solMonth} and {@code lunMonth}.
-     */
-    public static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MM");
-
-    /**
-     * The formatter for {@code solDay} and {@code lunDay}.
-     */
-    public static final DateTimeFormatter DAY_FORMATTER = DateTimeFormatter.ofPattern("dd");
-
-    /**
-     * Formats specified day-of-month value as {@code %02d}.
-     *
-     * @param dayOfMonth the value to format.
-     * @return a formatted string.
-     */
-    public static String formatDay(final int dayOfMonth) {
-        if (dayOfMonth < MIN_DAY_OF_MONTH_SOLAR || dayOfMonth > MAX_DAY_OF_MONTH_SOLAR) {
-            throw new IllegalArgumentException("invalid dayOfMonth: " + dayOfMonth);
-        }
-        return format02d(dayOfMonth);
-    }
-
-    /**
-     * Formats specified as {@code %02d}.
-     *
-     * @param parsed the value to format.
-     * @return a formatted string.
-     */
-    static String format02d(final Integer parsed) {
-        return ofNullable(parsed).map(v -> format("%1$02d", v)).orElse(null);
-    }
-
-    // TODO: Remove, unused.
-    @Deprecated
-    static Integer parse02d(final String formatted) {
-        return ofNullable(formatted).map(Integer::parseInt).orElse(null);
-    }
-
-    /**
-     * A formatter for formatting {@link java.time.temporal.ChronoField#DAY_OF_WEEK} with {@link Locale#KOREAN KOREAN}
-     * locale.
-     */
-    static final DateTimeFormatter WEEK_FORMATTER = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -155,14 +90,14 @@ public class Item implements Serializable {
      */
     public static final int MIN_DAY_OF_MONTH_SOLAR = 1;
 
-    // ----------------------------------------------------------------------------------------------------- comparators
-
     /**
      * The maximum value of day-of-month in solar calendar which is {@value}.
      *
      * @see #MIN_DAY_OF_MONTH_SOLAR
      */
     public static final int MAX_DAY_OF_MONTH_SOLAR = 31;
+
+    // ----------------------------------------------------------------------------------------------------- comparators
 
     private static Comparator<Item> comparingLunarDate(final Comparator<Item> leapMonthComparator) {
         requireNonNull(leapMonthComparator, "leapMonthComparator is null");
@@ -231,31 +166,27 @@ public class Item implements Serializable {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        final Item that = (Item) obj;
-        return lunNday == that.lunNday
-               && Objects.equals(lunYear, that.lunYear)
-               && Objects.equals(lunMonth, that.lunMonth)
-               && Objects.equals(lunDay, that.lunDay)
-               && Objects.equals(lunLeapmonth, that.lunLeapmonth)
-               && Objects.equals(lunSecha, that.lunSecha)
-               && Objects.equals(lunWolgeon, that.lunWolgeon)
-               && Objects.equals(lunIljin, that.lunIljin)
-               && Objects.equals(solYear, that.solYear)
-               && Objects.equals(solMonth, that.solMonth)
-               && Objects.equals(solDay, that.solDay)
-               && Objects.equals(solLeapyear, that.solLeapyear)
-               && Objects.equals(solWeek, that.solWeek)
-               && Objects.equals(solJd, that.solJd);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Objects.equals(lunYear, item.lunYear)
+               && lunMonth == item.lunMonth
+               && Objects.equals(lunDay, item.lunDay)
+               && Objects.equals(lunLeapmonth, item.lunLeapmonth)
+               && Objects.equals(lunNday, item.lunNday)
+               && Objects.equals(lunSecha, item.lunSecha)
+               && Objects.equals(lunWolgeon, item.lunWolgeon)
+               && Objects.equals(lunIljin, item.lunIljin)
+               && Objects.equals(solYear, item.solYear)
+               && solMonth == item.solMonth
+               && Objects.equals(solDay, item.solDay)
+               && Objects.equals(solLeapyear, item.solLeapyear)
+               && solWeek == item.solWeek
+               && Objects.equals(solJd, item.solJd)
+                ;
     }
 
-    /**
-     * Returns a hash code value for the object.
-     *
-     * @return a hash code value for this object.
-     */
     @Override
     public int hashCode() {
         return Objects.hash(
@@ -316,15 +247,6 @@ public class Item implements Serializable {
     }
 
     // ----------------------------------------------------------------------------------------------------------- solJd
-    @JsonIgnore
-    @XmlTransient
-    public Long getSolarJulianDay() {
-        return getSolJd();
-    }
-
-    void setSolarJulianDay(final Long solarJulianDay) {
-        setSolJd(solarJulianDay);
-    }
 
     // ------------------------------------------------------------------------------------------------------- solarDate
 
@@ -354,7 +276,7 @@ public class Item implements Serializable {
             setSolDay(null);
             setSolLeapyear(null);
             setSolWeek(null);
-            setSolarJulianDay(null);
+            setSolJd(null);
             return;
         }
         setSolYear(Year.from(solarDate));
@@ -362,7 +284,7 @@ public class Item implements Serializable {
         setSolDay(solarDate.getDayOfMonth());
         setSolLeapyear(solarDate.isLeapYear());
         setSolWeek(solarDate.getDayOfWeek());
-        setSolarJulianDay(solarDate.getLong(JulianFields.JULIAN_DAY));
+        setSolJd(solarDate.getLong(JulianFields.JULIAN_DAY));
     }
 
     Item solarDate(final LocalDate solarDate) {
@@ -464,8 +386,6 @@ public class Item implements Serializable {
     @XmlElement(required = true)
     private Boolean solLeapyear;
 
-    //@JsonFormat(shape = JsonFormat.Shape.NUMBER, pattern = "E")
-    //@JsonProperty(required = true)
     @JsonIgnore
     @NotNull
     @XmlJavaTypeAdapter(SingleKoreanDayOfWeekAdapter.class)

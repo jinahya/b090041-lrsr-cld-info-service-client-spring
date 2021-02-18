@@ -1,6 +1,5 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +11,9 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static java.util.Comparator.naturalOrder;
 import static java.util.concurrent.ThreadLocalRandom.current;
@@ -61,8 +60,6 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
     @Test
     void getSolCalInfo_Expected_LunarYearMonth() {
         final YearMonth lunarYearMonth = YearMonth.now();
-        final int lunYearExpected = lunarYearMonth.getYear();
-        final String lunMonthExpected = Item.MONTH_FORMATTER.format(lunarYearMonth);
         clientInstance().getSolCalInfo(lunarYearMonth)
                 .doOnNext(i -> {
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
@@ -82,7 +79,7 @@ class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServi
                     assertThat(i.getLunYear()).isNotNull().isEqualTo(lunarYear);
                 })
                 .<Map<Month, List<Integer>>>collect(
-                        TreeMap::new,
+                        () -> new EnumMap<>(Month.class),
                         (m, i) -> m.compute(i.getLunMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
                                 .add(i.getLunDay()))
                 .block();

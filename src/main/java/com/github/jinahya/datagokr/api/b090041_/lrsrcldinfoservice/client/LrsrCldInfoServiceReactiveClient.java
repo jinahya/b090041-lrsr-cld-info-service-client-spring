@@ -31,7 +31,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,12 +107,11 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .uri(b -> {
                     b.pathSegment(PATH_SEGMENT_GET_LUN_CAL_INFO)
                             .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                            .queryParam(QUERY_PARAM_NAME_SOL_YEAR, Item.YEAR_FORMATTER.format(solYear))
-                            .queryParam(QUERY_PARAM_NAME_SOL_MONTH, Item.MONTH_FORMATTER.format(solMonth))
+                            .queryParam(QUERY_PARAM_NAME_SOL_YEAR, solYear.getValue())
+                            .queryParam(QUERY_PARAM_NAME_SOL_MONTH, MONTH_FORMATTER.format(solMonth))
                     ;
                     ofNullable(solDay)
-                            .map(v -> MonthDay.of(solMonth, v))
-                            .map(Item.DAY_FORMATTER::format)
+                            .map(AbstractLrsrCldInfoServiceClient::format02d)
                             .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_SOL_DAY, v));
                     ofNullable(pageNo).ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
                     return b.build();
@@ -232,11 +230,11 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
                 .uri(b -> {
                     b.pathSegment(PATH_SEGMENT_GET_SOL_CAL_INFO)
                             .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                            .queryParam(QUERY_PARAM_NAME_LUN_YEAR, Item.YEAR_FORMATTER.format(lunYear))
-                            .queryParam(QUERY_PARAM_NAME_LUN_MONTH, Item.MONTH_FORMATTER.format(lunMonth))
+                            .queryParam(QUERY_PARAM_NAME_LUN_YEAR, lunYear.getValue())
+                            .queryParam(QUERY_PARAM_NAME_LUN_MONTH, MONTH_FORMATTER.format(lunMonth))
                     ;
                     ofNullable(lunDay)
-                            .map(Item::formatDay)
+                            .map(AbstractLrsrCldInfoServiceClient::format02d)
                             .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_LUN_DAY, v));
                     ofNullable(pageNo)
                             .ifPresent(v -> b.queryParam(QUERY_PARAM_NAME_PAGE_NO, v));
@@ -353,21 +351,16 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
             throw new IllegalArgumentException(
                     "toSolYear(" + toSolYear + ") is before fromSolYear(" + fromSolYear + ")");
         }
-        final String fromSolYearValue = Item.YEAR_FORMATTER.format(fromSolYear);
-        final String toSolYearValue = Item.YEAR_FORMATTER.format(toSolYear);
-        final String lunMonthValue = Item.MONTH_FORMATTER.format(lunMonth);
-        final String lunDayValue = Item.DAY_FORMATTER.format(MonthDay.of(lunMonth, lunDay));
-        final String leapMonthValue = leapMonth ? Item.LEAP : Item.NORMAL;
         return webClient
                 .get()
                 .uri(b -> b
                         .pathSegment(PATH_SEGMENT_GET_SPCIFY_LUN_CAL_INFO)
                         .queryParam(QUERY_PARAM_NAME_SERVICE_KEY, serviceKey())
-                        .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYearValue)
-                        .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYearValue)
-                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, lunMonthValue)
-                        .queryParam(QUERY_PARAM_NAME_LUN_DAY, lunDayValue)
-                        .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, leapMonthValue)
+                        .queryParam(QUERY_PARAM_NAME_FROM_SOL_YEAR, fromSolYear.getValue())
+                        .queryParam(QUERY_PARAM_NAME_TO_SOL_YEAR, toSolYear.getValue())
+                        .queryParam(QUERY_PARAM_NAME_LUN_MONTH, MONTH_FORMATTER.format(lunMonth))
+                        .queryParam(QUERY_PARAM_NAME_LUN_DAY, format02d(lunDay))
+                        .queryParam(QUERY_PARAM_NAME_LEAP_MONTH, queryParamValueLeapMonth(leapMonth))
                         .queryParam(QUERY_PARAM_NAME_PAGE_NO, pageNo)
                         .build()
                 )

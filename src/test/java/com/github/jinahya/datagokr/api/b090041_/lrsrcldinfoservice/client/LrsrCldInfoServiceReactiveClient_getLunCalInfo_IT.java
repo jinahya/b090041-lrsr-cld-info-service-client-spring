@@ -12,9 +12,9 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static java.util.Comparator.naturalOrder;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,7 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                     assertThat(i.getSolDay()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
                     assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(solarDate.isLeapYear());
                     assertThat(i.getSolWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
-                    assertThat(i.getSolarJulianDay()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
+                    assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
                 })
                 .blockLast();
     }
@@ -63,7 +63,7 @@ class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServi
                     assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYear));
                 })
                 .<Map<Month, List<Integer>>>collect(
-                        TreeMap::new,
+                        () -> new EnumMap<>(Month.class),
                         (m, i) -> m.compute(i.getLunMonth(), (k, v) -> v == null ? new ArrayList<>() : v)
                                 .add(i.getLunDay()))
                 .block();

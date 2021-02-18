@@ -1,5 +1,6 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 /**
  * An abstract parent class for client classes.
@@ -104,10 +110,45 @@ public abstract class AbstractLrsrCldInfoServiceClient {
      */
     public static final String QUERY_PARAM_NAME_LEAP_MONTH = "leapMonth";
 
+    static String queryParamValueLeapMonth(final boolean leapMonth) {
+        return leapMonth ? Item.LEAP : Item.NORMAL;
+    }
+
     /**
      * A query parameter name for the page number. The value is {@value}.
      */
     public static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
+
+    // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * The formatter for {@code solMonth} and {@code lunMonth}.
+     */
+    public static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MM");
+
+    /**
+     * The formatter for {@code solMonth} and {@code lunMonth}.
+     */
+    public static final DateTimeFormatter DAY_FORMATTER = DateTimeFormatter.ofPattern("dd");
+
+    /**
+     * Formats specified day-of-month value as {@code %02d}.
+     *
+     * @param dayOfMonth the value to format.
+     * @return a formatted string.
+     */
+    public static String formatDay(final int dayOfMonth) {
+        return format02d(dayOfMonth);
+    }
+
+    /**
+     * Formats specified as {@code %02d}.
+     *
+     * @param parsed the value to format.
+     * @return a formatted string.
+     */
+    static String format02d(final Integer parsed) {
+        return ofNullable(parsed).map(v -> format("%1$02d", v)).orElse(null);
+    }
 
     // -------------------------------------------------------------------------------------------- injection qualifiers
 
