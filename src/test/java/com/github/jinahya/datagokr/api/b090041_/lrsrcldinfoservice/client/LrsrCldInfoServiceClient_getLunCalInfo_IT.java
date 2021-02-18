@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.JulianFields;
@@ -20,46 +21,58 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LrsrCldInfoServiceClient_getLunCalInfo_IT extends LrsrCldInfoServiceClientIT {
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getLunCalInfo(solarDate)")
+    @DisplayName("getLunCalInfo(year, month, dayOfMonth)")
     @Test
-    void getLunCalInfo_Expected_SolarDate() {
-        final LocalDate solarDate = LocalDate.now();
-        assertThat(clientInstance().getLunCalInfo(solarDate))
+    void getLunCalInfo_Expected_YearMonthDay() {
+        final LocalDate now = LocalDate.now();
+        final Year year = Year.from(now);
+        final Month month = now.getMonth();
+        final int dayOfMonth = now.getDayOfMonth();
+        assertThat(clientInstance().getLunCalInfo(year, month, dayOfMonth))
                 .isNotNull()
                 .isNotEmpty()
                 .doesNotContainNull()
                 .allSatisfy(i -> {
-                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarDate));
-                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarDate.getMonth());
-                    assertThat(i.getSolDay()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
-                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(solarDate.isLeapYear());
-                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
-                    assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(month);
+                    assertThat(i.getSolDay()).isNotNull().isEqualTo(dayOfMonth);
+                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(now.isLeapYear());
+                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(now.getDayOfWeek());
+                    assertThat(i.getSolJd()).isNotNull().isEqualTo(now.getLong(JulianFields.JULIAN_DAY));
                 })
         ;
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getLunCalInfo(solarYearMonth)")
+    @DisplayName("getLunCalInfo(year, month, null)")
     @Test
-    void getLunCalInfo_Expected_SolarYearMonth() {
-        final YearMonth solarYearMonth = YearMonth.now();
-        final List<Item> items = clientInstance().getLunCalInfo(solarYearMonth);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
-            assertThat(i.getSolMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
-        });
+    void getLunCalInfo_Expected_YearMonth() {
+        final YearMonth now = YearMonth.now();
+        final Year year = Year.from(now);
+        final Month month = now.getMonth();
+        final List<Item> items = clientInstance().getLunCalInfo(year, month, null);
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(month);
+                });
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getLunCalInfo(year, executor, collection)")
     @Test
-    void getLunCalInfo_Expected_SolarYear() {
-        final List<Item> items = new ArrayList<>();
-        final Year solarYear = Year.now();
-        clientInstance().getLunCalInfo(solarYear, commonPool(), items);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getSolYear()).isNotNull().isEqualTo(solarYear);
-        });
+    void getLunCalInfo_Expected_Year() {
+        final Year year = Year.now();
+        final List<Item> items = clientInstance().getLunCalInfo(year, commonPool(), new ArrayList<>());
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                });
     }
 }

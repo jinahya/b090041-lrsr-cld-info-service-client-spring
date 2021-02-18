@@ -20,7 +20,8 @@ class LrsrCldInfoServiceClient_getSpcifyLunCalInfo_IT extends LrsrCldInfoService
     @DisplayName("getSpcifyLunCalInfo(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)")
     @Test
     void getSpcifyLunCalInfo_() {
-        final Item item = clientInstance().getLunCalInfo(LocalDate.now().withDayOfMonth(1)).get(0);
+        final LocalDate date = LocalDate.now().withDayOfMonth(1);
+        final Item item = clientInstance().getLunCalInfo(Year.from(date), date.getMonth(), null).get(0);
         final Year solarYear = item.getSolYear();
         final Year fromSolarYear = solarYear.minusYears(10L);
         final Year toSolarYear = solarYear.plusYears(5L);

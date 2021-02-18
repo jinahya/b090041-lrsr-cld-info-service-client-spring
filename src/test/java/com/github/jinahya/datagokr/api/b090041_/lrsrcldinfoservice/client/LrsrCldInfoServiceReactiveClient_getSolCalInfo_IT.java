@@ -16,67 +16,53 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.naturalOrder;
-import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class LrsrCldInfoServiceReactiveClient_getSolCalInfo_IT extends LrsrCldInfoServiceReactiveClientIT {
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunYear, lunMonth, lunDay, pageNo")
+    @DisplayName("getSolCalInfo(lunYear, lunMonth, lunDay")
     @Test
-    void getSolCalInfo_() {
+    void getSolCalInfo_Expected_YearMonthDay() {
         final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
-        final Integer lunDay = current().nextBoolean() ? lunarDate.getDayOfMonth() : null;
-        clientInstance().getSolCalInfo(Year.from(lunarDate), Month.from(lunarDate), lunDay, null)
-                .doOnNext(r -> {
-                    assertThat(r.getBody().getItems()).isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-                        assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-                        assertThat(i.getLunMonth()).isNotNull().isSameAs(Month.from(lunarDate));
-                        if (lunDay != null) {
-                            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
-                        }
-                    });
-                })
-                .block();
-    }
-
-    @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunarYear,lunarMonth,lunarDayOfMonth")
-    @Test
-    void getSolCalInfo_Expected_LunarDate() {
-        final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
-        clientInstance().getSolCalInfo(Year.from(lunarDate), lunarDate.getMonth(), lunarDate.getDayOfMonth())
+        final Year lunYear = Year.from(lunarDate);
+        final Month lunMonth = lunarDate.getMonth();
+        final int lunDay = lunarDate.getDayOfMonth();
+        clientInstance().getSolCalInfo(lunYear, lunMonth, lunDay)
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarDate.getMonth());
-                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
                 })
                 .blockLast();
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunarYearMonth)")
+    @DisplayName("getSolCalInfo(lunYear, lunMonth, null)")
     @Test
-    void getSolCalInfo_Expected_LunarYearMonth() {
-        final YearMonth lunarYearMonth = YearMonth.now();
-        clientInstance().getSolCalInfo(lunarYearMonth)
+    void getSolCalInfo_Expected_YearMonth() {
+        final YearMonth yearMonth = YearMonth.now();
+        final Year lunYear = Year.from(yearMonth);
+        final Month lunMonth = yearMonth.getMonth();
+        clientInstance().getSolCalInfo(lunYear, lunMonth, null)
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
-                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarYearMonth.getMonth());
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunMonth);
                 })
                 .blockLast();
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(year)")
+    @DisplayName("getSolCalInfo(year, parallelism, scheduler)")
     @Test
     void getSolCalInfo_Expected_Year() {
-        final Year lunarYear = Year.now();
+        final Year year = Year.now();
+        final int parallelism = Runtime.getRuntime().availableProcessors();
         final Map<Month, List<Integer>> map
-                = clientInstance().getSolCalInfo(lunarYear, Schedulers.parallel())
+                = clientInstance().getSolCalInfo(year, parallelism, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunarYear);
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(year);
                 })
                 .<Map<Month, List<Integer>>>collect(
                         () -> new EnumMap<>(Month.class),

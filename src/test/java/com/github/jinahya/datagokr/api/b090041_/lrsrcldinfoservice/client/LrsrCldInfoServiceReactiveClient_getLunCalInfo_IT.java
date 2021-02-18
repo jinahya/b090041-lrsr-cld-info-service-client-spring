@@ -23,44 +23,50 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LrsrCldInfoServiceReactiveClient_getLunCalInfo_IT extends LrsrCldInfoServiceReactiveClientIT {
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getLunCalInfo(solarDate)")
+    @DisplayName("getLunCalInfo(year, month, dayOfMonth)")
     @Test
-    void getLunCalInfo_Expected_SolarDate() {
-        final LocalDate solarDate = LocalDate.now();
-        clientInstance().getLunCalInfo(solarDate)
+    void getLunCalInfo_Expected_YearMonthDay() {
+        final LocalDate now = LocalDate.now();
+        final Year year = Year.from(now);
+        final Month month = now.getMonth();
+        final int dayOfMonth = now.getDayOfMonth();
+        clientInstance().getLunCalInfo(year, month, dayOfMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarDate));
-                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarDate.getMonth());
-                    assertThat(i.getSolDay()).isNotNull().isEqualTo(solarDate.getDayOfMonth());
-                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(solarDate.isLeapYear());
-                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(solarDate.getDayOfWeek());
-                    assertThat(i.getSolJd()).isNotNull().isEqualTo(solarDate.getLong(JulianFields.JULIAN_DAY));
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(month);
+                    assertThat(i.getSolDay()).isNotNull().isEqualTo(dayOfMonth);
+                    assertThat(i.getSolLeapyear()).isNotNull().isEqualTo(now.isLeapYear());
+                    assertThat(i.getSolWeek()).isNotNull().isEqualTo(now.getDayOfWeek());
+                    assertThat(i.getSolJd()).isNotNull().isEqualTo(now.getLong(JulianFields.JULIAN_DAY));
                 })
                 .blockLast();
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getLunCalInfo(solarYearMonth)")
+    @DisplayName("getLunCalInfo(year, month, null)")
     @Test
-    void getLunCalInfo_Expected_SolarYearMonth() {
-        final YearMonth solarYearMonth = YearMonth.now();
-        clientInstance().getLunCalInfo(YearMonth.from(solarYearMonth))
+    void getLunCalInfo_Expected_YearMonth() {
+        final YearMonth now = YearMonth.now();
+        final Year year = Year.from(now);
+        final Month month = now.getMonth();
+        clientInstance().getLunCalInfo(year, month, null)
                 .doOnNext(i -> {
-                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYearMonth));
-                    assertThat(i.getSolMonth()).isNotNull().isSameAs(solarYearMonth.getMonth());
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                    assertThat(i.getSolMonth()).isNotNull().isSameAs(month);
                 })
                 .blockLast();
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getLunCalInfo(year)")
+    @DisplayName("getLunCalInfo(year, parallelism, scheduler)")
     @Test
     void getLunCalInfo_Expected_Year() {
-        final Year solarYear = Year.now();
+        final Year year = Year.now();
+        final int parallelism = Runtime.getRuntime().availableProcessors();
         final Map<Month, List<Integer>> lunarMonthsAndDays
-                = clientInstance().getLunCalInfo(solarYear, Schedulers.parallel())
+                = clientInstance().getLunCalInfo(year, parallelism, Schedulers.parallel())
                 .doOnNext(i -> {
-                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(solarYear));
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(Year.from(year));
                 })
                 .<Map<Month, List<Integer>>>collect(
                         () -> new EnumMap<>(Month.class),

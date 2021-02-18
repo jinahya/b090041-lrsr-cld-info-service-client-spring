@@ -20,41 +20,55 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LrsrCldInfoServiceClient_getSolCalInfo_IT extends LrsrCldInfoServiceClientIT {
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunarYear,lunarMonth,lunarDayOfMonth)")
+    @DisplayName("getSolCalInfo(lunYear, lunMonth, lunDay)")
     @Test
-    @SuppressWarnings("java:S5841")
-    void getSolCalInfo_Expected_LunarDate() {
-        final LocalDate lunarDate = LocalDate.now().withDayOfMonth(1);
-        final List<Item> items = clientInstance().getSolCalInfo(
-                Year.from(lunarDate), Month.from(lunarDate), lunarDate.getDayOfMonth());
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarDate));
-            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunarDate.getMonth());
-            assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDate.getDayOfMonth());
-        });
+    void getSolCalInfo_Expected_YearMonthDay() {
+        final LocalDate now = LocalDate.now().withDayOfMonth(1);
+        final Year lunYear = Year.from(now);
+        final Month lunMonth = now.getMonth();
+        final int lunDay = now.getDayOfMonth();
+        final List<Item> items = clientInstance().getSolCalInfo(lunYear, lunMonth, lunDay);
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+                });
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
-    @DisplayName("getSolCalInfo(lunarYearMonth)")
+    @DisplayName("getSolCalInfo(lunYear, lunMonth, null)")
     @Test
-    void getSolCalInfo_Expected_LunarMonth() {
-        final YearMonth lunarYearMonth = YearMonth.now();
-        final List<Item> items = clientInstance().getSolCalInfo(lunarYearMonth);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunYear()).isNotNull().isEqualTo(Year.from(lunarYearMonth));
-            assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunarYearMonth.getMonth());
-        });
+    void getSolCalInfo_Expected_YearMonth() {
+        final YearMonth now = YearMonth.now();
+        final Year lunYear = Year.from(now);
+        final Month lunMonth = now.getMonth();
+        final List<Item> items = clientInstance().getSolCalInfo(lunYear, lunMonth, null);
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(lunYear);
+                    assertThat(i.getLunMonth()).isNotNull().isEqualTo(lunMonth);
+                });
     }
 
     @EnabledIf("#{systemProperties['" + SYSTEM_PROPERTY_SERVICE_KEY + "'] != null}")
     @DisplayName("getSolCalInfo(year, executor, collection)")
     @Test
     void getSolCalInfo_Expected_Year() {
-        final List<Item> items = new ArrayList<>();
-        final Year lunarYear = Year.now();
-        clientInstance().getSolCalInfo(lunarYear, commonPool(), items);
-        assertThat(items).isNotNull().isNotEmpty().doesNotContainNull().allSatisfy(i -> {
-            assertThat(i.getLunYear()).isNotNull().isEqualTo(lunarYear);
-        });
+        final Year year = Year.now();
+        final List<Item> items = clientInstance().getSolCalInfo(year, commonPool(), new ArrayList<>());
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(year);
+                });
     }
 }

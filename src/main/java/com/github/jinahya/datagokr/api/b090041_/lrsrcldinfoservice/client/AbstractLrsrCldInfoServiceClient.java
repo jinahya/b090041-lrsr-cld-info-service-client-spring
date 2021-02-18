@@ -15,7 +15,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -120,6 +119,7 @@ public abstract class AbstractLrsrCldInfoServiceClient {
     public static final String QUERY_PARAM_NAME_PAGE_NO = "pageNo";
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * The formatter for {@code solMonth} and {@code lunMonth}.
      */

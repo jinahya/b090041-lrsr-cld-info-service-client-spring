@@ -19,21 +19,24 @@ class LrsrCldInfoServiceReactiveClient_getSpcifyLunCalInfo_IT extends LrsrCldInf
     @DisplayName("getSpcifyLunCalInfo(fromSolarYear,toSolarYear,lunarMonth,lunarDayOfMonth,lunarLeapMonth)")
     @Test
     void getSpcifyLunCalInfo() {
-        final Item item = clientInstance().getLunCalInfo(LocalDate.now().withDayOfMonth(1)).blockLast();
+        final LocalDate date = LocalDate.now().withDayOfMonth(1);
+        final Item item = clientInstance()
+                .getLunCalInfo(Year.from(date), date.getMonth(), date.getDayOfMonth())
+                .blockLast();
         assertThat(item).isNotNull();
         final LocalDate solarDate = item.getSolarDate();
         final Year solarYear = Year.from(solarDate);
-        final Year fromSolarYear = solarYear.minusYears(10L);
-        final Year toSolarYear = solarYear.plusYears(5L);
-        final Month lunarMonth = item.getLunMonth();
-        final int lunarDayOfMonth = item.getLunDay();
-        final boolean lunarLeapMonth = item.getLunLeapmonth();
+        final Year fromSolYear = solarYear.minusYears(10L);
+        final Year toSolYear = solarYear.plusYears(5L);
+        final Month lunMonth = item.getLunMonth();
+        final int lunDay = item.getLunDay();
+        final boolean leapMonth = item.getLunLeapmonth();
         assertThat(item).isNotNull();
-        clientInstance().getSpcifyLunCalInfo(fromSolarYear, toSolarYear, lunarMonth, lunarDayOfMonth, lunarLeapMonth)
+        clientInstance().getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth)
                 .doOnNext(i -> {
-                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunarMonth);
-                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunarDayOfMonth);
-                    assertThat(i.getLunLeapmonth()).isNotNull().isEqualTo(lunarLeapMonth);
+                    assertThat(i.getLunMonth()).isNotNull().isSameAs(lunMonth);
+                    assertThat(i.getLunDay()).isNotNull().isEqualTo(lunDay);
+                    assertThat(i.getLunLeapmonth()).isNotNull().isEqualTo(leapMonth);
                 })
                 .blockLast();
     }
