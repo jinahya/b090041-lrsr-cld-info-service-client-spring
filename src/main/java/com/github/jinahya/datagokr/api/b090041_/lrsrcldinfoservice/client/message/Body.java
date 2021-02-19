@@ -1,6 +1,5 @@
 package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -73,13 +71,6 @@ public class Body implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(items, numOfRows, pageNo, totalCount);
-    }
-
-    // ------------------------------------------------------------------------------------------------------ pagination
-    @JsonIgnore
-    @XmlTransient
-    public boolean isLastPage() {
-        return numOfRows * pageNo >= totalCount;
     }
 
     // ------------------------------------------------------------------------------------------------- instance fields

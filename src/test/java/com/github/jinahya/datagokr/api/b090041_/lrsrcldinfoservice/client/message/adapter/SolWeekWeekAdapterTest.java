@@ -8,10 +8,10 @@ import java.time.DayOfWeek;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-class SingleKoreanDayOfWeekAdapterTest extends TemporalStringAdapterTest<SingleKoreanDayOfWeekAdapter, DayOfWeek> {
+class SolWeekWeekAdapterTest extends TemporalStringAdapterTest<SolWeekWeekAdapter, DayOfWeek> {
 
-    SingleKoreanDayOfWeekAdapterTest() {
-        super(SingleKoreanDayOfWeekAdapter.class, DayOfWeek.class);
+    SolWeekWeekAdapterTest() {
+        super(SolWeekWeekAdapter.class, DayOfWeek.class);
     }
 
     @Test

@@ -3,10 +3,14 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.messa
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.Format02dIntegerAdapter;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.LeapBooleanAdapter;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.MmMonthAdapter;
-import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.SingleKoreanDayOfWeekAdapter;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.SolWeekDeserializer;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.SolWeekSerializer;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.SolWeekWeekAdapter;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.adapter.UuuuYearAdapter;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +42,6 @@ import java.util.Objects;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 
 /**
  * A class for binding {@code /:response/:body/:item} part.
@@ -236,15 +239,6 @@ public class Item implements Serializable {
     // ----------------------------------------------------------------------------------------------------- solLeapyear
 
     // --------------------------------------------------------------------------------------------------------- solWeek
-    @JsonProperty(value = "solWeek", required = true)
-    @XmlTransient
-    public Integer getSolWeekAsInteger() {
-        return ofNullable(getSolWeek()).map(DayOfWeek::getValue).orElse(null);
-    }
-
-    public void setSolWeekAsInteger(final Integer solWeekAsInteger) {
-        setSolWeek(ofNullable(solWeekAsInteger).map(DayOfWeek::of).orElse(null));
-    }
 
     // ----------------------------------------------------------------------------------------------------------- solJd
 
@@ -285,11 +279,6 @@ public class Item implements Serializable {
         setSolLeapyear(solarDate.isLeapYear());
         setSolWeek(solarDate.getDayOfWeek());
         setSolJd(solarDate.getLong(JulianFields.JULIAN_DAY));
-    }
-
-    Item solarDate(final LocalDate solarDate) {
-        setSolarDate(solarDate);
-        return this;
     }
 
     // ----------------------------------------------------------------------------------------- lunar \ instance fields
@@ -386,9 +375,10 @@ public class Item implements Serializable {
     @XmlElement(required = true)
     private Boolean solLeapyear;
 
-    @JsonIgnore
+    @JsonDeserialize(using = SolWeekDeserializer.class)
+    @JsonSerialize(using = SolWeekSerializer.class)
     @NotNull
-    @XmlJavaTypeAdapter(SingleKoreanDayOfWeekAdapter.class)
+    @XmlJavaTypeAdapter(SolWeekWeekAdapter.class)
     @XmlSchemaType(name = "token")
     @XmlElement(required = true)
     private DayOfWeek solWeek;

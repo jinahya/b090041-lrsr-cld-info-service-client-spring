@@ -2,6 +2,7 @@ package com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client;
 
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Item;
 import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Response;
+import com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.Responses;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -182,7 +183,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         for (int pageNo = 1; ; pageNo++) {
             final Response response = getLunCalInfo(solYear, solMonth, solDay, pageNo);
             result.add(response);
-            if (response.getBody().isLastPage()) {
+            if (Responses.isLastPage(response)) {
                 break;
             }
         }
@@ -283,7 +284,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
         for (int pageNo = 1; ; pageNo++) {
             final Response response = getSolCalInfo(lunYear, lunMonth, lunDay, pageNo);
             responses.add(response);
-            if (response.getBody().isLastPage()) {
+            if (Responses.isLastPage(response)) {
                 break;
             }
         }
@@ -389,7 +390,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
             final Response response = getSpcifyLunCalInfo(
                     fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo);
             responses.add(response);
-            if (response.getBody().isLastPage()) {
+            if (Responses.isLastPage(response)) {
                 break;
             }
         }

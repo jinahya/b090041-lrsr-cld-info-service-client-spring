@@ -142,7 +142,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         final AtomicInteger pageNo = new AtomicInteger();
         return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet())
                 .expand(r -> {
-                    if (r.getBody().isLastPage()) {
+                    if (Responses.isLastPage(r)) {
                         return Mono.empty();
                     }
                     return getLunCalInfo(solYear, solMonth, solDay, pageNo.incrementAndGet());
@@ -231,7 +231,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         final AtomicInteger pageNo = new AtomicInteger();
         return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet())
                 .expand(r -> {
-                    if (r.getBody().isLastPage()) {
+                    if (Responses.isLastPage(r)) {
                         return Mono.empty();
                     }
                     return getSolCalInfo(lunYear, lunMonth, lunDay, pageNo.incrementAndGet());
@@ -328,7 +328,7 @@ public class LrsrCldInfoServiceReactiveClient extends AbstractLrsrCldInfoService
         final AtomicInteger pageNo = new AtomicInteger(0);
         return getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth, pageNo.incrementAndGet())
                 .expand(r -> {
-                    if (r.getBody().isLastPage()) {
+                    if (Responses.isLastPage(r)) {
                         return Mono.empty();
                     }
                     return getSpcifyLunCalInfo(fromSolYear, toSolYear, lunMonth, lunDay, leapMonth,

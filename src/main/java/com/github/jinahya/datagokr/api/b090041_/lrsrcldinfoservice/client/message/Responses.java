@@ -11,8 +11,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Responses {
 
-    // -------------------------------------------------------------------------------------------------- static methods
-
     /**
      * Indicates specified response has a successful result code.
      *
@@ -43,7 +41,12 @@ public final class Responses {
         return response;
     }
 
-    // ---------------------------------------------------------------------------------------------------- constructors
+    public static boolean isLastPage(final Response response) {
+        requireNonNull(response, "response is null");
+        final Body body = response.getBody();
+        return body.getNumOfRows() * body.getPageNo() >= body.getTotalCount();
+    }
+
     private Responses() {
         throw new AssertionError("instantiation is not allowed");
     }
