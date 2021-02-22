@@ -124,7 +124,7 @@ public class LrsrCldInfoServiceClient extends AbstractLrsrCldInfoServiceClient {
     @PostConstruct
     private void onPostConstruct() {
         if (restTemplate == null) {
-            log.warn("no rest template autowired. using default instance...");
+            log.warn("no rest template autowired. using a bare instance...");
             restTemplate = new RestTemplate();
             restTemplateRootUri = AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION;
         }

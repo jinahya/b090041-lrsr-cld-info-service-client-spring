@@ -10,13 +10,18 @@ import javax.xml.bind.Marshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class Response_Xml_Test {
 
-    @MethodSource({"com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest#responses"})
+    private static Stream<Response> responses() {
+        return ResponseResources.responses();
+    }
+
+    @MethodSource({"responses"})
     @ParameterizedTest
     void _Jaxb_(final Response expected) throws JAXBException {
         final JAXBContext context = JAXBContext.newInstance(Response.class);

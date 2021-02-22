@@ -9,17 +9,16 @@ import javax.validation.Validator;
 import java.time.temporal.JulianFields;
 import java.util.stream.Stream;
 
-import static com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest.responses;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class ItemTest {
 
-    static Stream<Item> items() {
-        return responses().flatMap(r -> r.getBody().getItems().stream());
+    private static Stream<Item> items() {
+        return ResponseResources.items();
     }
 
-    public ItemTest() {
+    ItemTest() {
         super();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }

@@ -7,7 +7,7 @@
 
 A client library for accessing http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService.
 
-See [음양력 정보 (data.go.kr)](https://www.data.go.kr/data/15012679/openapi.do).
+See [음양력정보(data.go.kr)](https://www.data.go.kr/data/15012679/openapi.do) and/or [월별음약력(천문연구원)](https://astro.kasi.re.kr/life/pageView/5).
 
 ## Verify
 
@@ -17,25 +17,34 @@ Verify with your own service key assigned by the service provider.
 $ mvn -Pfailsafe -DservcieKey=... clean verify
 ```
 
+You may put your service key on `src/test/resources/failsafe.system.properties`, which is git-ignored, like this,
+```
+serviceKey=...
+```
+and verify like this.
+```shell
+$ mvn -Pfailsafe clean verify
+```
+
 ## Injection points
 
-### Commaon
+### Common
 
 |Qualifier|Type|Notes|
 |---------|----|-----------|
 |`@LrsrCldInfoServiceServiceKey`|`java.lang.String`|Provided by the service provider|
 
-### For `RestTemplate`
+### For `LrsrCldInfoServiceClient` with `RestTemplate`
 
 |Qualifier|Type|Notes|
-|---------|----|-----------|
+|---------|----|-----|
 |`@LrsrCldInfoServiceRestTemplate`|[`RestTemplate`][RestTemplate]||
-|`@LrsrCldInfoServiceRestTemplateRootUri`|`j.l.String`|Optional|
+|`@LrsrCldInfoServiceRestTemplateRootUri`|`String`|Optional|
 
-### For `WebClient`
+### For `LrsrCldInfoServiceReactiveClient` with `WebClient`
 
 |Qualifier|Type|Notes|
-|---------|----|-----------|
+|---------|----|-----|
 |`@LrsrCldInfoServiceWebClient`|[`WebClient`][WebClient]||
 
 ## Usages
@@ -55,13 +64,12 @@ class MyApplication {
 }
 ```
 
-Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded
-value. You should use a URL-decoded value.
+Provide the service key assigned by the service provider. Note that the service provider may give you a URL-encoded value. You should use a URL-decoded value.
 
 ```java
 @AbstractLrsrCldInfoServiceClient.LrsrCldInfoServiceServiceKey
 @Bean
-String lrsrCldInfoServiceServiceKey(){
+public String lrsrCldInfoServiceServiceKey(){
     // The service key assigned by data.go.kr
     // Might be already URL-encoded
     // Use a URL-decoded value    
@@ -70,47 +78,44 @@ String lrsrCldInfoServiceServiceKey(){
 }
 ```
 
-### Using `RestTeamplate`
+### Using `LrsrCldInfoServiceClient` with `RestTemplate`
 
 Provide an instance of `RestTemplate`.
 
 ```java
 @LrsrCldInfoServiceRestTemplate
 @Bean
-RestTemplate lrsrCldInfoServiceRestTemplate() {
+public RestTemplate lrsrCldInfoServiceRestTemplate() {
     return new RestTemplateBuilder()
             ...
             .rootUri(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
             .build();
 }
 ```
 
-Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is internally get autowired with
-the `RestTemplate` instance.
+Get `@Autowired` with an instance of `LrsrCldInfoServiceClient` which is internally got autowired with the `RestTemplate` instance.
 
 ```java
 @Autowired
 private LrsrCldInfoServiceClient client;
 ```
 
-### Using `WebClient`
+### Using `LrsrCldInfoServiceReactiveClient` with `WebClient`
 
 Provide an instance of `WebClient`.
 
 ```java
 @LrsrCldInfoServiceWebClient
 @Bean
-WebClient lrsrCldInfoServiceWebClient() {
+public WebClient lrsrCldInfoServiceWebClient() {
     return WebClient.builder()
             ...
             .baseUrl(AbstractLrsrCldInfoServiceClient.BASE_URL_PRODUCTION)
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
             .build();
 }
 ```
 
-Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally get autowired with the `WebClient` instance.
+Get `@Autowired` with an instance of `LrsrCldInfoServiceReactiveClient` which is internally got autowired with the `WebClient` instance.
 
 ```java
 @Autowired

@@ -50,6 +50,7 @@ class LrsrCldInfoServiceClient_WithNoRestTemplateAutowired_IT
         super(LrsrCldInfoServiceClient.class);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
     void clientInstanceRestTemplate_NonNull_() {
         assertThat(clientInstance().restTemplate()).isNotNull();
@@ -60,6 +61,7 @@ class LrsrCldInfoServiceClient_WithNoRestTemplateAutowired_IT
         assertThat(clientInstance().restTemplateRootUri()).isNotBlank();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
     void getLunCalInfo__Year() {
         final Year year = Year.now();
@@ -72,6 +74,19 @@ class LrsrCldInfoServiceClient_WithNoRestTemplateAutowired_IT
                     assertThat(i.getSolarDate()).isNotNull().satisfies(d -> {
                         assertThat(Year.from(d)).isEqualTo(year);
                     });
+                });
+    }
+
+    @Test
+    void getSolCalInfo__Year() {
+        final Year year = Year.now();
+        final List<Item> items = clientInstance().getSolCalInfo(year, commonPool(), new ArrayList<>());
+        assertThat(items)
+                .isNotNull()
+                .isNotEmpty()
+                .doesNotContainNull()
+                .allSatisfy(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(year);
                 });
     }
 }

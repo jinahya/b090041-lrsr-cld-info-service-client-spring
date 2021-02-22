@@ -49,21 +49,42 @@ class LrsrCldInfoServiceReactiveClient_WithNoWebClientAutowired_IT
         super(LrsrCldInfoServiceReactiveClient.class);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
     void clientInstanceWebClient_NonNull_() {
         assertThat(clientInstance().webClient()).isNotNull();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Invokes {@link LrsrCldInfoServiceReactiveClient#getLunCalInfo(Year, int, Scheduler)} method with current year and
+     * asserts all items' {@code solYear} property equals to specified.
+     */
     @Test
-    void getLunCalInfo__() {
+    void getLunCalInfo_SolarYearEquals_() {
         final Year year = Year.now();
         final int parallelism = getRuntime().availableProcessors();
         final Scheduler scheduler = Schedulers.parallel();
         clientInstance().getLunCalInfo(year, parallelism, scheduler)
                 .doOnNext(i -> {
-                    assertThat(i.getSolarDate()).isNotNull().satisfies(d -> {
-                        assertThat(Year.from(d)).isEqualTo(year);
-                    });
+                    assertThat(i.getSolYear()).isNotNull().isEqualTo(year);
+                })
+                .blockLast();
+    }
+
+    /**
+     * Invokes {@link LrsrCldInfoServiceReactiveClient#getSolCalInfo(Year, int, Scheduler)} method with current year and
+     * asserts all items' {@code lunYear} property equals to specified.
+     */
+    @Test
+    void getSolCalInfo_LunarYearEquals_() {
+        final Year year = Year.now();
+        final int parallelism = getRuntime().availableProcessors();
+        final Scheduler scheduler = Schedulers.parallel();
+        clientInstance().getSolCalInfo(year, parallelism, scheduler)
+                .doOnNext(i -> {
+                    assertThat(i.getLunYear()).isNotNull().isEqualTo(year);
                 })
                 .blockLast();
     }

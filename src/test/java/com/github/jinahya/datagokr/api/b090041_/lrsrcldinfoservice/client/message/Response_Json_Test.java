@@ -8,12 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class Response_Json_Test {
 
-    @MethodSource({"com.github.jinahya.datagokr.api.b090041_.lrsrcldinfoservice.client.message.ResponseTest#responses"})
+    private static Stream<Response> responses() {
+        return ResponseResources.responses();
+    }
+
+    @MethodSource({"responses"})
     @ParameterizedTest
     void _Jackson_(final Response expected) throws Exception {
         // not available in 2.1.18.RELEASE
