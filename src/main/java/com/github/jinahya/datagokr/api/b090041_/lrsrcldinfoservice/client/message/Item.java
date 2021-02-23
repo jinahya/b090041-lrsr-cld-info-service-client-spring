@@ -232,28 +232,40 @@ public class Item implements Serializable {
     // ---------------------------------------------------------------------------------------------------- lunLeapmomth
 
     // -------------------------------------------------------------------------------------------------------- lunSecha
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiYearKore() {
         return ofNullable(getLunSecha()).map(v -> v.substring(0, 2)).orElse(null);
     }
 
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiYearHans() {
         return ofNullable(getLunSecha()).map(v -> v.substring(3, 5)).orElse(null);
     }
 
     // ------------------------------------------------------------------------------------------------------ lunWolgeon
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiMonthKore() {
         return ofNullable(getLunWolgeon()).map(v -> v.substring(0, 2)).orElse(null);
     }
 
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiMonthHans() {
         return ofNullable(getLunWolgeon()).map(v -> v.substring(3, 5)).orElse(null);
     }
 
     // -------------------------------------------------------------------------------------------------------- lunIljin
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiDayKore() {
         return ofNullable(getLunIljin()).map(v -> v.substring(0, 2)).orElse(null);
     }
 
+    @JsonIgnore
+    @XmlTransient
     public String getGanzhiDayHans() {
         return ofNullable(getLunIljin()).map(v -> v.substring(3, 5)).orElse(null);
     }
