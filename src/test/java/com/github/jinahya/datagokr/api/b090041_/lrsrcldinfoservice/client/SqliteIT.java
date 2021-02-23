@@ -31,7 +31,8 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
 
     private static final String TABLE = "calendar";
 
-    private static final YearMonth LOWER = YearMonth.of(1391, Month.FEBRUARY);
+    //    private static final YearMonth LOWER = YearMonth.of(1391, Month.FEBRUARY);
+    private static final YearMonth LOWER = YearMonth.of(1900, Month.FEBRUARY);
 
     private static final YearMonth UPPER = YearMonth.of(2050, Month.DECEMBER);
 
@@ -74,9 +75,14 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
         requireNonNull(connection, "connection is null");
         requireNonNull(item, "item is null");
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO " + TABLE + "(solar_year, solar_month, solar_day_of_month," +
-                "lunar_year, lunar_month, lunar_leap_month, lunar_day_of_month) VALUES (" +
-                "?, ?, ?, ?, ?, ?, ?)")) {
+                "INSERT INTO " + TABLE + "(solar_year, solar_month, solar_day_of_month"
+                + ", lunar_year, lunar_month, lunar_leap_month, lunar_day_of_month"
+                + ", ganzhi_year_kore, ganzhi_year_hans, ganzhi_month_kore, ganzhi_month_hans"
+                + ", ganzhi_day_kore, ganzhi_day_hans"
+                + ") VALUES ("
+                + "?, ?, ?"
+                + ", ?, ?, ?, ?"
+                + ", ?, ?, ?, ?, ?, ?)")) {
             int index = 0;
             statement.setInt(++index, item.getSolYear().getValue());
             statement.setInt(++index, item.getSolMonth().getValue());
@@ -85,6 +91,12 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
             statement.setInt(++index, item.getLunMonth().getValue());
             statement.setInt(++index, item.getLunLeapmonth() ? 1 : 0);
             statement.setInt(++index, item.getLunDay());
+            statement.setString(++index, item.getGanzhiYearKore());
+            statement.setString(++index, item.getGanzhiYearHans());
+            statement.setString(++index, item.getGanzhiMonthKore());
+            statement.setString(++index, item.getGanzhiMonthHans());
+            statement.setString(++index, item.getGanzhiDayKore());
+            statement.setString(++index, item.getGanzhiDayHans());
             return statement.executeUpdate();
         }
     }
@@ -98,9 +110,9 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
                     + " FROM " + TABLE
                     + " WHERE solar_year = ? AND solar_month = ? AND solar_day_of_month = ?")) {
                 int index = 0;
-                statement.setInt(1, solarYear);
-                statement.setInt(2, solarMonth);
-                statement.setInt(3, solarDayOfMonth);
+                statement.setInt(++index, solarYear);
+                statement.setInt(++index, solarMonth);
+                statement.setInt(++index, solarDayOfMonth);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return function.apply(resultSet);
                 }
@@ -174,9 +186,9 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
                 connection.setAutoCommit(false);
                 try {
                     for (final Item item : items) {
-                        final int inserted;
                         try {
-                            inserted = insertItem(connection, item);
+                            final int inserted = insertItem(connection, item);
+                            assertThat(inserted).isEqualTo(1);
                         } catch (final SQLException sqle) {
                             log.error("failed to update for " + item);
                             if (existsBySolar(item)) {
@@ -189,7 +201,6 @@ class SqliteIT extends LrsrCldInfoServiceClientIT {
                             }
                             throw sqle;
                         }
-                        assertThat(inserted).isEqualTo(1);
                     }
                     connection.commit();
                 } catch (final SQLException sqle) {

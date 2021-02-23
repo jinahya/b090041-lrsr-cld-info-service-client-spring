@@ -42,6 +42,7 @@ import java.util.Objects;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 /**
  * A class for binding {@code /:response/:body/:item} part.
@@ -230,7 +231,36 @@ public class Item implements Serializable {
 
     // ---------------------------------------------------------------------------------------------------- lunLeapmomth
 
+    // -------------------------------------------------------------------------------------------------------- lunSecha
+    public String getGanzhiYearKore() {
+        return ofNullable(getLunSecha()).map(v -> v.substring(0, 2)).orElse(null);
+    }
+
+    public String getGanzhiYearHans() {
+        return ofNullable(getLunSecha()).map(v -> v.substring(3, 5)).orElse(null);
+    }
+
+    // ------------------------------------------------------------------------------------------------------ lunWolgeon
+    public String getGanzhiMonthKore() {
+        return ofNullable(getLunWolgeon()).map(v -> v.substring(0, 2)).orElse(null);
+    }
+
+    public String getGanzhiMonthHans() {
+        return ofNullable(getLunWolgeon()).map(v -> v.substring(3, 5)).orElse(null);
+    }
+
+    // -------------------------------------------------------------------------------------------------------- lunIljin
+    public String getGanzhiDayKore() {
+        return ofNullable(getLunIljin()).map(v -> v.substring(0, 2)).orElse(null);
+    }
+
+    public String getGanzhiDayHans() {
+        return ofNullable(getLunIljin()).map(v -> v.substring(3, 5)).orElse(null);
+    }
+
     // --------------------------------------------------------------------------------------------------------- solYear
+
+    // --------------------------------------------------------------------------------------------------------- lunNDay
 
     // -------------------------------------------------------------------------------------------------------- solMonth
 

@@ -37,5 +37,53 @@ class ItemTest {
                 .isEqualTo(item.getSolarDate().getLong(JulianFields.JULIAN_DAY));
     }
 
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfYearKore_Valid_(final Item item) {
+        log.debug("ganzhiYearKore: {}", item.getGanzhiYearKore());
+        assertThat(item.getGanzhiYearKore()).isNotBlank().hasSize(2);
+    }
+
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfYearHans_Valid_(final Item item) {
+        log.debug("ganzhiYearHans: {}", item.getGanzhiYearHans());
+        assertThat(item.getGanzhiYearHans()).isNotBlank().hasSize(2);
+    }
+
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfMonthKore_Valid_(final Item item) {
+        final String ganzhiOfMonthKore = item.getGanzhiMonthKore();
+        log.debug("ganzhiMonthKore: {}", ganzhiOfMonthKore);
+        if (ganzhiOfMonthKore != null) {
+            assertThat(item.getGanzhiMonthKore()).hasSize(2);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfMonthHans_Valid_(final Item item) {
+        final String ganzhiMonthHans = item.getGanzhiMonthHans();
+        log.debug("ganzhiMonthHans: {}", ganzhiMonthHans);
+        if (ganzhiMonthHans != null) {
+            assertThat(item.getGanzhiMonthHans()).hasSize(2);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfDayOfMonthKore_Valid_(final Item item) {
+        log.debug("ganzhiDayKore: {}", item.getGanzhiDayKore());
+        assertThat(item.getGanzhiDayKore()).isNotBlank().hasSize(2);
+    }
+
+    @ParameterizedTest
+    @MethodSource({"items"})
+    void getGanzhiOfDayOfMonthHans_Valid_(final Item item) {
+        log.debug("ganzhiDayHans: {}", item.getGanzhiDayHans());
+        assertThat(item.getGanzhiDayHans()).isNotBlank().hasSize(2);
+    }
+
     private final Validator validator;
 }
